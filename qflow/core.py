@@ -48,3 +48,42 @@ class Graph:
     
     def get_dict_of_values(self, dictionary):
         return {key : self.nodes[value].value for key, value in dictionary.items()}
+
+    def evaluate_node(self, target):
+        # Check if it already has a value
+        node = self.nodes[target]
+        if node.has_value:
+            return
+        # If not, evaluate all arguments
+        list_of_threads = []
+        for argument in node.arguments:
+            list_of_threads.append(threading.Thread(target = self.evaluate_node, args = (argument,)))
+        for _, value in node.keyword_arguments.items():
+            list_of_threads.append(threading.Thread(target = self.evaluate_node, args = (value,)))
+        for t in list_of_threads:
+            t.start()
+        for t in list_of_threads:
+            t.join()
+
+        # Declare that the evaluation is going to start, wait if blocked
+        node.mutex.acquire()
+        # But check if it has already been computed in the meantime
+        if node.has_value:
+            node.mutex.release()
+            return
+        # Actual computation happens here
+        res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_dict_of_values(node.keyword_arguments))
+        # Save results and release
+        node.value = res
+        node.has_value = True
+        node.mutex.release()
+        return
+
+    def execute_to_targets(self, *targets):
+        list_of_threads = []
+        for target in targets:
+            list_of_threads.append(threading.Thread(target = self.evaluate_node, args = (target,)))
+        for t in list_of_threads:
+            t.start()
+        for t in list_of_threads:
+            t.join()
