@@ -11,5 +11,24 @@ class Node:
         else:
             self.is_placeholder = False
         self.mutex = threading.Lock()
-        self.is_computed = False
+        self.has_value = False
         self.value = None
+
+class Graph:
+    def __init__(self):
+        self.nodes = {}
+
+    def add_node(self, node):
+        self.nodes.update({node.name: node})
+
+    def clear_values(self):
+        for key in self.nodes.keys():
+            self.nodes[key].has_value = False
+
+    def set_internal_state(self, dictionary):
+        for key, value in dictionary.items():
+            self.nodes[key].has_value = True
+            self.nodes[key].value = value
+
+    def get_internal_state(self):
+        return {key : self.nodes[key].value for key, value in self.nodes.items() if self.nodes[key].has_value}
