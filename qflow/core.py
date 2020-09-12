@@ -11,6 +11,7 @@ class Node:
             self.is_placeholder = True
         else:
             self.is_placeholder = False
+        self.is_operation = False
         self.mutex = threading.Lock()
         self.has_value = False
         self.value = None
@@ -41,6 +42,10 @@ class Graph:
         # Here the actual insertion happens
         node = Node(name, func, *args, **kwargs)
         self.nodes.update({name: node})
+
+        # Mark as operation what is used as such
+        if func is not None:
+            self.nodes[func].is_operation = True
 
     def clear_values(self):
         for key in self.nodes.keys():
