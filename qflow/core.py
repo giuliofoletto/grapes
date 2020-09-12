@@ -39,3 +39,12 @@ class Graph:
 
     def get_internal_state(self):
         return {key : self.nodes[key].value for key, value in self.nodes.items() if self.nodes[key].has_value}
+
+    def get_list_of_values(self, list_of_keys):
+        res = []
+        for key in list_of_keys:
+            res.append(self.nodes[key].value)
+        return res
+    
+    def get_dict_of_values(self, dictionary):
+        return {key : self.nodes[value].value for key, value in dictionary.items()}
