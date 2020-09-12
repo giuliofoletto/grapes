@@ -1,4 +1,5 @@
 import threading
+import graphviz
 
 class Node:
     def __init__(self, name, func = None, *args, **kwargs):
@@ -99,3 +100,16 @@ class Graph:
             t.start()
         for t in list_of_threads:
             t.join()
+
+    def get_graphviz_digraph(self, directory = "visualizations"):
+        g = graphviz.Digraph(directory = directory)
+        for name, node in self.nodes.items():
+            g.node(name)
+        for name, node in self.nodes.items():
+            if node.func is not None:
+                g.edge(node.func, name, arrowhead = "dot")
+            for argument in node.arguments:
+                g.edge(argument, name)
+            for argument in list(node.keyword_arguments.values()):
+                g.edge(argument, name)
+        return g

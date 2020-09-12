@@ -37,6 +37,14 @@ def test_diamond():
     res = qflow.execute_graph_from_context(g, {"a":1, "op_b": lambda x: 2*x, "op_c": lambda x: 2*x, "op_d": lambda x: 2*x, "op_e": lambda x,y : x-y}, "e")
     assert res["e"] == 0
 
+def test_graphviz():
+    g = qflow.Graph()
+    g.add_node("e", "op_e", "a", "b")
+    g.add_node("f", "op_f", "c", "d")
+    g.add_node("g", "op_g", "e", "f")
+    gv = g.get_graphviz_digraph()
+    gv.view()
+
 if __name__ == "__main__":
     test_simple()
     test_simplified_input()

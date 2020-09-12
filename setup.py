@@ -7,5 +7,7 @@ setup(name='qflow',
       author_email='giulio.foletto@outlook.com',
       license='MIT',
       packages=['qflow'],
-      install_requires=[],
+      install_requires=[
+          'graphviz'
+      ],
       zip_safe=False)
