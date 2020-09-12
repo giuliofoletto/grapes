@@ -25,21 +25,22 @@ class Graph:
         self.nodes[key].value = value
         self.nodes[key].has_value = True
 
-    def add_node(self, node):
+    def add_node(self, name, func = None, *args, **kwargs):
         # We simplify insertion by taking care of undefined dependencies as placeholders
         dependencies = []
-        if node.func is not None:
-            dependencies.append(node.func)
-        if len(node.arguments) > 0:
-            dependencies.extend(list(node.arguments))
-        if len(node.keyword_arguments) > 0:
-            dependencies.extend(list(node.keyword_arguments.values()))
-        for name in dependencies:
-            if name not in self.nodes:
-                self.add_node(Node(name))
+        if func is not None:
+            dependencies.append(func)
+        if len(args) > 0:
+            dependencies.extend(args)
+        if len(kwargs) > 0:
+            dependencies.extend(list(kwargs.values()))
+        for name2 in dependencies:
+            if name2 not in self.nodes:
+                self.add_node(name2)
 
         # Here the actual insertion happens
-        self.nodes.update({node.name: node})
+        node = Node(name, func, *args, **kwargs)
+        self.nodes.update({name: node})
 
     def clear_values(self):
         for key in self.nodes.keys():
