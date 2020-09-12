@@ -16,7 +16,8 @@ class Node:
         self.value = None
 
 class Graph:
-    def __init__(self):
+    def __init__(self, name = "Graph"):
+        self.name = name
         self.nodes = {}
 
     def __getitem__(self, key):
@@ -102,7 +103,7 @@ class Graph:
             t.join()
 
     def get_graphviz_digraph(self, directory = "visualizations"):
-        g = graphviz.Digraph(directory = directory)
+        g = graphviz.Digraph(self.name, directory = directory)
         for name, node in self.nodes.items():
             g.node(name)
         for name, node in self.nodes.items():
