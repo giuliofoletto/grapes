@@ -30,13 +30,11 @@ class Graph:
         dependencies = []
         if func is not None:
             dependencies.append(func)
-        if len(args) > 0:
-            dependencies.extend(args)
-        if len(kwargs) > 0:
-            dependencies.extend(list(kwargs.values()))
-        for name2 in dependencies:
-            if name2 not in self.nodes:
-                self.add_node(name2)
+        dependencies.extend(args)
+        dependencies.extend(list(kwargs.values()))
+        for dependency_name in dependencies:
+            if dependency_name not in self.nodes:
+                self.add_node(dependency_name)
 
         # Here the actual insertion happens
         node = Node(name, func, *args, **kwargs)
