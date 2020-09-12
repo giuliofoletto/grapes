@@ -110,7 +110,14 @@ class Graph:
     def get_graphviz_digraph(self, directory = "visualizations"):
         g = graphviz.Digraph(self.name, directory = directory)
         for name, node in self.nodes.items():
-            g.node(name)
+            attributes = {}
+            if node.is_operation:
+                attributes.update({"shape": "ellipse"})
+            else:
+                attributes.update({"shape": "box"})
+            if node.has_value:
+                attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})    
+            g.node(name, **attributes)
         for name, node in self.nodes.items():
             if node.func is not None:
                 g.edge(node.func, name, arrowhead = "dot")
