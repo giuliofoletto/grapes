@@ -77,8 +77,10 @@ class Graph:
         conditional = SimpleConditional(name, condition, value_true, value_false)
         self.nodes.update({name: conditional})
 
-    def clear_values(self):
-        for key in self.nodes.keys():
+    def clear_values(self, keep_operations = False):
+        for key, node in self.nodes.items():
+            if keep_operations and node.is_operation:
+                continue
             self.nodes[key].has_value = False
 
     def set_internal_state(self, dictionary):
