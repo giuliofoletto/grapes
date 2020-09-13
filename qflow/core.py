@@ -86,8 +86,11 @@ class Graph:
             self.nodes[key].has_value = True
             self.nodes[key].value = value
 
-    def get_internal_state(self):
-        return {key : self.nodes[key].value for key, value in self.nodes.items() if self.nodes[key].has_value}
+    def get_internal_state(self, only_data = False):
+        if only_data:
+            return {key : self.nodes[key].value for key, value in self.nodes.items() if (self.nodes[key].has_value and not self.nodes[key].is_operation)}
+        else:
+            return {key : self.nodes[key].value for key, value in self.nodes.items() if self.nodes[key].has_value}
 
     def get_list_of_values(self, list_of_keys):
         res = []
