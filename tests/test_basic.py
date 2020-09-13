@@ -3,13 +3,13 @@ import qflow
 
 def test_simple():
     g = qflow.Graph()
-    g.add_node("a")
-    g.add_node("b")
-    g.add_node("c")
-    g.add_node("d")
-    g.add_node("op_e")
-    g.add_node("op_f")
-    g.add_node("op_g")
+    g.add_placeholder("a")
+    g.add_placeholder("b")
+    g.add_placeholder("c")
+    g.add_placeholder("d")
+    g.add_placeholder("op_e")
+    g.add_placeholder("op_f")
+    g.add_placeholder("op_g")
     g.add_node("e", "op_e", "a", "b")
     g.add_node("f", "op_f", "c", "d")
     g.add_node("g", "op_g", "e", "f")
@@ -28,7 +28,7 @@ def test_simplified_input():
 
 def test_diamond():
     g = qflow.Graph()
-    g.add_node(("a"))
+    g.add_placeholder("a")
     g.add_node("b", "op_b", "a")
     g.add_node("c", "op_c", "b")
     g.add_node("d", "op_d", "b")

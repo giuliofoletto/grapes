@@ -9,15 +9,20 @@ class GenericNode:
         self.value = None
         self.is_operation = False
         self.has_dependencies = False
+        self.dependencies = []
+
+class Placeholder(GenericNode):
+    def __init__(self, name):
+        super().__init__(name)
 
 class Node(GenericNode):
-    def __init__(self, name, func = None, *args, **kwargs):
+    def __init__(self, name, func, *args, **kwargs):
         super().__init__(name)
         self.func = func
         self.arguments = args
         self.keyword_arguments = kwargs
-        if self.func is not None and (len(self.arguments) > 0 or len(self.keyword_arguments) > 0):
-            self.has_dependencies = True        
+        self.has_dependencies = True
+        self.dependencies = [self.func] + list(self.arguments) + list(self.keyword_arguments.values())
 
 class Graph:
     def __init__(self, name = "Graph"):
@@ -31,6 +36,10 @@ class Graph:
         self.nodes[key].value = value
         self.nodes[key].has_value = True
 
+    def add_placeholder(self, name):
+        placeholder = Placeholder(name)
+        self.nodes.update({name: placeholder})
+
     def add_node(self, name, func = None, *args, **kwargs):
         # We simplify insertion by taking care of undefined dependencies as placeholders
         dependencies = []
@@ -40,7 +49,7 @@ class Graph:
         dependencies.extend(list(kwargs.values()))
         for dependency_name in dependencies:
             if dependency_name not in self.nodes:
-                self.add_node(dependency_name)
+                self.add_placeholder(dependency_name)
 
         # Here the actual insertion happens
         node = Node(name, func, *args, **kwargs)
@@ -81,10 +90,8 @@ class Graph:
             return node.value
         # If not, evaluate all arguments
         list_of_threads = []
-        for argument in node.arguments:
-            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (argument,)))
-        for _, value in node.keyword_arguments.items():
-            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (value,)))
+        for dependency_name in node.dependencies:
+            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (dependency_name,)))
         for t in list_of_threads:
             t.start()
         for t in list_of_threads:
@@ -130,10 +137,11 @@ class Graph:
                 attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})    
             g.node(name, **attributes)
         for name, node in self.nodes.items():
-            if node.func is not None and not hide_operations:
-                g.edge(node.func, name, arrowhead = "dot")
-            for argument in node.arguments:
-                g.edge(argument, name)
-            for argument in list(node.keyword_arguments.values()):
-                g.edge(argument, name)
+            special_dependencies = []
+            if isinstance(node, Node):
+                if not hide_operations:
+                    g.edge(node.func, name, arrowhead = "dot")
+                special_dependencies.append(node.func)
+            for dependency_name in [x for x in node.dependencies if x not in special_dependencies]:
+                g.edge(dependency_name, name)
         return g
