@@ -107,8 +107,10 @@ class Graph:
         for t in list_of_threads:
             t.join()
 
-    def get_graphviz_digraph(self, directory = "visualizations"):
-        g = graphviz.Digraph(self.name, directory = directory)
+    def get_graphviz_digraph(self, name = None, directory = "visualizations"):
+        if name is None:
+            name = self.name
+        g = graphviz.Digraph(name = name, directory = directory)
         for name, node in self.nodes.items():
             attributes = {}
             if node.is_operation:
