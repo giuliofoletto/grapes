@@ -54,9 +54,18 @@ def test_graphviz_with_values():
     gv = g.get_graphviz_digraph()
     gv.view()
 
+def test_graphviz_attrs():
+    g = qflow.Graph(name = "graph2")
+    g.add_node("e", "op_e", "a", "b")
+    g.add_node("f", "op_f", "c", "d")
+    g.add_node("g", "op_g", "e", "f")
+    gv = g.get_graphviz_digraph(rankdir = "LR")
+    gv.view()
+
 if __name__ == "__main__":
     test_simple()
     test_simplified_input()
     test_diamond()
     test_graphviz()
     test_graphviz_with_values()
+    test_graphviz_attrs()
