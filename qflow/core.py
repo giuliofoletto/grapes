@@ -68,17 +68,20 @@ class Graph:
     def get_dict_of_values(self, dictionary):
         return {key : self.nodes[value].value for key, value in dictionary.items()}
 
-    def evaluate_node(self, target):
-        # Check if it already has a value
+    def evaluate_target(self, target):
         node = self.nodes[target]
+        return self.evaluate_node(node)
+
+    def evaluate_node(self, node):
+        # Check if it already has a value
         if node.has_value:
             return
         # If not, evaluate all arguments
         list_of_threads = []
         for argument in node.arguments:
-            list_of_threads.append(threading.Thread(target = self.evaluate_node, args = (argument,)))
+            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (argument,)))
         for _, value in node.keyword_arguments.items():
-            list_of_threads.append(threading.Thread(target = self.evaluate_node, args = (value,)))
+            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (value,)))
         for t in list_of_threads:
             t.start()
         for t in list_of_threads:
@@ -101,7 +104,7 @@ class Graph:
     def execute_to_targets(self, *targets):
         list_of_threads = []
         for target in targets:
-            list_of_threads.append(threading.Thread(target = self.evaluate_node, args = (target,)))
+            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (target,)))
         for t in list_of_threads:
             t.start()
         for t in list_of_threads:
