@@ -1,0 +1,18 @@
+(dp0
+Vsimple
+p1
+Vdigraph simple {\u000a	op_e [shape=ellipse]\u000a	a [shape=box]\u000a	b [shape=box]\u000a	e [shape=box]\u000a	op_f [shape=ellipse]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [shape=box]\u000a	op_g [shape=ellipse]\u000a	g [shape=box]\u000a	op_e -> e [arrowhead=dot]\u000a	a -> e\u000a	b -> e\u000a	op_f -> f [arrowhead=dot]\u000a	c -> f\u000a	d -> f\u000a	op_g -> g [arrowhead=dot]\u000a	e -> g\u000a	f -> g\u000a}
+p2
+sVwith_values
+p3
+Vdigraph with_values {\u000a	op_e [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	a [fillcolor=darkolivegreen1 shape=box style=filled]\u000a	b [fillcolor=darkolivegreen1 shape=box style=filled]\u000a	e [shape=box]\u000a	op_f [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [fillcolor=darkolivegreen1 shape=box style=filled]\u000a	op_g [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	g [shape=box]\u000a	op_e -> e [arrowhead=dot]\u000a	a -> e\u000a	b -> e\u000a	op_f -> f [arrowhead=dot]\u000a	c -> f\u000a	d -> f\u000a	op_g -> g [arrowhead=dot]\u000a	e -> g\u000a	f -> g\u000a}
+p4
+sVattrs
+p5
+Vdigraph attrs {\u000a	rankdir=LR\u000a	op_e [shape=ellipse]\u000a	a [shape=box]\u000a	b [shape=box]\u000a	e [shape=box]\u000a	op_f [shape=ellipse]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [shape=box]\u000a	op_g [shape=ellipse]\u000a	g [shape=box]\u000a	op_e -> e [arrowhead=dot]\u000a	a -> e\u000a	b -> e\u000a	op_f -> f [arrowhead=dot]\u000a	c -> f\u000a	d -> f\u000a	op_g -> g [arrowhead=dot]\u000a	e -> g\u000a	f -> g\u000a}
+p6
+sVno_operations
+p7
+Vdigraph no_operations {\u000a	a [shape=box]\u000a	b [shape=box]\u000a	e [shape=box]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [shape=box]\u000a	g [shape=box]\u000a	a -> e\u000a	b -> e\u000a	c -> f\u000a	d -> f\u000a	e -> g\u000a	f -> g\u000a}
+p8
+s.

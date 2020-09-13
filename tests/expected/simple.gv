@@ -1,0 +1,21 @@
+digraph simple {
+	op_e [shape=ellipse]
+	a [shape=box]
+	b [shape=box]
+	e [shape=box]
+	op_f [shape=ellipse]
+	c [shape=box]
+	d [shape=box]
+	f [shape=box]
+	op_g [shape=ellipse]
+	g [shape=box]
+	op_e -> e [arrowhead=dot]
+	a -> e
+	b -> e
+	op_f -> f [arrowhead=dot]
+	c -> f
+	d -> f
+	op_g -> g [arrowhead=dot]
+	e -> g
+	f -> g
+}

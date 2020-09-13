@@ -1,44 +1,56 @@
 import pytest
 import qflow
+import filecmp
+import pickle
 
-def test_graphviz():
+output_directory = "tests/visualizations"
+expected_directory = "tests/expected"
+
+@pytest.fixture(scope="module")
+def expected_sources():
+    with open(expected_directory + "/expected.pkl", "rb") as f:
+        expected = pickle.load(f)
+    yield expected
+    with open(expected_directory + "/expected.pkl", "wb") as f:
+        pickle.dump(expected, f, 0)
+
+def build_graph():
     g = qflow.Graph()
     g.add_node("e", "op_e", "a", "b")
     g.add_node("f", "op_f", "c", "d")
     g.add_node("g", "op_g", "e", "f")
-    gv = g.get_graphviz_digraph(name = "test_graphviz")
-    gv.render()
-    gv.save()
+    return g
 
-def test_graphviz_with_values():
-    g = qflow.Graph()
-    g.add_node("e", "op_e", "a", "b")
-    g.add_node("f", "op_f", "c", "d")
-    g.add_node("g", "op_g", "e", "f")
+def test_simple(expected_sources):
+    g = build_graph()
+    name = "simple"
+    gv = g.get_graphviz_digraph(name = name)
+    assert gv.source == expected_sources[name]
+
+def test_with_values(expected_sources):
+    g = build_graph()
     g.set_internal_state({"a":1, "b": 2, "f": 12, "op_e": lambda x,y : x+y, "op_f": lambda x,y : x*y, "op_g": lambda x,y : x-y})
-    gv = g.get_graphviz_digraph(name = "test_graphviz_with_values")
-    gv.render()
-    gv.save()
+    name = "with_values"
+    gv = g.get_graphviz_digraph(name = name)
+    assert gv.source == expected_sources[name]
 
-def test_graphviz_attrs():
-    g = qflow.Graph()
-    g.add_node("e", "op_e", "a", "b")
-    g.add_node("f", "op_f", "c", "d")
-    g.add_node("g", "op_g", "e", "f")
-    gv = g.get_graphviz_digraph(name = "test_graphviz_attrs", rankdir = "LR")
-    gv.render()
-    gv.save()
+def test_attrs(expected_sources):
+    g = build_graph()
+    name = "attrs"
+    gv = g.get_graphviz_digraph(name = name, rankdir = "LR")
+    assert gv.source == expected_sources[name]
 
-def test_graphviz_no_operations():
-    g = qflow.Graph()
-    g.add_node("e", "op_e", "a", "b")
-    g.add_node("f", "op_f", "c", "d")
-    g.add_node("g", "op_g", "e", "f")
-    gv = g.get_graphviz_digraph(name = "test_graphviz_no_operations", hide_operations = True)
-    gv.render()
-    gv.save()
+def test_no_operations(expected_sources):
+    g = build_graph()
+    name = "no_operations"
+    gv = g.get_graphviz_digraph(name = name, hide_operations = True)
+    assert gv.source == expected_sources[name]
 
-if __name__ == "__main__":
-    test_graphviz()
-    test_graphviz_with_values()
-    test_graphviz_attrs()
+def test_save_and_render(expected_sources):
+    g = build_graph()
+    name = "simple"
+    gv = g.get_graphviz_digraph(name = name)
+    gv.save(directory = output_directory)
+    assert filecmp.cmp(output_directory + "/" + name + ".gv", expected_directory + "/" + name + ".gv")
+    gv.render(directory = output_directory)
+    assert filecmp.cmp(output_directory + "/" + name + ".gv.pdf", expected_directory + "/" + name + ".gv.pdf")
