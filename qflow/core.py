@@ -107,14 +107,16 @@ class Graph:
         for t in list_of_threads:
             t.join()
 
-    def get_graphviz_digraph(self, name = None, directory = "visualizations", **attrs):
+    def get_graphviz_digraph(self, name = None, directory = "visualizations", hide_operations = False, **attrs):
         if name is None:
             name = self.name
         g = graphviz.Digraph(name = name, directory = directory)
         g.attr(**attrs)
         for name, node in self.nodes.items():
             attributes = {}
-            if node.is_operation:
+            if node.is_operation and hide_operations:
+                continue
+            elif node.is_operation:
                 attributes.update({"shape": "ellipse"})
             else:
                 attributes.update({"shape": "box"})
@@ -122,7 +124,7 @@ class Graph:
                 attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})    
             g.node(name, **attributes)
         for name, node in self.nodes.items():
-            if node.func is not None:
+            if node.func is not None and not hide_operations:
                 g.edge(node.func, name, arrowhead = "dot")
             for argument in node.arguments:
                 g.edge(argument, name)
