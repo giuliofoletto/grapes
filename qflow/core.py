@@ -1,20 +1,23 @@
 import threading
 import graphviz
 
-class Node:
-    def __init__(self, name, func = None, *args, **kwargs):
+class GenericNode:
+    def __init__(self, name):
         self.name = name
-        self.func = func
-        self.arguments = args
-        self.keyword_arguments = kwargs
-        if self.func == None:
-            self.is_placeholder = True
-        else:
-            self.is_placeholder = False
-        self.is_operation = False
         self.mutex = threading.Lock()
         self.has_value = False
         self.value = None
+        self.is_operation = False
+        self.has_dependencies = False
+
+class Node(GenericNode):
+    def __init__(self, name, func = None, *args, **kwargs):
+        super().__init__(name)
+        self.func = func
+        self.arguments = args
+        self.keyword_arguments = kwargs
+        if self.func is not None and (len(self.arguments) > 0 or len(self.keyword_arguments) > 0):
+            self.has_dependencies = True        
 
 class Graph:
     def __init__(self, name = "Graph"):
