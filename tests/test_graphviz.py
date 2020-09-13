@@ -54,3 +54,10 @@ def test_save_and_render(expected_sources):
     assert filecmp.cmp(output_directory + "/" + name + ".gv", expected_directory + "/" + name + ".gv")
     gv.render(directory = output_directory)
     assert filecmp.cmp(output_directory + "/" + name + ".gv.pdf", expected_directory + "/" + name + ".gv.pdf")
+
+def test_conditional(expected_sources):
+    g = qflow.Graph()
+    g.add_simple_conditional("d", "c", "a", "b")
+    name = "conditional"
+    gv = g.get_graphviz_digraph(name = name)
+    assert gv.source == expected_sources[name]

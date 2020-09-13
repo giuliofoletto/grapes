@@ -36,3 +36,9 @@ def test_diamond():
 
     res = qflow.execute_graph_from_context(g, {"a":1, "op_b": lambda x: 2*x, "op_c": lambda x: 2*x, "op_d": lambda x: 2*x, "op_e": lambda x,y : x-y}, "e")
     assert res["e"] == 0
+
+def test_conditional():
+    g = qflow.Graph()
+    g.add_simple_conditional("d", "c", "a", "b")
+    res = qflow.execute_graph_from_context(g, {"a":1, "b": 2, "c": True}, "d")
+    assert res["d"] == res["a"]

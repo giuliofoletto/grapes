@@ -15,4 +15,8 @@ sVno_operations
 p7
 Vdigraph no_operations {\u000a	a [shape=box]\u000a	b [shape=box]\u000a	e [shape=box]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [shape=box]\u000a	g [shape=box]\u000a	a -> e\u000a	b -> e\u000a	c -> f\u000a	d -> f\u000a	e -> g\u000a	f -> g\u000a}
 p8
+sVconditional
+p9
+Vdigraph conditional {\u000a	c [shape=box]\u000a	a [shape=box]\u000a	b [shape=box]\u000a	d [shape=diamond]\u000a	c -> d [arrowhead=diamond]\u000a	a -> d\u000a	b -> d\u000a}
+p10
 s.
