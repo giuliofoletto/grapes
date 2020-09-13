@@ -75,7 +75,7 @@ class Graph:
     def evaluate_node(self, node):
         # Check if it already has a value
         if node.has_value:
-            return
+            return node.value
         # If not, evaluate all arguments
         list_of_threads = []
         for argument in node.arguments:
@@ -92,14 +92,14 @@ class Graph:
         # But check if it has already been computed in the meantime
         if node.has_value:
             node.mutex.release()
-            return
+            return node.value
         # Actual computation happens here
         res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_dict_of_values(node.keyword_arguments))
         # Save results and release
         node.value = res
         node.has_value = True
         node.mutex.release()
-        return
+        return node.value
 
     def execute_to_targets(self, *targets):
         list_of_threads = []
