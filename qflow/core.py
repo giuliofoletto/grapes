@@ -1,10 +1,8 @@
-import threading
 import graphviz
 
 class GenericNode:
     def __init__(self, name):
         self.name = name
-        self.mutex = threading.Lock()
         self.has_value = False
         self.value = None
         self.is_operation = False
@@ -112,26 +110,14 @@ class Graph:
         if node.has_value:
             return node.value
         # If not, evaluate all arguments
-        list_of_threads = []
         for dependency_name in node.dependencies:
-            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (dependency_name,)))
-        for t in list_of_threads:
-            t.start()
-        for t in list_of_threads:
-            t.join()
+            self.evaluate_target(dependency_name)
 
-        # Declare that the evaluation is going to start, wait if blocked
-        node.mutex.acquire()
-        # But check if it has already been computed in the meantime
-        if node.has_value:
-            node.mutex.release()
-            return node.value
         # Actual computation happens here
         res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_dict_of_values(node.keyword_arguments))
         # Save results and release
         node.value = res
         node.has_value = True
-        node.mutex.release()
         return node.value
 
     def evaluate_conditional(self, conditional):
@@ -146,28 +132,17 @@ class Graph:
         else: # Happens if loop is never broken, i.e. when no conditions are true
             index = -1
 
-        # Declare that the evaluation is going to start, wait if blocked
-        conditional.mutex.acquire()
-        # But check if it has already been computed in the meantime
-        if conditional.has_value:
-            conditional.mutex.release()
-            return conditional.value
         # Actual computation happens here
         res = self.evaluate_target(conditional.possibilities[index])
         # Save results and release
         conditional.value = res
         conditional.has_value = True
-        conditional.mutex.release()
         return conditional.value
 
     def execute_to_targets(self, *targets):
         list_of_threads = []
         for target in targets:
-            list_of_threads.append(threading.Thread(target = self.evaluate_target, args = (target,)))
-        for t in list_of_threads:
-            t.start()
-        for t in list_of_threads:
-            t.join()
+            self.evaluate_target(target)
 
     def get_graphviz_digraph(self, name = None, directory = "visualizations", hide_operations = False, **attrs):
         if name is None:
