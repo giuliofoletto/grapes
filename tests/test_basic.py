@@ -43,7 +43,8 @@ def test_graphviz():
     g.add_node("f", "op_f", "c", "d")
     g.add_node("g", "op_g", "e", "f")
     gv = g.get_graphviz_digraph()
-    gv.view()
+    gv.layout(prog = 'dot')
+    gv.draw()
 
 def test_graphviz_with_values():
     g = qflow.Graph(name = "graph_values")
@@ -52,7 +53,8 @@ def test_graphviz_with_values():
     g.add_node("g", "op_g", "e", "f")
     g.set_internal_state({"a":1, "b": 2, "f": 12, "op_e": lambda x,y : x+y, "op_f": lambda x,y : x*y, "op_g": lambda x,y : x-y})
     gv = g.get_graphviz_digraph()
-    gv.view()
+    gv.layout(prog = 'dot')
+    gv.draw('file.pdf')
 
 if __name__ == "__main__":
     test_simple()

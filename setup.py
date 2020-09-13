@@ -8,6 +8,5 @@ setup(name='qflow',
       license='MIT',
       packages=['qflow'],
       install_requires=[
-          'graphviz'
       ],
       zip_safe=False)

@@ -1,5 +1,5 @@
 import threading
-import graphviz
+import pygraphviz
 
 class Node:
     def __init__(self, name, func = None, *args, **kwargs):
@@ -110,7 +110,7 @@ class Graph:
     def get_graphviz_digraph(self, name = None, directory = "visualizations"):
         if name is None:
             name = self.name
-        g = graphviz.Digraph(name = name, directory = directory)
+        g = pygraphviz.AGraph()
         for name, node in self.nodes.items():
             attributes = {}
             if node.is_operation:
@@ -119,12 +119,12 @@ class Graph:
                 attributes.update({"shape": "box"})
             if node.has_value:
                 attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})    
-            g.node(name, **attributes)
+            g.add_node(name, **attributes)
         for name, node in self.nodes.items():
             if node.func is not None:
-                g.edge(node.func, name, arrowhead = "dot")
+                g.add_edge(node.func, name, arrowhead = "dot")
             for argument in node.arguments:
-                g.edge(argument, name)
+                g.add_edge(argument, name)
             for argument in list(node.keyword_arguments.values()):
-                g.edge(argument, name)
+                g.add_edge(argument, name)
         return g
