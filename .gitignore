@@ -1,2 +1,5 @@
 visualizations/*
 tests/visualizations/*
+.pytest_cache/*
+**/__pycache__/*
+qflow.egg-info/*
