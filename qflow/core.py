@@ -7,9 +7,50 @@ class GenericNode:
         self.has_dependencies = False
         self.dependencies = []
 
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+
+    def isCompatible(self, other):
+        # If other is not a GenericNode, return False
+        if not isinstance(other, GenericNode):
+            return False
+        # If they are equal, return True
+        if self == other:
+            return True
+        # If they are not named the same, return False
+        if self.name != other.name:
+            return False
+        # If they both have values but they differ, return False. If only one has a value, proceed
+        if self.has_value and other.has_value and self.value != other.value:
+            return False
+        # If they both have dependencies but they differ, return False. If only one has dependencies, proceed
+        if self.has_dependencies and other.has_dependencies and self.dependencies != other.dependencies:
+            return False
+        # Return True if they have the same name, at least one has no dependencies (or they are the same), at least one has no value (or they are the same)
+        return True
+
+    def merge(self, other):
+        if not self.isCompatible(other):
+            raise ValueError("Cannot merge node with something incompatible with it")
+        if self == other:
+            return # Nothing to do in this case
+        if not self.has_value and other.has_value:
+            self.value = other_value
+            self.has_value = True
+        if not self.has_dependencies and other.has_dependencies:
+            self.dependencies = other.dependencies
+            self.has_dependencies = True
+        self.is_operation = self.is_operation or other.is_operation
+
 class Placeholder(GenericNode):
     def __init__(self, name):
         super().__init__(name)
+
+    def merge(self, other):
+        super().merge(other)
+        # A Placeholder likes to be replaced
+        self.__class__ = other.__class__
+        self.__dict__ = other.__dict__
 
 class Node(GenericNode):
     def __init__(self, name, func, *args, **kwargs):
@@ -19,6 +60,16 @@ class Node(GenericNode):
         self.keyword_arguments = kwargs
         self.has_dependencies = True
         self.dependencies = [self.func] + list(self.arguments) + list(self.keyword_arguments.values())
+
+    def merge(self, other):
+        super().merge(other)
+        if self == other:
+            return # Nothing to do in this case, it must be done again after doing it in super
+        if type(other) == type(self):
+            if self.func is None and other.func is not None:
+                self.func = other.func
+            self.arguments = self.arguments + other.arguments
+            self.keyword_arguments.update(other.keyword_arguments)
 
 class SimpleConditional(GenericNode):
     def __init__(self, name, condition, value_true, value_false):
@@ -39,6 +90,9 @@ class Graph:
     def __setitem__(self, key, value):
         self.nodes[key].value = value
         self.nodes[key].has_value = True
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
 
     def add_placeholder(self, name):
         placeholder = Placeholder(name)
@@ -146,3 +200,22 @@ class Graph:
         list_of_threads = []
         for target in targets:
             self.evaluate_target(target)
+
+    def isCompatible(self, other):
+        """Check if self and other can be merged. Currently DAG status is not verified"""
+        if not isinstance(other, Graph):
+            return False
+        common_nodes = self.nodes.keys() & other.nodes.keys() # Intersection
+        for key in common_nodes:
+            if not self.nodes[key].isCompatible(other.nodes[key]):
+                return False
+        return True
+
+    def merge(self, other):
+        if not self.isCompatible(other):
+            raise ValueError("Cannot merge incompatible graphs")
+        common_nodes = self.nodes.keys() & other.nodes.keys() # Intersection
+        for key in common_nodes:
+            self.nodes[key].merge(other.nodes[key])
+        new_nodes = {k : other.nodes[k] for k in other.nodes.keys() - self.nodes.keys()}
+        self.nodes.update(new_nodes)

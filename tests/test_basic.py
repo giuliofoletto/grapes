@@ -42,3 +42,30 @@ def test_conditional():
     g.add_simple_conditional("d", "c", "a", "b")
     res = qflow.execute_graph_from_context(g, {"a":1, "b": 2, "c": True}, "d")
     assert res["d"] == res["a"]
+
+def test_compatibility():
+    g = qflow.Graph()
+    g.add_node("c", "op_c", "a", "b")
+    h = qflow.Graph()
+    h.add_node("e", "op_e", "c", "d")
+    assert h.isCompatible(g)
+
+def test_incompatibility():
+    g = qflow.Graph()
+    g.add_node("c", "op_c", "a", "b")
+    h = qflow.Graph()
+    h.add_node("c", "op_c2", "a", "d")
+    assert not h.isCompatible(g)
+
+def test_merge():
+    res = qflow.Graph()
+    res.add_node("c", "op_c", "a", "b")
+    res.add_node("e", "op_e", "c", "d")
+
+    g = qflow.Graph()
+    g.add_node("c", "op_c", "a", "b")
+    h = qflow.Graph()
+    h.add_node("e", "op_e", "c", "d")
+    g.merge(h)
+    
+    assert g == res
