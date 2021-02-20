@@ -81,8 +81,10 @@ class Graph:
 
     def set_internal_state(self, dictionary):
         for key, value in dictionary.items():
-            self.nodes[key].has_value = True
-            self.nodes[key].value = value
+            # Accept dictionaries with more keys than needed
+            if key in self.nodes:
+                self.nodes[key].has_value = True
+                self.nodes[key].value = value
 
     def get_internal_state(self, only_data = False):
         if only_data:
