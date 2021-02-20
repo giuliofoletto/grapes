@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qflow',
-      version='0.1',
+      version='0.2',
       description='Helper for dataflow based programming',
       author='Giulio Foletto',
       author_email='giulio.foletto@outlook.com',
