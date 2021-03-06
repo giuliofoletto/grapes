@@ -1,13 +1,21 @@
 import graphviz
 from .. import *
 
-def get_graphviz_digraph(graph, name = None, directory = "visualizations", hide_operations = False, pretty_names = False, **attrs):
+def get_graphviz_digraph(graph, name = None, directory = "visualizations", hide_operations = False, pretty_names = False, include_values = False, **attrs):
     if name is None:
         name = graph.name
     g = graphviz.Digraph(name = name, directory = directory)
     g.attr(**attrs)
     for name, node in graph.nodes.items():
         label = prettify_label(name) if pretty_names else name
+        if include_values and node.has_value:
+            if isinstance(node.value, float):
+                value_in_label = "{:.2e}".format(node.value)
+            else:
+                value_in_label = str(node.value)
+            label += "\n" + value_in_label.partition('\n')[0]
+            if value_in_label.find("\n") != -1:
+                label += "\n..."
         attributes = {"label": label} if label != name else {}
         if node.is_operation and hide_operations:
             continue
