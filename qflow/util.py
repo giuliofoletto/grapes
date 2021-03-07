@@ -58,3 +58,9 @@ def json_from_graph(graph):
     else:
         res = context
     return json.dumps(res, sort_keys=True, indent=4, separators=(',', ': '))
+
+def context_from_json_file(file_name):
+    """Load a json file into a dict"""
+    with open(file_name, encoding='utf-8') as json_file:
+        data = json.load(json_file)
+    return data
