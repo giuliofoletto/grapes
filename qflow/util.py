@@ -6,7 +6,8 @@ Author: Giulio Foletto.
 import json
 import copy
 
-def execute_graph_from_context(graph, context, *targets, inplace = False):
+
+def execute_graph_from_context(graph, context, *targets, inplace=False):
     """Execute a graph up to a target given a context.
 
     Parameters
@@ -19,7 +20,7 @@ def execute_graph_from_context(graph, context, *targets, inplace = False):
         Indicator of what to compute (desired output).
     inplace : bool
         Whether to modify graph and context inplace (default: False).
-    
+
     Returns
     -------
     qflow Graph
@@ -30,10 +31,11 @@ def execute_graph_from_context(graph, context, *targets, inplace = False):
         graph = copy.deepcopy(graph)
         context = copy.deepcopy(context)
 
-    graph.set_internal_context(context, keep_operations = True)
-    graph.execute_to_targets(*targets) 
+    graph.set_internal_context(context, keep_operations=True)
+    graph.execute_to_targets(*targets)
 
     return graph
+
 
 def json_from_graph(graph):
     """Get a JSON string representing the context of a graph.
@@ -48,7 +50,7 @@ def json_from_graph(graph):
     str
         JSON string that prettily represents the context of the graph.
     """
-    
+
     context = graph.get_internal_context(only_data=True)
     non_serializable_items = {}
     for key, value in context.items():
@@ -56,12 +58,13 @@ def json_from_graph(graph):
             json.dumps(value)
         except:
             non_serializable_items.update({key: str(value)})
-    if len(non_serializable_items) > 0: # We must copy the context, to preserve it, and dump a modified version of it
+    if len(non_serializable_items) > 0:  # We must copy the context, to preserve it, and dump a modified version of it
         res = copy.deepcopy(context)
         res.update(non_serializable_items)
     else:
         res = context
     return json.dumps(res, sort_keys=True, indent=4, separators=(',', ': '))
+
 
 def context_from_json_file(file_name):
     """
@@ -71,7 +74,7 @@ def context_from_json_file(file_name):
     ----------
     file_name: str
         Path to the json file.
-    
+
     Returns
     dict
         Content of the file as dictionary.
