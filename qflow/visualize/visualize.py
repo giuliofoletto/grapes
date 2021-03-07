@@ -1,10 +1,17 @@
+"""
+Tools that allow the visualization of a graph using graphviz.
+
+Author: Giulio Foletto.
+"""
+
 import graphviz
 from .. import *
 
-def get_graphviz_digraph(graph, name = None, directory = "visualizations", hide_operations = False, pretty_names = False, include_values = False, **attrs):
+
+def get_graphviz_digraph(graph, name=None, directory="visualizations", hide_operations=False, pretty_names=False, include_values=False, **attrs):
     if name is None:
         name = graph.name
-    g = graphviz.Digraph(name = name, directory = directory)
+    g = graphviz.Digraph(name=name, directory=directory)
     g.attr(**attrs)
     for name, node in graph.nodes.items():
         label = prettify_label(name) if pretty_names else name
@@ -26,21 +33,22 @@ def get_graphviz_digraph(graph, name = None, directory = "visualizations", hide_
         else:
             attributes.update({"shape": "box"})
         if node.has_value:
-            attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})    
+            attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})
         g.node(name, **attributes)
     for name, node in graph.nodes.items():
         special_dependencies = []
         if isinstance(node, Node):
             if not hide_operations:
-                g.edge(node.func, name, arrowhead = "dot")
+                g.edge(node.func, name, arrowhead="dot")
             special_dependencies.append(node.func)
         elif isinstance(node, SimpleConditional):
             for condition in node.conditions:
-                g.edge(condition, name, arrowhead = "diamond")
-            special_dependencies.extend(node.conditions)    
+                g.edge(condition, name, arrowhead="diamond")
+            special_dependencies.extend(node.conditions)
         for dependency_name in [x for x in node.dependencies if x not in special_dependencies]:
             g.edge(dependency_name, name)
     return g
+
 
 def prettify_label(name):
     return "".join(c.upper() if ((i > 0 and name[i-1] == "_") or i == 0) else c for i, c in enumerate(name)).replace("_", " ")

@@ -1,24 +1,29 @@
+"""
+Some utilities. Also, a more functional API to the execution of graphs.
+
+Author: Giulio Foletto.
+"""
 import json
 import copy
 
 def execute_graph_from_context(graph, context, *targets, inplace = False):
-    """Execute a graph up to a target given a context
+    """Execute a graph up to a target given a context.
 
     Parameters
     ----------
     graph : qflow Graph
-        Graph of the computation
+        Graph of the computation.
     context : dict
-        Dictionary of the initial state of the computation (input)
+        Dictionary of the initial state of the computation (input).
     targets : strings (or keys in the graph)
-        Indicator of what to compute (desired output)
+        Indicator of what to compute (desired output).
     inplace : bool
-        Whether to modify graph and context inplace (default: False)
+        Whether to modify graph and context inplace (default: False).
     
     Returns
     -------
-    graph
-        Graph with context updated after computation
+    qflow Graph
+        Graph with context updated after computation.
     """
 
     if not inplace:
@@ -32,17 +37,17 @@ def execute_graph_from_context(graph, context, *targets, inplace = False):
     return graph
 
 def json_from_graph(graph):
-    """Get a JSON string representing the context of a graph
+    """Get a JSON string representing the context of a graph.
 
     Parameters
     ----------
     graph : qflow Graph
-        Graph containing the context to convert to JSON
+        Graph containing the context to convert to JSON.
 
     Returns
     -------
     str
-        JSON string that prettily represents the context of the graph
+        JSON string that prettily represents the context of the graph.
     """
     
     context = graph.get_internal_state(only_data=True)
@@ -60,7 +65,18 @@ def json_from_graph(graph):
     return json.dumps(res, sort_keys=True, indent=4, separators=(',', ': '))
 
 def context_from_json_file(file_name):
-    """Load a json file into a dict"""
+    """
+    Load a json file into a dictionary.
+
+    Parameters
+    ----------
+    file_name: str
+        Path to the json file.
+    
+    Returns
+    dict
+        Content of the file as dictionary.
+    """
     with open(file_name, encoding='utf-8') as json_file:
         data = json.load(json_file)
     return data
