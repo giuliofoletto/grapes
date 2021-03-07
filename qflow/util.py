@@ -14,7 +14,7 @@ def execute_graph_from_context(graph, context, *targets, inplace = False):
     graph : qflow Graph
         Graph of the computation.
     context : dict
-        Dictionary of the initial state of the computation (input).
+        Dictionary of the initial context of the computation (input).
     targets : strings (or keys in the graph)
         Indicator of what to compute (desired output).
     inplace : bool
@@ -30,9 +30,8 @@ def execute_graph_from_context(graph, context, *targets, inplace = False):
         graph = copy.deepcopy(graph)
         context = copy.deepcopy(context)
 
-    graph.clear_values(keep_operations = True)
-    graph.set_internal_state(context)
-    graph.execute_to_targets(*targets)
+    graph.set_internal_context(context, keep_operations = True)
+    graph.execute_to_targets(*targets) 
 
     return graph
 
@@ -50,7 +49,7 @@ def json_from_graph(graph):
         JSON string that prettily represents the context of the graph.
     """
     
-    context = graph.get_internal_state(only_data=True)
+    context = graph.get_internal_context(only_data=True)
     non_serializable_items = {}
     for key, value in context.items():
         try:

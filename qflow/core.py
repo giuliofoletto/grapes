@@ -241,9 +241,9 @@ class Graph:
                 continue
             self.nodes[key].has_value = False
 
-    def set_internal_state(self, dictionary):
+    def update_internal_context(self, dictionary):
         """
-        Update internal state with a new context.
+        Update internal context with a dictionary.
         """
         for key, value in dictionary.items():
             # Accept dictionaries with more keys than needed
@@ -251,7 +251,19 @@ class Graph:
                 self.nodes[key].has_value = True
                 self.nodes[key].value = value
 
-    def get_internal_state(self, only_data=False):
+    def set_internal_context(self, dictionary, keep_operations=False):
+        """
+        Clear all values and then set a new internal context with a dictionary.
+
+        Parameters
+        ----------
+        keep_operations: bool
+            Whether to spare operations from clearing.
+        """
+        self.clear_values(keep_operations)
+        self.update_internal_context(dictionary)
+
+    def get_internal_context(self, only_data=False):
         """
         Get the internal context.
 

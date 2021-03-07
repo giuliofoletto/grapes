@@ -30,7 +30,7 @@ def test_simple(expected_sources):
 
 def test_with_values(expected_sources):
     g = build_graph()
-    g.set_internal_state({"a":1, "b": 2, "f": 12, "op_e": lambda x,y : x+y, "op_f": lambda x,y : x*y, "op_g": lambda x,y : x-y})
+    g.set_internal_context({"a":1, "b": 2, "f": 12, "op_e": lambda x,y : x+y, "op_f": lambda x,y : x*y, "op_g": lambda x,y : x-y})
     name = "with_values"
     gv = qflow.visualize.get_graphviz_digraph(g, name = name)
     assert gv.source == expected_sources[name]
