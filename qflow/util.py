@@ -82,3 +82,18 @@ def context_from_json_file(file_name):
     with open(file_name, encoding='utf-8') as json_file:
         data = json.load(json_file)
     return data
+
+
+def lambdify_graph(graph, input_keys, *targets):
+    def specific_function(*args):
+        operational_graph = copy.deepcopy(graph)
+        # Use for loop rather than dict comprehension because it is a more basic operation
+        for i in range(len(input_keys)):
+            operational_graph[input_keys[i]] = args[i]
+        operational_graph.execute_to_targets(*targets)
+        list_of_values = operational_graph.get_list_of_values(targets)
+        if len(list_of_values) == 1:
+            return list_of_values[0]
+        else:
+            return list_of_values
+    return specific_function

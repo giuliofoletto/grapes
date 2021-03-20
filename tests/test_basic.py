@@ -86,3 +86,20 @@ def test_kwargs():
         return base**exponent
     res = qflow.execute_graph_from_context(g, {"a": 5, "b": 2, "op_c": example_exponentiation_func}, "c")
     assert res["c"] == 25
+
+
+def test_lambdify():
+    g = qflow.Graph()
+    g.add_node("e", "op_e", "a", "b")
+    g.add_node("f", "op_f", "c", "d")
+    g.add_node("g", "op_g", "e", "f")
+
+    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    g.set_internal_context(operations)
+
+    # Get a function a,b,c,d -> g
+    f1 = qflow.lambdify_graph(g, ["a", "b", "c", "d"], "g")
+    # Get a function a,b,c,d -> [e,f,g]
+    f2 = qflow.lambdify_graph(g, ["a", "b", "c", "d"], "e", "f", "g")
+    assert f1(1, 2, 3, 4) == -9
+    assert f2(1, 2, 3, 4) == [3, 12, -9]
