@@ -76,3 +76,13 @@ def test_merge():
     g.merge(h)
 
     assert g == res
+
+
+def test_kwargs():
+    g = qflow.Graph()
+    g.add_node("c", "op_c", "a", exponent="b")
+
+    def example_exponentiation_func(base, exponent):
+        return base**exponent
+    res = qflow.execute_graph_from_context(g, {"a": 5, "b": 2, "op_c": example_exponentiation_func}, "c")
+    assert res["c"] == 25

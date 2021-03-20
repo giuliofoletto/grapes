@@ -280,15 +280,51 @@ class Graph:
     def get_list_of_values(self, list_of_keys):
         """
         Get values as list.
+
+        Parameters
+        ----------
+        list_of_keys: list of hashables (typically strings)
+            List of names of nodes whose values are required
+
+        Returns
+        -------
+        list
+            List like list_of_keys which contains values of nodes
         """
         res = []
         for key in list_of_keys:
             res.append(self.nodes[key].value)
         return res
 
-    def get_dict_of_values(self, dictionary):
+    def get_dict_of_values(self, list_of_keys):
         """
-        Get values as dictionary. Keys in the input dict will remain in the output, values in the input select nodes.
+        Get values as dictionary.
+
+        Parameters
+        ----------
+        list_of_keys: list of hashables (typically strings)
+            List of names of nodes whose values are required
+
+        Returns
+        -------
+        dict
+            Dictionary whose keys are the elements of list_of_keys and whose values are the corresponding node values
+        """
+        return {key: self.nodes[key].value for key in list_of_keys}
+
+    def get_kwargs_values(self, dictionary):
+        """
+        Get values from the graph, using a dictionary that works like function kwargs.
+
+        Parameters
+        ----------
+        dictionary: dict
+            Keys in dictionary are to be interpreted as keys for function kwargs, while values in dictionary are node names
+
+        Returns
+        -------
+        dict
+            A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes
         """
         return {key: self.nodes[value].value for key, value in dictionary.items()}
 
@@ -314,7 +350,7 @@ class Graph:
             self.evaluate_target(dependency_name)
 
         # Actual computation happens here
-        res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_dict_of_values(node.keyword_arguments))
+        res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_kwargs_values(node.keyword_arguments))
         # Save results and release
         node.value = res
         node.has_value = True
