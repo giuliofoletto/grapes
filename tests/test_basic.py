@@ -118,3 +118,18 @@ def test_simplify_dependency():
 
     res = qflow.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
     assert res["g"] == -9
+
+
+def test_simplify_all_dependencies():
+    g = qflow.Graph()
+    g.add_node("e", "op_e", "a", "b")
+    g.add_node("f", "op_f", "c", "d")
+    g.add_node("g", "op_g", "e", "f")
+
+    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    g.set_internal_context(operations)
+
+    g.simplify_all_dependencies("g")
+
+    res = qflow.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
+    assert res["g"] == -9

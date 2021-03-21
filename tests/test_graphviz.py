@@ -94,3 +94,14 @@ def test_simplify_dependency(expected_sources):
     name = "postsimplification"
     gv = qflow.visualize.get_graphviz_digraph(g, name=name)
     assert gv.source == expected_sources[name]
+
+
+def test_simplify_all_dependencies(expected_sources):
+    g = build_graph()
+    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    g.set_internal_context(operations)
+
+    g.simplify_all_dependencies("g")
+    name = "postallsimplification"
+    gv = qflow.visualize.get_graphviz_digraph(g, name=name)
+    assert gv.source == expected_sources[name]

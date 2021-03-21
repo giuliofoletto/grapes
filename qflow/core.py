@@ -434,3 +434,9 @@ class Graph:
         node.keyword_arguments = {key: value for key, value in node.keyword_arguments.items() if value != dependency_name}
         node.dependencies = [node.func] + list(node.arguments) + list(node.keyword_arguments.values())
         self.nodes[node_name] = node
+
+    def simplify_all_dependencies(self, node_name, exclude=[]):
+        dependencies = self.nodes[node_name].dependencies[1:]
+        for dependency in dependencies:
+            if dependency not in exclude and isinstance(self.nodes[dependency], Node):
+                self.simplify_dependency(node_name, dependency)

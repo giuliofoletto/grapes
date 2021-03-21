@@ -27,4 +27,8 @@ sVpostsimplification
 p13
 Vdigraph postsimplification {\u000a	op_e [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	a [shape=box]\u000a	b [shape=box]\u000a	e [shape=box]\u000a	op_f [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [shape=box]\u000a	op_g [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	g [shape=box]\u000a	op_e -> e [arrowhead=dot]\u000a	a -> e\u000a	b -> e\u000a	op_f -> f [arrowhead=dot]\u000a	c -> f\u000a	d -> f\u000a	op_g -> g [arrowhead=dot]\u000a	e -> g\u000a	c -> g\u000a	d -> g\u000a}
 p14
+sVpostallsimplification
+p15
+Vdigraph postallsimplification {\u000a	op_e [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	a [shape=box]\u000a	b [shape=box]\u000a	e [shape=box]\u000a	op_f [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	c [shape=box]\u000a	d [shape=box]\u000a	f [shape=box]\u000a	op_g [fillcolor=darkolivegreen1 shape=ellipse style=filled]\u000a	g [shape=box]\u000a	op_e -> e [arrowhead=dot]\u000a	a -> e\u000a	b -> e\u000a	op_f -> f [arrowhead=dot]\u000a	c -> f\u000a	d -> f\u000a	op_g -> g [arrowhead=dot]\u000a	a -> g\u000a	b -> g\u000a	c -> g\u000a	d -> g\u000a}
+p16
 s.
