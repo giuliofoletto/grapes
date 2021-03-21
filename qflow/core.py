@@ -3,6 +3,7 @@ Core of the qflow package. Includes the classes for nodes and graphs.
 
 Author: Giulio Foletto. 
 """
+from . import function_composer
 
 
 class GenericNode:
@@ -409,3 +410,27 @@ class Graph:
             self.nodes[key].merge(other.nodes[key])
         new_nodes = {k: other.nodes[k] for k in other.nodes.keys() - self.nodes.keys()}
         self.nodes.update(new_nodes)
+
+    def simplify_dependency(self, node_name, dependency_name):
+        node = self.nodes[node_name]
+        # Make everything a keyword argument. This is the fate of a simplified node
+        node.keyword_arguments.update({argument: argument for argument in node.arguments})
+        # Build lists of dependencies
+        func_dependencies = node.dependencies[1:]
+        subfuncs = []
+        subfuncs_dependencies = []
+        for argument in node.keyword_arguments:
+            if argument == dependency_name:
+                subfuncs.append(self[self.nodes[dependency_name].func])
+                subfuncs_dependencies.append(self.nodes[dependency_name].dependencies[1:])
+            else:
+                subfuncs.append(function_composer.identity_token)
+                subfuncs_dependencies.append([argument])
+        # Compose the functions
+        self[node.func] = function_composer.function_compose_simple(self[node.func], subfuncs, func_dependencies, subfuncs_dependencies)
+        # Update node
+        node.arguments = []
+        node.keyword_arguments.update({argument: argument for argument in self.nodes[dependency_name].dependencies[1:]})
+        node.keyword_arguments = {key: value for key, value in node.keyword_arguments.items() if value != dependency_name}
+        node.dependencies = [node.func] + list(node.arguments) + list(node.keyword_arguments.values())
+        self.nodes[node_name] = node
