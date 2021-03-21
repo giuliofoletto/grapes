@@ -81,7 +81,7 @@ def test_conditional(expected_sources):
     assert gv.source == expected_sources[name]
 
 
-def test_simplify_node(expected_sources):
+def test_simplify_dependency(expected_sources):
     g = build_graph()
     operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
     g.set_internal_context(operations)
