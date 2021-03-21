@@ -50,14 +50,18 @@ def function_compose_simple(func, subfuncs, func_dependencies, subfuncs_dependen
         Names of the arguments of the old subfuncs
     """
     if func_signature is None:
-        if inspect.getfullargspec(func).varargs is None and inspect.getfullargspec(func).varkw is None:  # Well defined spec
+        if inspect.getfullargspec(func).varargs is not None:
+            raise ValueError("Functions with varargs are not supported by Function Composer")
+        elif inspect.getfullargspec(func).varargs is None and inspect.getfullargspec(func).varkw is None:  # Well defined spec
             func_signature = list(inspect.signature(func).parameters.keys())
         else:
             func_signature = func_dependencies
     if subfuncs_signatures is None:
         subfuncs_signatures = []
         for index, subfunc in enumerate(subfuncs):
-            if inspect.getfullargspec(subfunc).varargs is None and inspect.getfullargspec(subfunc).varkw is None:  # Well defined spec
+            if inspect.getfullargspec(func).varargs is not None:
+                raise ValueError("Functions with varargs are not supported by Function Composer")
+            elif inspect.getfullargspec(subfunc).varargs is None and inspect.getfullargspec(subfunc).varkw is None:  # Well defined spec
                 this_signature = list(inspect.signature(subfunc).parameters.keys())
             else:
                 this_signature = subfuncs_dependencies[index]

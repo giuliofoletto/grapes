@@ -84,7 +84,7 @@ def context_from_json_file(file_name):
     return data
 
 
-def lambdify_graph(graph, input_keys, *targets):
+def wrap_graph_with_function(graph, input_keys, *targets):
     def specific_function(*args):
         operational_graph = copy.deepcopy(graph)
         # Use for loop rather than dict comprehension because it is a more basic operation
@@ -97,3 +97,9 @@ def lambdify_graph(graph, input_keys, *targets):
         else:
             return list_of_values
     return specific_function
+
+
+def lambdify_graph(graph, input_keys, target):
+    while not set(graph.nodes[target].dependencies[1:]).issubset(set(input_keys)):
+        graph.simplify_all_dependencies(target, exclude=input_keys)
+    return graph[graph.nodes[target].func]
