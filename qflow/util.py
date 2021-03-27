@@ -31,7 +31,7 @@ def execute_graph_from_context(graph, context, *targets, inplace=False):
         graph = copy.deepcopy(graph)
         context = copy.deepcopy(context)
 
-    graph.set_internal_context(context, keep_operations=True)
+    graph.set_internal_context(context)
     graph.execute_to_targets(*targets)
 
     return graph
@@ -100,6 +100,8 @@ def wrap_graph_with_function(graph, input_keys, *targets):
 
 
 def lambdify_graph(graph, input_keys, target):
+    graph = copy.deepcopy(graph)
+    graph.unfreeze()
     while not set(graph.nodes[target].dependencies[1:]).issubset(set(input_keys)):
         graph.simplify_all_dependencies(target, exclude=input_keys)
     return graph[graph.nodes[target].func]

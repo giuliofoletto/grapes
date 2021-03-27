@@ -83,7 +83,7 @@ def test_kwargs():
     g.add_node("c", "op_c", "a", exponent="b")
 
     def example_exponentiation_func(base, exponent):
-        return base**exponent
+        return base**exponent  
     res = qflow.execute_graph_from_context(g, {"a": 5, "b": 2, "op_c": example_exponentiation_func}, "c")
     assert res["c"] == 25
 
@@ -96,6 +96,7 @@ def test_wrap_with_function():
 
     operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
     g.set_internal_context(operations)
+    g.finalize_definition()
 
     # Get a function a,b,c,d -> g
     f1 = qflow.wrap_graph_with_function(g, ["a", "b", "c", "d"], "g")
@@ -113,6 +114,7 @@ def test_lambdify():
 
     operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
     g.set_internal_context(operations)
+    g.finalize_definition()
 
     # Get a function a,b,c,d -> g
     f1 = qflow.lambdify_graph(g, ["a", "b", "c", "d"], "g")
@@ -127,8 +129,9 @@ def test_simplify_dependency():
 
     operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
     g.set_internal_context(operations)
-
+    
     g.simplify_dependency("g", "f")
+    g.finalize_definition()
 
     res = qflow.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
     assert res["g"] == -9
@@ -144,6 +147,7 @@ def test_simplify_all_dependencies():
     g.set_internal_context(operations)
 
     g.simplify_all_dependencies("g")
+    g.finalize_definition()
 
     res = qflow.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
     assert res["g"] == -9

@@ -17,10 +17,21 @@ class GenericNode:
         """
         self.name = name
         self.has_value = False
-        self.value = None
+        self._value = None
         self.is_operation = False
+        self.is_frozen = False
         self.has_dependencies = False
         self.dependencies = []
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if self.is_frozen:
+            raise AttributeError("Trying to update node " + self.name + " which is frozen.")
+        self._value = value 
 
     def __eq__(self, other):
         """
@@ -65,6 +76,7 @@ class GenericNode:
             self.dependencies = other.dependencies
             self.has_dependencies = True
         self.is_operation = self.is_operation or other.is_operation
+        self.is_frozen = self.is_frozen or other.is_frozen
 
 
 class Placeholder(GenericNode):
@@ -228,40 +240,40 @@ class Graph:
         conditional = SimpleConditional(name, condition, value_true, value_false)
         self.nodes.update({name: conditional})
 
-    def clear_values(self, keep_operations=False):
+    def clear_values(self):
         """
         Clear all values in the graph nodes.
-
-        Parameters
-        ----------
-        keep_operations: bool
-            Whether to spare operations from clearing.
         """
         for key, node in self.nodes.items():
-            if keep_operations and node.is_operation:
+            if node.is_frozen:
                 continue
             self.nodes[key].has_value = False
 
     def update_internal_context(self, dictionary):
         """
         Update internal context with a dictionary.
+
+        Parameters
+        ----------
+        dictionary: dict
+            Dictionary with the new values
         """
         for key, value in dictionary.items():
             # Accept dictionaries with more keys than needed
             if key in self.nodes:
-                self.nodes[key].has_value = True
                 self.nodes[key].value = value
+                self.nodes[key].has_value = True  
 
-    def set_internal_context(self, dictionary, keep_operations=False):
+    def set_internal_context(self, dictionary):
         """
         Clear all values and then set a new internal context with a dictionary.
 
         Parameters
         ----------
-        keep_operations: bool
-            Whether to spare operations from clearing.
+        dictionary: dict
+            Dictionary with the new values
         """
-        self.clear_values(keep_operations)
+        self.clear_values()
         self.update_internal_context(dictionary)
 
     def get_internal_context(self, only_data=False):
@@ -445,3 +457,28 @@ class Graph:
         for dependency in dependencies:
             if dependency not in exclude and isinstance(self.nodes[dependency], Node):
                 self.simplify_dependency(node_name, dependency)
+
+    def freeze(self, *args):
+        if len(args) == 0: # Interpret as "Freeze everything"
+            nodes_to_freeze = self.nodes.keys()
+        else:
+            nodes_to_freeze = args
+        for key in nodes_to_freeze:
+            if self.nodes[key].has_value:
+                self.nodes[key].is_frozen = True
+
+    def unfreeze(self, *args):
+        if len(args) == 0: # Interpret as "Unfreeze everything"
+            nodes_to_unfreeze = self.nodes.keys()
+        else:
+            nodes_to_unfreeze = args
+        for key in nodes_to_unfreeze:
+            self.nodes[key].is_frozen = False
+
+    def finalize_definition(self):
+        """
+        Perform operations that should typically be done after the definition of a graph is completed
+
+        Currently, this freezes all values, because it is assumed that values given during definition are to be frozen
+        """
+        self.freeze()
