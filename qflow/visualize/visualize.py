@@ -36,6 +36,8 @@ def get_graphviz_digraph(graph, name=None, directory="visualizations", hide_oper
             attributes.update({"style": "filled", "fillcolor": "darkolivegreen1"})
         g.node(name, **attributes)
     for name, node in graph.nodes.items():
+        if node.is_operation and hide_operations:
+            continue
         special_dependencies = []
         if isinstance(node, Node):
             if not hide_operations:

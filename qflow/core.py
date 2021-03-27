@@ -475,10 +475,21 @@ class Graph:
         for key in nodes_to_unfreeze:
             self.nodes[key].is_frozen = False
 
+    def make_operation_dependencies_also_operations(self):
+        """
+        Make dependencies (parents) of operations also operations
+        """
+        for key, node in self.nodes.items():
+            if node.is_operation:
+                for parent in node.dependencies:
+                    self.nodes[parent].is_operation = True
+
     def finalize_definition(self):
         """
         Perform operations that should typically be done after the definition of a graph is completed
 
-        Currently, this freezes all values, because it is assumed that values given during definition are to be frozen
+        Currently, this freezes all values, because it is assumed that values given during definition are to be frozen.
+        It also marks dependencies of operations as operations themselves.
         """
+        self.make_operation_dependencies_also_operations()
         self.freeze()
