@@ -351,7 +351,12 @@ class Graph:
             self.evaluate_target(dependency_name)
 
         # Actual computation happens here
-        res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_kwargs_values(node.keyword_arguments))
+        try:
+            res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_kwargs_values(node.keyword_arguments))
+        except Exception as e:
+            if len(e.args) > 0:
+                e.args = ("While evaluating " + node.name + ": " + e.args[0],) + e.args[1:]
+            raise
         # Save results and release
         node.value = res
         node.has_value = True
