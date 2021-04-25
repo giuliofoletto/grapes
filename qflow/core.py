@@ -3,251 +3,149 @@ Core of the qflow package. Includes the classes for nodes and graphs.
 
 Author: Giulio Foletto. 
 """
+import networkx as nx
 from . import function_composer
 
 
-class GenericNode:
-    """
-    Generic class for all kinds of nodes.
-    """
-
-    def __init__(self, name):
-        """
-        Constructor. Nodes are created with just a name, values are provided by the graph.
-        """
-        self.name = name
-        self.has_value = False
-        self._value = None
-        self.is_operation = False
-        self.is_frozen = False
-        self.has_dependencies = False
-        self.dependencies = []
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        if self.is_frozen:
-            raise AttributeError("Trying to update node " + self.name + " which is frozen.")
-        self._value = value 
-
-    def __eq__(self, other):
-        """
-        Equality check based on all members.
-        """
-        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
-
-    def isCompatible(self, other):
-        """
-        Check if a node is compatible to another, meaning that they can replace each other in a graph.
-        """
-        # If other is not a GenericNode, return False
-        if not isinstance(other, GenericNode):
-            return False
-        # If they are equal, return True
-        if self == other:
-            return True
-        # If they are not named the same, return False
-        if self.name != other.name:
-            return False
-        # If they both have values but they differ, return False. If only one has a value, proceed
-        if self.has_value and other.has_value and self.value != other.value:
-            return False
-        # If they both have dependencies but they differ, return False. If only one has dependencies, proceed
-        if self.has_dependencies and other.has_dependencies and self.dependencies != other.dependencies:
-            return False
-        # Return True if they have the same name, at least one has no dependencies (or they are the same), at least one has no value (or they are the same)
-        return True
-
-    def merge(self, other):
-        """
-        Merge other into self.
-        """
-        if not self.isCompatible(other):
-            raise ValueError("Cannot merge node with something incompatible with it")
-        if self == other:
-            return  # Nothing to do in this case
-        if not self.has_value and other.has_value:
-            self.value = other_value
-            self.has_value = True
-        if not self.has_dependencies and other.has_dependencies:
-            self.dependencies = other.dependencies
-            self.has_dependencies = True
-        self.is_operation = self.is_operation or other.is_operation
-        self.is_frozen = self.is_frozen or other.is_frozen
+starting_node_properties = {"type": "standard", "has_value": False, "value": None, "is_frozen": False, "is_recipe": False}
 
 
-class Placeholder(GenericNode):
-    """
-    A trivial node with no children.
-    """
-
-    def __init__(self, name):
-        super().__init__(name)
-
-    def merge(self, other):
-        super().merge(other)
-        # A Placeholder likes to be replaced
-        self.__class__ = other.__class__
-        self.__dict__ = other.__dict__
-
-
-class Node(GenericNode):
-    """
-    The most typical kind of node. It has a special parent that takes the role of an operation, the recipe used to evaluate the node.
-    """
-
-    def __init__(self, name, func, *args, **kwargs):
-        """
-        Constructor.
-
-        Parameters
-        ----------
-        name: hashable (typically string)
-            Name of the node, which identifies it in the graph.
-        func: hashable (typically string)
-            Name of the parent node that takes the role of the recipe used to evaluate this node.
-        args: list of hashables
-            Names of other parent nodes that will be passed to func as arguments.
-        kwargs: dict of hashables
-            Key, value pairs that will be passed to func as keyword arguments. Keys are keywords of the func, values are names of nodes.
-        """
-        super().__init__(name)
-        self.func = func
-        self.arguments = args
-        self.keyword_arguments = kwargs
-        self.has_dependencies = True
-        self.dependencies = [self.func] + list(self.arguments) + list(self.keyword_arguments.values())
-
-    def merge(self, other):
-        """
-        Merge two nodes.
-        """
-        super().merge(other)
-        if self == other:
-            return  # Nothing to do in this case, it must be done again after doing it in super
-        if type(other) == type(self):
-            if self.func is None and other.func is not None:
-                self.func = other.func
-            self.arguments = self.arguments + other.arguments
-            self.keyword_arguments.update(other.keyword_arguments)
-
-
-class SimpleConditional(GenericNode):
-    """
-    A node that takes one of two values (taken from parent nodes) based on the value of another node.
-    """
-
-    def __init__(self, name, condition, value_true, value_false):
-        """
-        Constructor.
-
-        Parameters
-        ----------
-        name: hashable
-            Name of the node.
-        condition: hashable
-            Name of the parent nodes that acts as a condition
-        value_true: hashable
-            Name of the parent node that will give its value to this node if condition is True
-        value_false: hashable
-            Name of the parent node that will give its value to this node if condition is False
-        """
-        super().__init__(name)
-        self.conditions = [condition]
-        self.possibilities = [value_true, value_false]
-        self.has_dependencies = True
-        self.dependencies = [condition, value_true, value_false]
-
-
-class Graph:
+class Graph():
     """
     Class that represents a graph of nodes.
     """
 
-    def __init__(self, name="Graph"):
-        """
-        Constructor.
+    def __init__(self, nx_digraph=None):
+        # Internally, we handle a nx_digraph
+        if nx_digraph == None:
+            self._nxdg = nx.DiGraph()
+        else:
+            self._nxdg = nx_digraph
+        # Alias for easy access
+        self.nodes = self._nxdg.nodes
 
-        Parameters
-        ----------
-        name: hashable
-            Name of the graph.
-        """
-        self.name = name
-        self.nodes = {}
-
-    def __getitem__(self, key):
+    def __getitem__(self, node):
         """
         Get the value of a node with []
         """
-        return self.nodes[key].value
+        return self.nodes[node]["value"]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, node, value):
         """
         Set the value of a node with []
         """
-        self.nodes[key].value = value
-        self.nodes[key].has_value = True
+        self.nodes[node]["value"] = value
+        self.nodes[node]["has_value"] = True
 
     def __eq__(self, other):
         """
         Equality check based on all members.
         """
-        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+        return (isinstance(other, self.__class__) and nx.is_isomorphic(self._nxdg, other._nxdg, dict.__eq__, dict.__eq__))
 
-    def add_placeholder(self, name):
+    def add_step(self, name, recipe=None, *args, **kwargs):
         """
-        Interface to add a placeholder node to the graph.
+        Interface to add a node to the graph, with all its dependencies.
         """
-        placeholder = Placeholder(name)
-        self.nodes.update({name: placeholder})
+        # Check that if a node has dependencies, it also has a recipe
+        if recipe is None and (len(args) > 0 or len(kwargs.keys()) > 0):
+            raise ValueError("Cannot add node with dependencies without a recipe")
 
-    def add_node(self, name, func=None, *args, **kwargs):
-        """
-        Interface to add a node to the graph.
-        """
-        # We simplify insertion by taking care of undefined dependencies as placeholders
-        dependencies = []
-        if func is not None:
-            dependencies.append(func)
-        dependencies.extend(args)
-        dependencies.extend(list(kwargs.values()))
-        for dependency_name in dependencies:
-            if dependency_name not in self.nodes:
-                self.add_placeholder(dependency_name)
+        elif recipe is None:  # Accept nodes with no dependencies
+            self._nxdg.add_node(name, **starting_node_properties)
 
-        # Here the actual insertion happens
-        node = Node(name, func, *args, **kwargs)
-        self.nodes.update({name: node})
+        else:  # Standard case
+            # Add the node
+            self._nxdg.add_node(name, recipe=recipe, args=args, kwargs=kwargs, **starting_node_properties)
 
-        # Mark as operation what is used as such
-        if func is not None:
-            self.nodes[func].is_operation = True
+            # Add and connect the recipe
+            self._nxdg.add_node(recipe, **starting_node_properties)
+            self.nodes[recipe]["is_recipe"] = True
+            self._nxdg.add_edge(recipe, name, type="recipe")
+
+            # Add and connect the other dependencies
+            for index, arg in enumerate(args):
+                # Avoid adding existing dependencies so as not to overwrite attributes
+                if arg not in self.nodes:
+                    self._nxdg.add_node(arg, **starting_node_properties)
+                self._nxdg.add_edge(arg, name, type="standard", accessor=index)
+            for key, value in kwargs.items():
+                # Avoid adding existing dependencies so as not to overwrite attributes
+                if value not in self.nodes:
+                    self._nxdg.add_node(value, **starting_node_properties)
+                self._nxdg.add_edge(value, name, type="standard", accessor=key)
 
     def add_simple_conditional(self, name, condition, value_true, value_false):
         """
         Interface to add a conditional to the graph.
         """
-        # We simplify insertion by taking care of undefined dependencies as placeholders
-        for dependency_name in [condition, value_true, value_false]:
-            if dependency_name not in self.nodes:
-                self.add_placeholder(dependency_name)
+        # Add all nodes
+        self._nxdg.add_node(name, **starting_node_properties)
+        for node in [condition, value_true, value_false]:
+            # Avoid adding existing dependencies so as not to overwrite attributes
+            if node not in self.nodes:
+                self._nxdg.add_node(node, **starting_node_properties)
 
-        # Here the actual insertion happens
-        conditional = SimpleConditional(name, condition, value_true, value_false)
-        self.nodes.update({name: conditional})
+        # Connect edges
+        self._nxdg.add_edge(condition, name, type="condition")
+        self._nxdg.add_edge(value_true, name, type="standard", accessor=True)
+        self._nxdg.add_edge(value_false, name, type="standard", accessor=False)
+
+        # Specify that this node is a conditional
+        self.nodes[name]["type"] = "conditional"
+
+        # Add conditions name to the list of conditions of the conditional
+        self.nodes[name]["conditions"] = [condition]
+
+        # Add possibilities to the list of possibilities of the conditional
+        self.nodes[name]["possibilities"] = [value_true, value_false]
+
+    def is_recipe(self, node):
+        return self.nodes[node]["is_recipe"]
+
+    def get_recipe(self, node):
+        attributes = self.nodes[node]
+        if "recipe" in attributes and attributes["recipe"] is not None:
+            return attributes["recipe"]
+        else:
+            raise ValueError("Node ", node, " has no recipe")
+
+    def get_args(self, node):
+        attributes = self.nodes[node]
+        if "args" in attributes and attributes["args"] is not None:
+            return attributes["args"]
+        else:
+            raise ValueError("Node ", node, " has no args")
+
+    def get_kwargs(self, node):
+        attributes = self.nodes[node]
+        if "kwargs" in attributes and attributes["kwargs"] is not None:
+            return attributes["kwargs"]
+        else:
+            raise ValueError("Node ", node, " has no kwargs")
+
+    def get_conditions(self, node):
+        attributes = self.nodes[node]
+        if "conditions" in attributes and attributes["conditions"] is not None:
+            return attributes["conditions"]
+        else:
+            raise ValueError("Node ", node, " has no conditions")
+
+    def get_possibilities(self, node):
+        attributes = self.nodes[node]
+        if "possibilities" in attributes and attributes["possibilities"] is not None:
+            return attributes["possibilities"]
+        else:
+            raise ValueError("Node ", node, " has no possibilities")
 
     def clear_values(self):
         """
         Clear all values in the graph nodes.
         """
-        for key, node in self.nodes.items():
-            if node.is_frozen:
+        for node in self.nodes:
+            if self.nodes[node]["is_frozen"]:
                 continue
-            self.nodes[key].has_value = False
+            self.nodes[node]["has_value"] = False
 
     def update_internal_context(self, dictionary):
         """
@@ -261,8 +159,8 @@ class Graph:
         for key, value in dictionary.items():
             # Accept dictionaries with more keys than needed
             if key in self.nodes:
-                self.nodes[key].value = value
-                self.nodes[key].has_value = True  
+                self.nodes[key]["value"] = value
+                self.nodes[key]["has_value"] = True
 
     def set_internal_context(self, dictionary):
         """
@@ -276,19 +174,19 @@ class Graph:
         self.clear_values()
         self.update_internal_context(dictionary)
 
-    def get_internal_context(self, only_data=False):
+    def get_internal_context(self, exclude_recipes=False):
         """
         Get the internal context.
 
         Parameters
         ----------
-        only_data: bool
-            Whether to return only data or also operations.
+        exclude_recipes: bool
+            Whether to exclude recipes from the returned dictionary or keep them.
         """
-        if only_data:
-            return {key: self.nodes[key].value for key, value in self.nodes.items() if (self.nodes[key].has_value and not self.nodes[key].is_operation)}
+        if exclude_recipes:
+            return {key: self.nodes[key]["value"] for key in self.nodes if (self.nodes[key]["has_value"] and not self.is_recipe(self.nodes[key]))}
         else:
-            return {key: self.nodes[key].value for key, value in self.nodes.items() if self.nodes[key].has_value}
+            return {key: self.nodes[key]["value"] for key in self.nodes if self.nodes[key]["has_value"]}
 
     def get_list_of_values(self, list_of_keys):
         """
@@ -306,7 +204,7 @@ class Graph:
         """
         res = []
         for key in list_of_keys:
-            res.append(self.nodes[key].value)
+            res.append(self.nodes[key]["value"])
         return res
 
     def get_dict_of_values(self, list_of_keys):
@@ -323,7 +221,7 @@ class Graph:
         dict
             Dictionary whose keys are the elements of list_of_keys and whose values are the corresponding node values
         """
-        return {key: self.nodes[key].value for key in list_of_keys}
+        return {key: self.nodes[key]["value"] for key in list_of_keys}
 
     def get_kwargs_values(self, dictionary):
         """
@@ -339,50 +237,56 @@ class Graph:
         dict
             A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes
         """
-        return {key: self.nodes[value].value for key, value in dictionary.items()}
+        return {key: self.nodes[value]["value"] for key, value in dictionary.items()}
 
     def evaluate_target(self, target):
         """
         Generic interface to evaluate a GenericNode.
         """
-        node = self.nodes[target]
-        if isinstance(node, Node) or isinstance(node, Placeholder):
-            return self.evaluate_node(node)
-        elif isinstance(node, SimpleConditional):
-            return self.evaluate_conditional(node)
+        attributes = self.nodes[target]
+        if "type" in attributes and attributes["type"] == "standard":
+            return self.evaluate_standard(target)
+        elif "type" in attributes and attributes["type"] == "conditional":
+            return self.evaluate_conditional(target)
+        elif "type" in attributes:
+            raise ValueError("Evaluation of nodes of type ", attributes["type"], " is not supported")
+        else:
+            raise ValueError("Node ", target, " has no type")
 
-    def evaluate_node(self, node):
+    def evaluate_standard(self, node):
         """
         Evaluate of a node.
         """
         # Check if it already has a value
-        if node.has_value:
-            return node.value
+        if self.nodes[node]["has_value"]:
+            return self.nodes[node]["value"]
         # If not, evaluate all arguments
-        for dependency_name in node.dependencies:
+        for dependency_name in self._nxdg.predecessors(node):
             self.evaluate_target(dependency_name)
 
         # Actual computation happens here
         try:
-            res = self.nodes[node.func].value(*self.get_list_of_values(node.arguments), **self.get_kwargs_values(node.keyword_arguments))
+            recipe = self.get_recipe(node)
+            func = self.nodes[recipe]["value"]
+            res = func(*self.get_list_of_values(self.get_args(node)), **self.get_kwargs_values(self.get_kwargs(node)))
         except Exception as e:
             if len(e.args) > 0:
-                e.args = ("While evaluating " + node.name + ": " + e.args[0],) + e.args[1:]
+                e.args = ("While evaluating " + node + ": " + e.args[0],) + e.args[1:]
             raise
-        # Save results and release
-        node.value = res
-        node.has_value = True
-        return node.value
+        # Save results
+        self.nodes[node]["value"] = res
+        self.nodes[node]["has_value"] = True
+        return res
 
     def evaluate_conditional(self, conditional):
         """
         Evaluate a conditional.
         """
         # Check if it already has a value
-        if conditional.has_value:
-            return conditional.value
+        if self.nodes[conditional]["has_value"]:
+            return self.nodes[conditional]["value"]
         # If not, evaluate the conditions until one is found true
-        for index, condition in enumerate(conditional.conditions):
+        for index, condition in enumerate(self.get_conditions(conditional)):
             res = self.evaluate_target(condition)
             if res:
                 break
@@ -390,29 +294,46 @@ class Graph:
             index = -1
 
         # Actual computation happens here
-        res = self.evaluate_target(conditional.possibilities[index])
+        res = self.evaluate_target(self.get_possibilities(conditional)[index])
         # Save results and release
-        conditional.value = res
-        conditional.has_value = True
-        return conditional.value
+        self.nodes[conditional]["value"] = res
+        self.nodes[conditional]["has_value"] = True
+        return res
 
     def execute_to_targets(self, *targets):
         """
         Evaluate all nodes in the graph that are needed to reach the targets.
         """
-        list_of_threads = []
         for target in targets:
             self.evaluate_target(target)
 
-    def isCompatible(self, other):
+    def is_other_node_compatible(self, node, other, other_node):
+        this_attributes = self.nodes[node]
+        other_attributes = other._nxdg.nodes[other_node]
+        # If types differ, return False
+        if this_attributes["type"] != other_attributes["type"]:
+            return False
+        # If nodes are equal, return True
+        if this_attributes == other_attributes:
+            return True
+        # If they both have values but they differ, return False. If only one has a value, proceed
+        if this_attributes["has_value"] and other_attributes["has_value"] and this_attributes["value"] != other_attributes["value"]:
+            return False
+        # If they both have dependencies but they differ, return False. If only one has dependencies, proceed
+        if len(list(self._nxdg.predecessors(node))) != 0 and len(list(other._nxdg.predecessors(other_node))) != 0 and self._nxdg.predecessors(node) != other._nxdg.predecessors(other_node):
+            return False
+        # Return True if at least one has no dependencies (or they are the same), at least one has no value (or they are the same)
+        return True
+
+    def is_compatible(self, other):
         """
-        Check if self and other can be merged. Currently DAG status is not verified.
+        Check if self and other can be composed. Currently DAG status is not verified.
         """
         if not isinstance(other, Graph):
             return False
-        common_nodes = self.nodes.keys() & other.nodes.keys()  # Intersection
+        common_nodes = self.nodes & other._nxdg.nodes  # Intersection
         for key in common_nodes:
-            if not self.nodes[key].isCompatible(other.nodes[key]):
+            if not self.is_other_node_compatible(key, other, key):
                 return False
         return True
 
@@ -420,76 +341,76 @@ class Graph:
         """
         Merge other into self.
         """
-        if not self.isCompatible(other):
+        if not self.is_compatible(other):
             raise ValueError("Cannot merge incompatible graphs")
-        common_nodes = self.nodes.keys() & other.nodes.keys()  # Intersection
-        for key in common_nodes:
-            self.nodes[key].merge(other.nodes[key])
-        new_nodes = {k: other.nodes[k] for k in other.nodes.keys() - self.nodes.keys()}
-        self.nodes.update(new_nodes)
+        res = nx.compose(self._nxdg, other._nxdg)
+        self._nxdg = res
 
     def simplify_dependency(self, node_name, dependency_name):
-        node = self.nodes[node_name]
         # Make everything a keyword argument. This is the fate of a simplified node
-        node.keyword_arguments.update({argument: argument for argument in node.arguments})
+        self.get_kwargs(node_name).update({argument: argument for argument in self.get_args(node_name)})
         # Build lists of dependencies
-        func_dependencies = node.dependencies[1:]
+        func_dependencies = list(self.get_kwargs(node_name).values())
         subfuncs = []
         subfuncs_dependencies = []
-        for argument in node.keyword_arguments:
+        for argument in self.get_kwargs(node_name):
             if argument == dependency_name:
-                subfuncs.append(self[self.nodes[dependency_name].func])
-                subfuncs_dependencies.append(self.nodes[dependency_name].dependencies[1:])
+                subfuncs.append(self[self.get_recipe(dependency_name)])  # Get python function
+                subfuncs_dependencies.append(list(self.get_args(dependency_name)) + list(self.get_kwargs(dependency_name).values()))
             else:
                 subfuncs.append(function_composer.identity_token)
                 subfuncs_dependencies.append([argument])
         # Compose the functions
-        self[node.func] = function_composer.function_compose_simple(self[node.func], subfuncs, func_dependencies, subfuncs_dependencies)
+        self[self.get_recipe(node_name)] = function_composer.function_compose_simple(self[self.get_recipe(node_name)], subfuncs, func_dependencies, subfuncs_dependencies)
+        # Change edges
+        self._nxdg.remove_edge(dependency_name, node_name)
+        for argument in self.get_args(dependency_name) + tuple(self.get_kwargs(dependency_name).values()):
+            self._nxdg.add_edge(argument, node_name, accessor=argument)
         # Update node
-        node.arguments = []
-        node.keyword_arguments.update({argument: argument for argument in self.nodes[dependency_name].dependencies[1:]})
-        node.keyword_arguments = {key: value for key, value in node.keyword_arguments.items() if value != dependency_name}
-        node.dependencies = [node.func] + list(node.arguments) + list(node.keyword_arguments.values())
-        self.nodes[node_name] = node
+        self.nodes[node_name]["args"] = ()
+        self.get_kwargs(node_name).update({argument: argument for argument in self.get_args(dependency_name) + tuple(self.get_kwargs(dependency_name).values())})
+        self.nodes[node_name]["kwargs"] = {key: value for key, value in self.get_kwargs(node_name).items() if value != dependency_name}
 
     def simplify_all_dependencies(self, node_name, exclude=[]):
-        dependencies = self.nodes[node_name].dependencies[1:]
+        dependencies = self.get_args(node_name) + tuple(self.get_kwargs(node_name).values())
         for dependency in dependencies:
-            if dependency not in exclude and isinstance(self.nodes[dependency], Node):
+            if dependency not in exclude and self.nodes[dependency]["type"] == "standard":
                 self.simplify_dependency(node_name, dependency)
 
     def freeze(self, *args):
-        if len(args) == 0: # Interpret as "Freeze everything"
-            nodes_to_freeze = self.nodes.keys()
+        if len(args) == 0:  # Interpret as "Freeze everything"
+            nodes_to_freeze = self.nodes
         else:
             nodes_to_freeze = args
+
         for key in nodes_to_freeze:
-            if self.nodes[key].has_value:
-                self.nodes[key].is_frozen = True
+            if self.nodes[key]["has_value"]:
+                self.nodes[key]["is_frozen"] = True
 
     def unfreeze(self, *args):
-        if len(args) == 0: # Interpret as "Unfreeze everything"
+        if len(args) == 0:  # Interpret as "Unfreeze everything"
             nodes_to_unfreeze = self.nodes.keys()
         else:
             nodes_to_unfreeze = args
-        for key in nodes_to_unfreeze:
-            self.nodes[key].is_frozen = False
 
-    def make_operation_dependencies_also_operations(self):
+        for key in nodes_to_unfreeze:
+            self.nodes[key]["is_frozen"] = False
+
+    def make_recipe_dependencies_also_recipes(self):
         """
-        Make dependencies (parents) of operations also operations
+        Make dependencies (parents) of recipes also recipes
         """
-        for key, node in self.nodes.items():
-            if node.is_operation:
-                for parent in node.dependencies:
-                    self.nodes[parent].is_operation = True
+        for node in self.nodes:
+            if self.is_recipe(node):
+                for parent in self._nxdg.predecessors(node):
+                    self.nodes[parent]["is_recipe"] = True
 
     def finalize_definition(self):
         """
         Perform operations that should typically be done after the definition of a graph is completed
 
         Currently, this freezes all values, because it is assumed that values given during definition are to be frozen.
-        It also marks dependencies of operations as operations themselves.
+        It also marks dependencies of recipes as recipes themselves.
         """
-        self.make_operation_dependencies_also_operations()
+        self.make_recipe_dependencies_also_recipes()
         self.freeze()

@@ -4,16 +4,10 @@ A simple library for dataflow programming in python. Inspired by [`pythonflow`](
 The name QFlow is not definitive.
 
 ## Dependencies
-QFlow itself has no dependencies (except python itself), however, if you want to visualize graphs, you need to install [Graphviz](https://graphviz.org/) and its python wrapper.
-It is advised to do this with `conda`:
-```console
-conda install -y graphviz python-graphviz
-```
-
-If you need to run test, also install `pytest`:
-```console
-pip install pytest
-```
+QFlow depends only on [`networkx`](https://github.com/networkx/networkx), which is included in Anaconda.
+To visualize graphs, [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) is also needed.
+For its installation, refer to the official [guide](https://pygraphviz.github.io/documentation/stable/install.html).
+Finally, [`pytest`](https://github.com/pytest-dev/pytest) is needed to run the tests.
 
 ## Installation
 Move to the root directory of the QFlow source code (the one where `setup.py` is located) and run
