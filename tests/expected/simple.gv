@@ -20,8 +20,7 @@ strict digraph "" {
 		shape=box,
 		type=standard,
 		value=None];
-	e -> g	[accessor=0,
-		type=standard];
+	e -> g;
 	op_e	[has_value=False,
 		is_frozen=False,
 		is_recipe=True,
@@ -29,8 +28,7 @@ strict digraph "" {
 		shape=ellipse,
 		type=standard,
 		value=None];
-	op_e -> e	[arrowhead=dot,
-		type=recipe];
+	op_e -> e	[arrowhead=dot];
 	a	[has_value=False,
 		is_frozen=False,
 		is_recipe=False,
@@ -38,8 +36,7 @@ strict digraph "" {
 		shape=box,
 		type=standard,
 		value=None];
-	a -> e	[accessor=0,
-		type=standard];
+	a -> e;
 	b	[has_value=False,
 		is_frozen=False,
 		is_recipe=False,
@@ -47,8 +44,7 @@ strict digraph "" {
 		shape=box,
 		type=standard,
 		value=None];
-	b -> e	[accessor=1,
-		type=standard];
+	b -> e;
 	f	[args="('c', 'd')",
 		has_value=False,
 		is_frozen=False,
@@ -59,8 +55,7 @@ strict digraph "" {
 		shape=box,
 		type=standard,
 		value=None];
-	f -> g	[accessor=1,
-		type=standard];
+	f -> g;
 	op_f	[has_value=False,
 		is_frozen=False,
 		is_recipe=True,
@@ -68,8 +63,7 @@ strict digraph "" {
 		shape=ellipse,
 		type=standard,
 		value=None];
-	op_f -> f	[arrowhead=dot,
-		type=recipe];
+	op_f -> f	[arrowhead=dot];
 	c	[has_value=False,
 		is_frozen=False,
 		is_recipe=False,
@@ -77,8 +71,7 @@ strict digraph "" {
 		shape=box,
 		type=standard,
 		value=None];
-	c -> f	[accessor=0,
-		type=standard];
+	c -> f;
 	d	[has_value=False,
 		is_frozen=False,
 		is_recipe=False,
@@ -86,8 +79,7 @@ strict digraph "" {
 		shape=box,
 		type=standard,
 		value=None];
-	d -> f	[accessor=1,
-		type=standard];
+	d -> f;
 	op_g	[has_value=False,
 		is_frozen=False,
 		is_recipe=True,
@@ -95,6 +87,5 @@ strict digraph "" {
 		shape=ellipse,
 		type=standard,
 		value=None];
-	op_g -> g	[arrowhead=dot,
-		type=recipe];
+	op_g -> g	[arrowhead=dot];
 }

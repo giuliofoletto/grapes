@@ -61,19 +61,23 @@ class Graph():
             # Add and connect the recipe
             self._nxdg.add_node(recipe, **starting_node_properties)
             self.nodes[recipe]["is_recipe"] = True
-            self._nxdg.add_edge(recipe, name, type="recipe")
+            # Note: adding argument to the edges is elegant but impractical.
+            # If relations were defined through edges attributes rather than stored inside nodes,
+            # retrieving them would require iterating through all edges and selecting the ones with the right attributes.
+            # Although feasible, this is much slower than simply accessing node attributes.
+            self._nxdg.add_edge(recipe, name)
 
             # Add and connect the other dependencies
-            for index, arg in enumerate(args):
+            for arg in args:
                 # Avoid adding existing dependencies so as not to overwrite attributes
                 if arg not in self.nodes:
                     self._nxdg.add_node(arg, **starting_node_properties)
-                self._nxdg.add_edge(arg, name, type="standard", accessor=index)
-            for key, value in kwargs.items():
+                self._nxdg.add_edge(arg, name)
+            for value in kwargs.values():
                 # Avoid adding existing dependencies so as not to overwrite attributes
                 if value not in self.nodes:
                     self._nxdg.add_node(value, **starting_node_properties)
-                self._nxdg.add_edge(value, name, type="standard", accessor=key)
+                self._nxdg.add_edge(value, name)
 
     def add_simple_conditional(self, name, condition, value_true, value_false):
         """
@@ -87,9 +91,9 @@ class Graph():
                 self._nxdg.add_node(node, **starting_node_properties)
 
         # Connect edges
-        self._nxdg.add_edge(condition, name, type="condition")
-        self._nxdg.add_edge(value_true, name, type="standard", accessor=True)
-        self._nxdg.add_edge(value_false, name, type="standard", accessor=False)
+        self._nxdg.add_edge(condition, name)
+        self._nxdg.add_edge(value_true, name)
+        self._nxdg.add_edge(value_false, name)
 
         # Specify that this node is a conditional
         self.nodes[name]["type"] = "conditional"
