@@ -28,14 +28,13 @@ class Graph():
         """
         Get the value of a node with []
         """
-        return self.nodes[node]["value"]
+        return self.get_value(node)
 
     def __setitem__(self, node, value):
         """
         Set the value of a node with []
         """
-        self.nodes[node]["value"] = value
-        self.nodes[node]["has_value"] = True
+        self.set_value(node, value)
 
     def __eq__(self, other):
         """
@@ -56,11 +55,17 @@ class Graph():
 
         else:  # Standard case
             # Add the node
-            self._nxdg.add_node(name, recipe=recipe, args=args, kwargs=kwargs, **starting_node_properties)
+            self._nxdg.add_node(name, **starting_node_properties)
+            # Set attributes
+            # Note: This could be done in the constructor, but doing it separately adds flexibility
+            # Indeed, we might want to change how attributes work, and we can do it by modifying setters
+            self.set_recipe(name, recipe)
+            self.set_args(name, args)
+            self.set_kwargs(name, kwargs)
 
             # Add and connect the recipe
             self._nxdg.add_node(recipe, **starting_node_properties)
-            self.nodes[recipe]["is_recipe"] = True
+            self.set_is_recipe(recipe, True)
             # Note: adding argument to the edges is elegant but impractical.
             # If relations were defined through edges attributes rather than stored inside nodes,
             # retrieving them would require iterating through all edges and selecting the ones with the right attributes.
@@ -96,60 +101,100 @@ class Graph():
         self._nxdg.add_edge(value_false, name)
 
         # Specify that this node is a conditional
-        self.nodes[name]["type"] = "conditional"
+        self.set_type(name, "conditional")
 
         # Add conditions name to the list of conditions of the conditional
-        self.nodes[name]["conditions"] = [condition]
+        self.set_conditions(name, [condition])
 
         # Add possibilities to the list of possibilities of the conditional
-        self.nodes[name]["possibilities"] = [value_true, value_false]
+        self.set_possibilities(name, [value_true, value_false])
+
+    def get_node_attribute(self, node, attribute):
+        attributes = self.nodes[node]
+        if attribute in attributes and attributes[attribute] is not None:
+            return attributes[attribute]
+        else:
+            raise ValueError("Node ", node, " has no ", attribute)
+
+    def set_node_attribute(self, node, attribute, value):
+        self.nodes[node][attribute] = value
 
     def is_recipe(self, node):
-        return self.nodes[node]["is_recipe"]
+        return self.get_node_attribute(node, "is_recipe")
+
+    def set_is_recipe(self, node, is_recipe):
+        return self.set_node_attribute(node, "is_recipe", is_recipe)
 
     def get_recipe(self, node):
-        attributes = self.nodes[node]
-        if "recipe" in attributes and attributes["recipe"] is not None:
-            return attributes["recipe"]
-        else:
-            raise ValueError("Node ", node, " has no recipe")
+        return self.get_node_attribute(node, "recipe")
+
+    def set_recipe(self, node, recipe):
+        return self.set_node_attribute(node, "recipe", recipe)
 
     def get_args(self, node):
-        attributes = self.nodes[node]
-        if "args" in attributes and attributes["args"] is not None:
-            return attributes["args"]
-        else:
-            raise ValueError("Node ", node, " has no args")
+        return self.get_node_attribute(node, "args")
+
+    def set_args(self, node, args):
+        return self.set_node_attribute(node, "args", args)
 
     def get_kwargs(self, node):
-        attributes = self.nodes[node]
-        if "kwargs" in attributes and attributes["kwargs"] is not None:
-            return attributes["kwargs"]
-        else:
-            raise ValueError("Node ", node, " has no kwargs")
+        return self.get_node_attribute(node, "kwargs")
+
+    def set_kwargs(self, node, kwargs):
+        return self.set_node_attribute(node, "kwargs", kwargs)
 
     def get_conditions(self, node):
-        attributes = self.nodes[node]
-        if "conditions" in attributes and attributes["conditions"] is not None:
-            return attributes["conditions"]
-        else:
-            raise ValueError("Node ", node, " has no conditions")
+        return self.get_node_attribute(node, "conditions")
+
+    def set_conditions(self, node, conditions):
+        return self.set_node_attribute(node, "conditions", conditions)
 
     def get_possibilities(self, node):
+        return self.get_node_attribute(node, "possibilities")
+
+    def set_possibilities(self, node, possibilities):
+        return self.set_node_attribute(node, "possibilities", possibilities)
+
+    def get_type(self, node):
+        return self.get_node_attribute(node, "type")
+
+    def set_type(self, node, type):
+        return self.set_node_attribute(node, "type", type)
+
+    def get_value(self, node):
         attributes = self.nodes[node]
-        if "possibilities" in attributes and attributes["possibilities"] is not None:
-            return attributes["possibilities"]
+        if "value" in attributes and attributes["value"] is not None and self.nodes[node]["has_value"]:
+            return attributes["value"]
         else:
-            raise ValueError("Node ", node, " has no possibilities")
+            raise ValueError("Node ", node, " has no value")
+
+    def set_value(self, node, value):
+        self.nodes[node]["value"] = value
+        self.nodes[node]["has_value"] = True
+
+    def unset_value(self, node):
+        self.nodes[node]["has_value"] = False
+
+    def is_frozen(self, node):
+        return self.get_node_attribute(node, "is_frozen")
+
+    def set_is_frozen(self, node, is_frozen):
+        return self.set_node_attribute(node, "is_frozen", is_frozen)
+
+    def has_value(self, node):
+        return self.get_node_attribute(node, "has_value")
+
+    def set_has_value(self, node, has_value):
+        return self.set_node_attribute(node, "has_value", has_value)
 
     def clear_values(self):
         """
         Clear all values in the graph nodes.
         """
         for node in self.nodes:
-            if self.nodes[node]["is_frozen"]:
+            if self.is_frozen(node):
                 continue
-            self.nodes[node]["has_value"] = False
+            self.unset_value(node)
 
     def update_internal_context(self, dictionary):
         """
@@ -163,8 +208,7 @@ class Graph():
         for key, value in dictionary.items():
             # Accept dictionaries with more keys than needed
             if key in self.nodes:
-                self.nodes[key]["value"] = value
-                self.nodes[key]["has_value"] = True
+                self.set_value(key, value)
 
     def set_internal_context(self, dictionary):
         """
@@ -188,9 +232,9 @@ class Graph():
             Whether to exclude recipes from the returned dictionary or keep them.
         """
         if exclude_recipes:
-            return {key: self.nodes[key]["value"] for key in self.nodes if (self.nodes[key]["has_value"] and not self.is_recipe(self.nodes[key]))}
+            return {key: self.get_value(key) for key in self.nodes if (self.has_value(key) and not self.is_recipe(key))}
         else:
-            return {key: self.nodes[key]["value"] for key in self.nodes if self.nodes[key]["has_value"]}
+            return {key: self.get_value(key) for key in self.nodes if self.has_value(key)}
 
     def get_list_of_values(self, list_of_keys):
         """
@@ -208,7 +252,7 @@ class Graph():
         """
         res = []
         for key in list_of_keys:
-            res.append(self.nodes[key]["value"])
+            res.append(self.get_value(key))
         return res
 
     def get_dict_of_values(self, list_of_keys):
@@ -225,7 +269,7 @@ class Graph():
         dict
             Dictionary whose keys are the elements of list_of_keys and whose values are the corresponding node values
         """
-        return {key: self.nodes[key]["value"] for key in list_of_keys}
+        return {key: self.get_value(key) for key in list_of_keys}
 
     def get_kwargs_values(self, dictionary):
         """
@@ -241,29 +285,26 @@ class Graph():
         dict
             A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes
         """
-        return {key: self.nodes[value]["value"] for key, value in dictionary.items()}
+        return {key: self.get_value(value) for key, value in dictionary.items()}
 
     def evaluate_target(self, target):
         """
         Generic interface to evaluate a GenericNode.
         """
-        attributes = self.nodes[target]
-        if "type" in attributes and attributes["type"] == "standard":
+        if self.get_type(target) == "standard":
             return self.evaluate_standard(target)
-        elif "type" in attributes and attributes["type"] == "conditional":
+        elif self.get_type(target) == "conditional":
             return self.evaluate_conditional(target)
-        elif "type" in attributes:
-            raise ValueError("Evaluation of nodes of type ", attributes["type"], " is not supported")
         else:
-            raise ValueError("Node ", target, " has no type")
+            raise ValueError("Evaluation of nodes of type ", self.get_type(target), " is not supported")
 
     def evaluate_standard(self, node):
         """
         Evaluate of a node.
         """
         # Check if it already has a value
-        if self.nodes[node]["has_value"]:
-            return self.nodes[node]["value"]
+        if self.has_value(node):
+            return self.get_value(node)
         # If not, evaluate all arguments
         for dependency_name in self._nxdg.predecessors(node):
             self.evaluate_target(dependency_name)
@@ -271,15 +312,14 @@ class Graph():
         # Actual computation happens here
         try:
             recipe = self.get_recipe(node)
-            func = self.nodes[recipe]["value"]
+            func = self.get_value(recipe)
             res = func(*self.get_list_of_values(self.get_args(node)), **self.get_kwargs_values(self.get_kwargs(node)))
         except Exception as e:
             if len(e.args) > 0:
                 e.args = ("While evaluating " + node + ": " + e.args[0],) + e.args[1:]
             raise
         # Save results
-        self.nodes[node]["value"] = res
-        self.nodes[node]["has_value"] = True
+        self.set_value(node, res)
         return res
 
     def evaluate_conditional(self, conditional):
@@ -287,8 +327,8 @@ class Graph():
         Evaluate a conditional.
         """
         # Check if it already has a value
-        if self.nodes[conditional]["has_value"]:
-            return self.nodes[conditional]["value"]
+        if self.has_value(conditional):
+            return self.get_value(conditional)
         # If not, evaluate the conditions until one is found true
         for index, condition in enumerate(self.get_conditions(conditional)):
             res = self.evaluate_target(condition)
@@ -300,8 +340,7 @@ class Graph():
         # Actual computation happens here
         res = self.evaluate_target(self.get_possibilities(conditional)[index])
         # Save results and release
-        self.nodes[conditional]["value"] = res
-        self.nodes[conditional]["has_value"] = True
+        self.set_value(conditional, res)
         return res
 
     def execute_to_targets(self, *targets):
@@ -312,16 +351,14 @@ class Graph():
             self.evaluate_target(target)
 
     def is_other_node_compatible(self, node, other, other_node):
-        this_attributes = self.nodes[node]
-        other_attributes = other._nxdg.nodes[other_node]
         # If types differ, return False
-        if this_attributes["type"] != other_attributes["type"]:
+        if self.get_type(node) != other.get_type(other_node):
             return False
         # If nodes are equal, return True
-        if this_attributes == other_attributes:
+        if self.nodes[node] == other._nxdg.nodes[other_node]:
             return True
         # If they both have values but they differ, return False. If only one has a value, proceed
-        if this_attributes["has_value"] and other_attributes["has_value"] and this_attributes["value"] != other_attributes["value"]:
+        if self.has_value(node) and other.has_value(other_node) and self.get_value(node) != other.get_value(other_node):
             return False
         # If they both have dependencies but they differ, return False. If only one has dependencies, proceed
         if len(list(self._nxdg.predecessors(node))) != 0 and len(list(other._nxdg.predecessors(other_node))) != 0 and self._nxdg.predecessors(node) != other._nxdg.predecessors(other_node):
@@ -371,14 +408,16 @@ class Graph():
         for argument in self.get_args(dependency_name) + tuple(self.get_kwargs(dependency_name).values()):
             self._nxdg.add_edge(argument, node_name, accessor=argument)
         # Update node
-        self.nodes[node_name]["args"] = ()
-        self.get_kwargs(node_name).update({argument: argument for argument in self.get_args(dependency_name) + tuple(self.get_kwargs(dependency_name).values())})
-        self.nodes[node_name]["kwargs"] = {key: value for key, value in self.get_kwargs(node_name).items() if value != dependency_name}
+        self.set_args(node_name, ())
+        new_kwargs = self.get_kwargs(node_name)
+        new_kwargs.update({argument: argument for argument in self.get_args(dependency_name) + tuple(self.get_kwargs(dependency_name).values())})
+        new_kwargs = {key: value for key, value in new_kwargs.items() if value != dependency_name}
+        self.set_kwargs(node_name, new_kwargs)
 
     def simplify_all_dependencies(self, node_name, exclude=[]):
         dependencies = self.get_args(node_name) + tuple(self.get_kwargs(node_name).values())
         for dependency in dependencies:
-            if dependency not in exclude and self.nodes[dependency]["type"] == "standard":
+            if dependency not in exclude and self.get_type(dependency) == "standard":
                 self.simplify_dependency(node_name, dependency)
 
     def freeze(self, *args):
@@ -388,8 +427,8 @@ class Graph():
             nodes_to_freeze = args
 
         for key in nodes_to_freeze:
-            if self.nodes[key]["has_value"]:
-                self.nodes[key]["is_frozen"] = True
+            if self.has_value(key):
+                self.set_is_frozen(key, True)
 
     def unfreeze(self, *args):
         if len(args) == 0:  # Interpret as "Unfreeze everything"
@@ -398,7 +437,7 @@ class Graph():
             nodes_to_unfreeze = args
 
         for key in nodes_to_unfreeze:
-            self.nodes[key]["is_frozen"] = False
+            self.set_is_frozen(key, False)
 
     def make_recipe_dependencies_also_recipes(self):
         """
@@ -407,7 +446,7 @@ class Graph():
         for node in self.nodes:
             if self.is_recipe(node):
                 for parent in self._nxdg.predecessors(node):
-                    self.nodes[parent]["is_recipe"] = True
+                    self.set_is_recipe(parent, True)
 
     def finalize_definition(self):
         """
