@@ -12,7 +12,7 @@ def execute_graph_from_context(graph, context, *targets, inplace=False):
 
     Parameters
     ----------
-    graph : qflow Graph
+    graph : grapes Graph
         Graph of the computation.
     context : dict
         Dictionary of the initial context of the computation (input).
@@ -23,7 +23,7 @@ def execute_graph_from_context(graph, context, *targets, inplace=False):
 
     Returns
     -------
-    qflow Graph
+    grapes Graph
         Graph with context updated after computation.
     """
 
@@ -42,7 +42,7 @@ def json_from_graph(graph):
 
     Parameters
     ----------
-    graph : qflow Graph
+    graph : grapes Graph
         Graph containing the context to convert to JSON.
 
     Returns

@@ -1,12 +1,12 @@
 from setuptools import setup
 
-setup(name='qflow',
+setup(name='grapes',
       version='0.3',
       description='Helper for dataflow based programming',
       author='Giulio Foletto',
       author_email='giulio.foletto@outlook.com',
       license='MIT',
-      packages=['qflow'],
+      packages=['grapes'],
       install_requires=[
           'networkx',
       ],

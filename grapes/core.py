@@ -1,5 +1,5 @@
 """
-Core of the qflow package. Includes the classes for nodes and graphs.
+Core of the grapes package. Includes the classes for nodes and graphs.
 
 Author: Giulio Foletto. 
 """
