@@ -3,3 +3,4 @@
 
 # Match file that require lf
 tests/expected/expected.pkl text eol=lf
+**/*.gv text eol=lf
