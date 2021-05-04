@@ -51,7 +51,7 @@ def json_from_graph(graph):
         JSON string that prettily represents the context of the graph.
     """
 
-    context = graph.get_internal_context(only_data=True)
+    context = graph.get_internal_context(exclude_recipes=True)
     non_serializable_items = {}
     for key, value in context.items():
         try:

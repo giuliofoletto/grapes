@@ -51,11 +51,15 @@ class Graph():
             raise ValueError("Cannot add node with dependencies without a recipe")
 
         elif recipe is None:  # Accept nodes with no dependencies
-            self._nxdg.add_node(name, **starting_node_properties)
+            # Avoid adding existing node so as not to overwrite attributes
+            if name not in self.nodes:
+                self._nxdg.add_node(name, **starting_node_properties)
 
         else:  # Standard case
             # Add the node
-            self._nxdg.add_node(name, **starting_node_properties)
+            # Avoid adding existing node so as not to overwrite attributes
+            if name not in self.nodes:
+                self._nxdg.add_node(name, **starting_node_properties)
             # Set attributes
             # Note: This could be done in the constructor, but doing it separately adds flexibility
             # Indeed, we might want to change how attributes work, and we can do it by modifying setters
@@ -64,7 +68,9 @@ class Graph():
             self.set_kwargs(name, kwargs)
 
             # Add and connect the recipe
-            self._nxdg.add_node(recipe, **starting_node_properties)
+            # Avoid adding existing recipe so as not to overwrite attributes
+            if recipe not in self.nodes:
+                self._nxdg.add_node(recipe, **starting_node_properties)
             self.set_is_recipe(recipe, True)
             # Note: adding argument to the edges is elegant but impractical.
             # If relations were defined through edges attributes rather than stored inside nodes,
@@ -386,6 +392,8 @@ class Graph():
             raise ValueError("Cannot merge incompatible graphs")
         res = nx.compose(self._nxdg, other._nxdg)
         self._nxdg = res
+        # Refresh alias for easy access
+        self.nodes = self._nxdg.nodes
 
     def simplify_dependency(self, node_name, dependency_name):
         # Make everything a keyword argument. This is the fate of a simplified node

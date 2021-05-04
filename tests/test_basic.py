@@ -78,6 +78,21 @@ def test_merge():
     assert g == exp
 
 
+def test_merge_and_execute():
+    exp = gr.Graph()
+    exp.add_step("c", "op_c", "a", "b")
+    exp.add_step("e", "op_e", "c", "d")
+
+    g = gr.Graph()
+    g.add_step("c", "op_c", "a", "b")
+    h = gr.Graph()
+    h.add_step("e", "op_e", "c", "d")
+    g.merge(h)
+
+    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "d": 4, "op_c": lambda x, y: x+y, "op_e": lambda x, y: x*y}, "e")
+    assert res["e"] == 12
+
+
 def test_kwargs():
     g = gr.Graph()
     g.add_step("c", "op_c", "a", exponent="b")
