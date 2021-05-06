@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='grapes',
-      version='0.3',
+      version='0.4',
       description='Helper for dataflow based programming',
       author='Giulio Foletto',
       author_email='giulio.foletto@outlook.com',
