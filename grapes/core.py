@@ -322,7 +322,7 @@ class Graph():
             res = func(*self.get_list_of_values(self.get_args(node)), **self.get_kwargs_values(self.get_kwargs(node)))
         except Exception as e:
             if len(e.args) > 0:
-                e.args = ("While evaluating " + node + ": " + e.args[0],) + e.args[1:]
+                e.args = ("While evaluating " + node + ": " + str(e.args[0]),) + e.args[1:]
             raise
         # Save results
         self.set_value(node, res)
