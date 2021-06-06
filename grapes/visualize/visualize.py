@@ -1,10 +1,10 @@
 """
 Tools that allow the visualization of a graph using graphviz. Requires pygraphviz.
 
-Author: Giulio Foletto.
+Author: Giulio Foletto <giulio.foletto@outlook.com>.
+License: See project-level license file.
 """
 
-# import graphviz
 import networkx
 from .. import *
 

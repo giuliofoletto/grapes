@@ -1,3 +1,10 @@
+"""
+Some tools to compose functions into one.
+
+Author: Giulio Foletto <giulio.foletto@outlook.com>.
+License: See project-level license file.
+"""
+
 import inspect
 
 

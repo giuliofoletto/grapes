@@ -1,8 +1,10 @@
 """
 Core of the grapes package. Includes the classes for nodes and graphs.
 
-Author: Giulio Foletto. 
+Author: Giulio Foletto <giulio.foletto@outlook.com>.
+License: See project-level license file.
 """
+
 import networkx as nx
 from . import function_composer
 

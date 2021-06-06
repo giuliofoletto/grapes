@@ -1,12 +1,17 @@
 """
 Tests of visualization.
+
 In many tests, the source of a graphviz graph is compared to an expected value stored in a pickle (pkl) file.
 To build a new test of this kind, simply insert a line like
 expected_sources[name] = gv.string()
 just before the assertion. This populates the expected file with the graph produced by the test.
 After running the test once (with pytest), remove that line, otherwise the test always passes.
 Remember to use LF line endings in the pkl file.
+
+Author: Giulio Foletto <giulio.foletto@outlook.com>.
+License: See project-level license file.
 """
+
 import pytest
 import grapes as gr
 import grapes.visualize

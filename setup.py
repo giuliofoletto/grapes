@@ -1,3 +1,12 @@
+"""
+Setup file to install grapes as a package.
+
+Usage: pip install .
+
+Author: Giulio Foletto <giulio.foletto@outlook.com>.
+License: See project-level license file.
+"""
+
 from setuptools import setup
 
 setup(name='grapes',

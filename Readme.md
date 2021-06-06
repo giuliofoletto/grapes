@@ -15,5 +15,13 @@ Move to the root directory of the grapes source code (the one where `setup.py` i
 pip install -e .
 ```
 
-## Copyright
-The bulk of grapes development was done by Giulio Foletto in his spare time. The plan is to release this code in an open manner. However, for the moment Giulio Foletto retains all copyright.
+## Roadmap
+Future plans include:
+
+* Better explanation of what `grapes` is.
+* Usage examples.
+* Better comments and documentation.
+
+## Authorship and License
+The bulk of `grapes` development was done by Giulio Foletto in his spare time.
+See the project-level license file for details on how `grapes` is distributed.

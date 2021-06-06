@@ -1,8 +1,10 @@
 """
 Some utilities. Also, a more functional API to the execution of graphs.
 
-Author: Giulio Foletto.
+Author: Giulio Foletto <giulio.foletto@outlook.com>.
+License: See project-level license file.
 """
+
 import json
 import copy
 
