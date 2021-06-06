@@ -9,9 +9,18 @@ License: See project-level license file.
 
 from setuptools import setup
 
+# Assign the content of README.md to long_description
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(name='grapes',
-      version='0.4',
+      version='0.4.1',
       description='Helper for dataflow based programming',
+      long_description=long_description,
+      long_description_content_type='text/markdown',
+      url='https://github.com/giuliofoletto/grapes',
       author='Giulio Foletto',
       author_email='giulio.foletto@outlook.com',
       license='Apache',
