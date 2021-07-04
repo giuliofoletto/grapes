@@ -406,6 +406,8 @@ class Graph():
         subfuncs_dependencies = []
         for argument in self.get_kwargs(node_name):
             if argument == dependency_name:
+                if self.get_type(dependency_name) == "conditional" or self.get_type(self.get_recipe(dependency_name)) == "conditional":
+                    raise TypeError("Simplification does not support conditional nodes.")
                 subfuncs.append(self[self.get_recipe(dependency_name)])  # Get python function
                 subfuncs_dependencies.append(list(self.get_args(dependency_name)) + list(self.get_kwargs(dependency_name).values()))
             else:
