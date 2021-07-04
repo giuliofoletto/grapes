@@ -87,13 +87,17 @@ def context_from_json_file(file_name):
 
 
 def wrap_graph_with_function(graph, input_keys, *targets):
+    # Copy graph so as not to pollute the original
+    operational_graph = copy.deepcopy(graph)
+
     def specific_function(*args):
-        operational_graph = copy.deepcopy(graph)
         # Use for loop rather than dict comprehension because it is a more basic operation
         for i in range(len(input_keys)):
             operational_graph[input_keys[i]] = args[i]
         operational_graph.execute_to_targets(*targets)
         list_of_values = operational_graph.get_list_of_values(targets)
+        # Clear values so that the function can be called again
+        operational_graph.clear_values()
         if len(list_of_values) == 1:
             return list_of_values[0]
         else:
