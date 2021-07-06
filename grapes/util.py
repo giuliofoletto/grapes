@@ -86,9 +86,17 @@ def context_from_json_file(file_name):
     return data
 
 
-def wrap_graph_with_function(graph, input_keys, *targets, input_as_kwargs=True):
+def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as_kwargs=True):
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
+    # Pass all constants to the graph
+    operational_graph.update_internal_context(constants)
+    # Freeze so that the constants are fixed
+    operational_graph.freeze()
+    # Unfreeze the input.
+    # Note that this has precedence over constants (i.e., if a key is both input and constant, it is treated as input)
+    operational_graph.unfreeze(*input_keys)
+
     if input_as_kwargs:
         def specific_function(**kwargs):
             # Use for loop rather than dict comprehension because it is a more basic operation
