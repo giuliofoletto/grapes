@@ -95,7 +95,10 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
     operational_graph.freeze()
     # Unfreeze the input.
     # Note that this has precedence over constants (i.e., if a key is both input and constant, it is treated as input)
-    operational_graph.unfreeze(*input_keys)
+    if len(input_keys) > 0:
+        operational_graph.unfreeze(*input_keys)
+        operational_graph.clear_values(*input_keys)
+    operational_graph.progress_towards_targets(*targets)
 
     if input_as_kwargs:
         def specific_function(**kwargs):
