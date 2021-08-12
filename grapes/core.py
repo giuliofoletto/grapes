@@ -202,7 +202,7 @@ class Graph():
         if len(args) == 0:  # Interpret as "Clear everything"
             nodes_to_clear = self.nodes
         else:
-            nodes_to_clear = args
+            nodes_to_clear = args & self.nodes  # Intersection
 
         for node in nodes_to_clear:
             if self.is_frozen(node):
@@ -468,7 +468,7 @@ class Graph():
         if len(args) == 0:  # Interpret as "Freeze everything"
             nodes_to_freeze = self.nodes
         else:
-            nodes_to_freeze = args
+            nodes_to_freeze = args & self.nodes  # Intersection
 
         for key in nodes_to_freeze:
             if self.has_value(key):
@@ -478,7 +478,7 @@ class Graph():
         if len(args) == 0:  # Interpret as "Unfreeze everything"
             nodes_to_unfreeze = self.nodes.keys()
         else:
-            nodes_to_unfreeze = args
+            nodes_to_unfreeze = args & self.nodes  # Intersection
 
         for key in nodes_to_unfreeze:
             self.set_is_frozen(key, False)
