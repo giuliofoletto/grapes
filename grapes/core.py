@@ -312,7 +312,8 @@ class Graph():
         """
         # Check if it already has a value
         if self.has_value(node):
-            return self.get_value(node)
+            self.get_value(node)
+            return
         # If not, evaluate all arguments
         for dependency_name in self._nxdg.predecessors(node):
             self.evaluate_target(dependency_name)
@@ -328,7 +329,6 @@ class Graph():
             raise
         # Save results
         self.set_value(node, res)
-        return res
 
     def evaluate_conditional(self, conditional):
         """
@@ -336,20 +336,28 @@ class Graph():
         """
         # Check if it already has a value
         if self.has_value(conditional):
-            return self.get_value(conditional)
+            self.get_value(conditional)
+            return
         # If not, evaluate the conditions until one is found true
         for index, condition in enumerate(self.get_conditions(conditional)):
-            res = self.evaluate_target(condition)
-            if res:
+            self.evaluate_target(condition)
+            if self.has_value(condition) and self.get_value(condition):
                 break
+            elif not self.has_value(condition):
+                # Computing failed
+                raise ValueError("Node " + condition + " could not be computed.")
         else:  # Happens if loop is never broken, i.e. when no conditions are true
             index = -1
 
         # Actual computation happens here
-        res = self.evaluate_target(self.get_possibilities(conditional)[index])
+        try:
+            possibility = self.get_possibilities(conditional)[index]
+            self.evaluate_target(possibility)
+            res = self.get_value(possibility)
+        except:
+            raise ValueError("Node " + possibility + " could not be computed.")
         # Save results and release
         self.set_value(conditional, res)
-        return res
 
     def execute_to_targets(self, *targets):
         """
