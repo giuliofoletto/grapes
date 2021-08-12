@@ -195,11 +195,16 @@ class Graph():
     def set_has_value(self, node, has_value):
         return self.set_node_attribute(node, "has_value", has_value)
 
-    def clear_values(self):
+    def clear_values(self, *args):
         """
-        Clear all values in the graph nodes.
+        Clear values in the graph nodes.
         """
-        for node in self.nodes:
+        if len(args) == 0:  # Interpret as "Clear everything"
+            nodes_to_clear = self.nodes
+        else:
+            nodes_to_clear = args
+
+        for node in nodes_to_clear:
             if self.is_frozen(node):
                 continue
             self.unset_value(node)
