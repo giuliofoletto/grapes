@@ -295,18 +295,18 @@ class Graph():
         """
         return {key: self.get_value(value) for key, value in dictionary.items()}
 
-    def evaluate_target(self, target):
+    def evaluate_target(self, target, continue_on_fail=False):
         """
         Generic interface to evaluate a GenericNode.
         """
         if self.get_type(target) == "standard":
-            return self.evaluate_standard(target)
+            return self.evaluate_standard(target, continue_on_fail)
         elif self.get_type(target) == "conditional":
-            return self.evaluate_conditional(target)
+            return self.evaluate_conditional(target, continue_on_fail)
         else:
             raise ValueError("Evaluation of nodes of type ", self.get_type(target), " is not supported")
 
-    def evaluate_standard(self, node):
+    def evaluate_standard(self, node, continue_on_fail=False):
         """
         Evaluate of a node.
         """
@@ -316,7 +316,7 @@ class Graph():
             return
         # If not, evaluate all arguments
         for dependency_name in self._nxdg.predecessors(node):
-            self.evaluate_target(dependency_name)
+            self.evaluate_target(dependency_name, continue_on_fail)
 
         # Actual computation happens here
         try:
@@ -324,13 +324,17 @@ class Graph():
             func = self.get_value(recipe)
             res = func(*self.get_list_of_values(self.get_args(node)), **self.get_kwargs_values(self.get_kwargs(node)))
         except Exception as e:
-            if len(e.args) > 0:
-                e.args = ("While evaluating " + node + ": " + str(e.args[0]),) + e.args[1:]
-            raise
+            if continue_on_fail:
+                # Do nothing, we want to keep going
+                return
+            else:
+                if len(e.args) > 0:
+                    e.args = ("While evaluating " + node + ": " + str(e.args[0]),) + e.args[1:]
+                raise
         # Save results
         self.set_value(node, res)
 
-    def evaluate_conditional(self, conditional):
+    def evaluate_conditional(self, conditional, continue_on_fail=False):
         """
         Evaluate a conditional.
         """
@@ -340,22 +344,30 @@ class Graph():
             return
         # If not, evaluate the conditions until one is found true
         for index, condition in enumerate(self.get_conditions(conditional)):
-            self.evaluate_target(condition)
+            self.evaluate_target(condition, continue_on_fail)
             if self.has_value(condition) and self.get_value(condition):
                 break
             elif not self.has_value(condition):
                 # Computing failed
-                raise ValueError("Node " + condition + " could not be computed.")
+                if continue_on_fail:
+                    # Do nothing, we want to keep going
+                    return
+                else:
+                    raise ValueError("Node " + condition + " could not be computed.")
         else:  # Happens if loop is never broken, i.e. when no conditions are true
             index = -1
 
         # Actual computation happens here
         try:
             possibility = self.get_possibilities(conditional)[index]
-            self.evaluate_target(possibility)
+            self.evaluate_target(possibility, continue_on_fail)
             res = self.get_value(possibility)
         except:
-            raise ValueError("Node " + possibility + " could not be computed.")
+            if continue_on_fail:
+                # Do nothing, we want to keep going
+                return
+            else:
+                raise ValueError("Node " + possibility + " could not be computed.")
         # Save results and release
         self.set_value(conditional, res)
 
@@ -364,7 +376,14 @@ class Graph():
         Evaluate all nodes in the graph that are needed to reach the targets.
         """
         for target in targets:
-            self.evaluate_target(target)
+            self.evaluate_target(target, False)
+
+    def progress_towards_targets(self, *targets):
+        """
+        Move towards the targets by evaluating nodes, but keep going if evaluation fails.
+        """
+        for target in targets:
+            self.evaluate_target(target, True)
 
     def is_other_node_compatible(self, node, other, other_node):
         # If types differ, return False

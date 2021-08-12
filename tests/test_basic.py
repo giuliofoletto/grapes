@@ -173,3 +173,19 @@ def test_simplify_all_dependencies():
 
     res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
     assert res["g"] == -9
+
+
+def test_progress_towards_targets():
+    g = gr.Graph()
+    g.add_step("b", "op_b", "a")
+    g.add_step("f", "op_f", "b", "c", "e")
+    g.add_step("e", "op_e", "d")
+
+    context = {"op_b": lambda x: 2*x, "op_e": lambda x: 3*x, "op_f": lambda x, y, z: x + y + z, "a": 5, "d": 4}
+    g.set_internal_context(context)
+    g.finalize_definition()
+
+    # f cannot be reached because c is not in context, but b and e can be computed
+    g.progress_towards_targets("f")
+    assert g["b"] == 10
+    assert g["e"] == 12
