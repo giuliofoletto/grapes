@@ -455,7 +455,8 @@ class Graph():
         """
         Make dependencies (parents) of recipes also recipes
         """
-        for node in self.nodes:
+        # Work in reverse topological order, to get children before parents
+        for node in reversed(self.get_topological_order()):
             if self.is_recipe(node):
                 for parent in self._nxdg.predecessors(node):
                     self.set_is_recipe(parent, True)
@@ -469,3 +470,9 @@ class Graph():
         """
         self.make_recipe_dependencies_also_recipes()
         self.freeze()
+
+    def get_topological_order(self):
+        """
+        Return list of nodes in topological order, i.e., from dependencies to targets
+        """
+        return list(nx.topological_sort(self._nxdg))
