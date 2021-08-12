@@ -121,9 +121,9 @@ def test_wrap_with_function():
     g.finalize_definition()
 
     # Get a function a,b,c,d -> g
-    f1 = gr.wrap_graph_with_function(g, ["a", "b", "c", "d"], "g")
+    f1 = gr.wrap_graph_with_function(g, ["a", "b", "c", "d"], "g", input_as_kwargs=False)
     # Get a function a,b,c,d -> [e,f,g]
-    f2 = gr.wrap_graph_with_function(g, ["a", "b", "c", "d"], "e", "f", "g")
+    f2 = gr.wrap_graph_with_function(g, ["a", "b", "c", "d"], "e", "f", "g", input_as_kwargs=False)
     assert f1(1, 2, 3, 4) == -9
     assert f2(1, 2, 3, 4) == [3, 12, -9]
 
