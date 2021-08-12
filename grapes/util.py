@@ -134,6 +134,9 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
 def lambdify_graph(graph, input_keys, target):
     graph = copy.deepcopy(graph)
     graph.unfreeze()
+    if len(input_keys) > 0:
+        graph.clear_values(*input_keys)
+    graph.progress_towards_targets(target)
     while not set(graph.get_args(target) + tuple(graph.get_kwargs(target).values())).issubset(set(input_keys)):
         graph.simplify_all_dependencies(target, exclude=input_keys)
     return graph[graph.get_recipe(target)]
