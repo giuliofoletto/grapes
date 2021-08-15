@@ -117,6 +117,27 @@ class Graph():
         # Add possibilities to the list of possibilities of the conditional
         self.set_possibilities(name, [value_true, value_false])
 
+    def add_multiple_conditional(self, name, conditions, possibilities):
+        """
+        Interface to add a multiple conditional to the graph.
+        """
+        # Add all nodes and connect all edges
+        self._nxdg.add_node(name, **starting_node_properties)
+        for node in conditions + possibilities:
+            # Avoid adding existing dependencies so as not to overwrite attributes
+            if node not in self.nodes:
+                self._nxdg.add_node(node, **starting_node_properties)
+            self._nxdg.add_edge(node, name)
+
+        # Specify that this node is a conditional
+        self.set_type(name, "conditional")
+
+        # Add conditions name to the list of conditions of the conditional
+        self.set_conditions(name, conditions)
+
+        # Add possibilities to the list of possibilities of the conditional
+        self.set_possibilities(name, possibilities)
+
     def get_node_attribute(self, node, attribute):
         attributes = self.nodes[node]
         if attribute in attributes and attributes[attribute] is not None:

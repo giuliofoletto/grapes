@@ -189,3 +189,42 @@ def test_progress_towards_targets():
     g.progress_towards_targets("f")
     assert g["b"] == 10
     assert g["e"] == 12
+
+
+def test_multiple_conditional():
+    g = gr.Graph()
+    g.add_multiple_conditional("result", ["condition_1", "condition_2", "condition_3"], ["node_1", "node_2", "node_3"])
+    context = {
+        "condition_1": False,
+        "condition_2": True,
+        "condition_3": False,
+        "node_1": 1,
+        "node_2": 2,
+        "node_3": 3,
+    }
+    g.set_internal_context(context)
+    g.finalize_definition()
+
+    g.execute_to_targets("result")
+
+    assert g["result"] == 2
+
+
+def test_multiple_conditional_with_default():
+    g = gr.Graph()
+    g.add_multiple_conditional("result", ["condition_1", "condition_2", "condition_3"], ["node_1", "node_2", "node_3", "node_default"])
+    context = {
+        "condition_1": False,
+        "condition_2": False,
+        "condition_3": False,
+        "node_1": 1,
+        "node_2": 2,
+        "node_3": 3,
+        "node_default": 4
+    }
+    g.set_internal_context(context)
+    g.finalize_definition()
+
+    g.execute_to_targets("result")
+
+    assert g["result"] == 4
