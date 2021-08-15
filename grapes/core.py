@@ -401,7 +401,9 @@ class Graph():
         if self.has_value(node) and other.has_value(other_node) and self.get_value(node) != other.get_value(other_node):
             return False
         # If they both have dependencies but they differ, return False. If only one has dependencies, proceed
-        if len(list(self._nxdg.predecessors(node))) != 0 and len(list(other._nxdg.predecessors(other_node))) != 0 and self._nxdg.predecessors(node) != other._nxdg.predecessors(other_node):
+        predecessors = list(self._nxdg.predecessors(node))
+        other_predecessors = list(other._nxdg.predecessors(other_node))
+        if len(predecessors) != 0 and len(other_predecessors) != 0 and predecessors != other_predecessors:
             return False
         # Return True if at least one has no dependencies (or they are the same), at least one has no value (or they are the same)
         return True
