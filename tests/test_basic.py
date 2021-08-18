@@ -48,6 +48,17 @@ def test_diamond():
     assert res["e"] == 0
 
 
+def test_inverted_input():
+    # Typically, we proceed from bottom to top
+    # Here we test the opposite
+    g = gr.Graph()
+    g.add_step("c", "op_c", "b")
+    g.add_step("b", "op_b", "a")
+
+    res = gr.execute_graph_from_context(g, {"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x}, "c")
+    assert res["c"] == 6
+
+
 def test_conditional():
     g = gr.Graph()
     g.add_simple_conditional("d", "c", "a", "b")

@@ -54,15 +54,13 @@ class Graph():
             raise ValueError("Cannot add node with dependencies without a recipe")
 
         elif recipe is None:  # Accept nodes with no dependencies
-            # Avoid adding existing node so as not to overwrite attributes
-            if name not in self.nodes:
-                self._nxdg.add_node(name, **starting_node_properties)
+            # The node is readded even if already existing
+            self._nxdg.add_node(name, **starting_node_properties)
 
         else:  # Standard case
             # Add the node
-            # Avoid adding existing node so as not to overwrite attributes
-            if name not in self.nodes:
-                self._nxdg.add_node(name, **starting_node_properties)
+            # The node is readded even if already existing
+            self._nxdg.add_node(name, **starting_node_properties)
             # Set attributes
             # Note: This could be done in the constructor, but doing it separately adds flexibility
             # Indeed, we might want to change how attributes work, and we can do it by modifying setters
