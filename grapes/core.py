@@ -139,6 +139,32 @@ class Graph():
         # Add possibilities to the list of possibilities of the conditional
         self.set_possibilities(name, possibilities)
 
+    def edit_step(self, name, recipe=None, *args, **kwargs):
+        """
+        Interface to edit an existing node, changing its predecessors
+        """
+        if name not in self.nodes:
+            raise ValueError("Cannot edit non-existent node " + name)
+
+        # Store old attributes and out edges
+        was_recipe = self.is_recipe(name)
+        was_frozen = self.is_frozen(name)
+        had_value = self.has_value(name)
+        if had_value:
+            old_value = self.get_value(name)
+        old_out_edges = self._nxdg.out_edges(name, data=True)
+
+        # Readd the step. This should not break anything
+        self.add_step(name, recipe, *args, **kwargs)
+
+        # Readd attributes and out edges
+        self.set_is_recipe(name, was_recipe)
+        self.set_is_frozen(name, was_frozen)
+        self.set_has_value(name, had_value)
+        if had_value:
+            self.set_value(name, old_value)
+        self._nxdg.add_edges_from(old_out_edges)
+
     def get_node_attribute(self, node, attribute):
         attributes = self.nodes[node]
         if attribute in attributes and attributes[attribute] is not None:

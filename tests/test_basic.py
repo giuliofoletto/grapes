@@ -228,3 +228,27 @@ def test_multiple_conditional_with_default():
     g.execute_to_targets("result")
 
     assert g["result"] == 4
+
+
+def test_edit_step():
+    g = gr.Graph()
+    g.add_step("b", "op_b", "a")
+    g.add_step("c", "op_c", "b")
+    g.set_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x})
+    g.finalize_definition()
+
+    g.execute_to_targets("c")
+    assert g["b"] == 2
+    assert g["c"] == 6
+
+    g.edit_step("b", "new_op_b", "a", "d")
+    assert g["b"] == 2  # Value is unchanged
+    assert g["c"] == 6  # Value is unchanged
+
+    g.clear_values("b", "c")
+    g.update_internal_context({"d": 3, "new_op_b": lambda x, y: x + y})
+    g.finalize_definition()
+
+    g.execute_to_targets("c")
+    assert g["b"] == 4
+    assert g["c"] == 12
