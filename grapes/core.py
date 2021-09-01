@@ -144,24 +144,26 @@ class Graph():
         if name not in self.nodes:
             raise ValueError("Cannot edit non-existent node " + name)
 
-        # Store old attributes and out edges
+        # Store old attributes
         was_recipe = self.is_recipe(name)
         was_frozen = self.is_frozen(name)
         had_value = self.has_value(name)
         if had_value:
             old_value = self.get_value(name)
-        old_out_edges = self._nxdg.out_edges(name, data=True)
 
+        # Remove in-edges from the node because we need to replace them
+        # use of list() is to make a copy because in_edges() returns a view
+        self._nxdg.remove_edges_from(list(self._nxdg.in_edges(name)))
         # Readd the step. This should not break anything
         self.add_step(name, recipe, *args, **kwargs)
 
-        # Readd attributes and out edges
+        # Readd attributes
+        # Readding out-edges is not needed because we never removed them
         self.set_is_recipe(name, was_recipe)
         self.set_is_frozen(name, was_frozen)
         self.set_has_value(name, had_value)
         if had_value:
             self.set_value(name, old_value)
-        self._nxdg.add_edges_from(old_out_edges)
 
     def get_node_attribute(self, node, attribute):
         attributes = self.nodes[node]
