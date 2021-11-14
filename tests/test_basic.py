@@ -263,3 +263,17 @@ def test_edit_step():
     g.execute_to_targets("c")
     assert g["b"] == 4
     assert g["c"] == 12
+
+
+def test_remove_step():
+    g = gr.Graph()
+    g.add_step("b", "op_b", "a")
+    g.add_step("c", "op_c", "b")
+    g.set_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x})
+    g.finalize_definition()
+
+    g.remove_step("b")
+    with pytest.raises(KeyError):
+        g["b"]
+    with pytest.raises(ValueError):
+        g.remove_step("d")

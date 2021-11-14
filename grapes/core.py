@@ -165,6 +165,14 @@ class Graph():
         if had_value:
             self.set_value(name, old_value)
 
+    def remove_step(self, name):
+        """
+        Interface to remove an existing node, without changing anything else
+        """
+        if name not in self.nodes:
+            raise ValueError("Cannot edit non-existent node " + name)
+        self._nxdg.remove_node(name)
+
     def get_node_attribute(self, node, attribute):
         attributes = self.nodes[node]
         if attribute in attributes and attributes[attribute] is not None:
