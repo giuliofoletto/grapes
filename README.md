@@ -4,9 +4,12 @@ A simple library for dataflow programming in python.
 It is inspired by [`pythonflow`](https://github.com/spotify/pythonflow) but with substantial modifications.
 
 ## Dependencies
-`grapes` depends only on [`networkx`](https://github.com/networkx/networkx), which can be found on PyPI and is included in the Anaconda distribution.
-To visualize graphs, [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) is also needed.
-For its installation, refer to the official [guide](https://pygraphviz.github.io/documentation/stable/install.html).
+The core `grapes` module depends only on [`networkx`](https://github.com/networkx/networkx), which can be found on PyPI and is included in the Anaconda distribution.
+
+To visualize graphs, [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) is also needed, which in turn requires [`Graphviz`](https://graphviz.org/).
+On  Windows, `pygraphviz` requires the [Visual Studio C/C++ build tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) to be installed (including MSVC tools), alongside [`Graphviz` 2.46](https://gitlab.com/graphviz/graphviz/-/package_files/6164164/download) or higher, which should be in `PATH`.
+This is explained in detail in the official [guide](https://pygraphviz.github.io/documentation/stable/install.html) of `pygraphviz`.
+
 Finally, [`pytest`](https://github.com/pytest-dev/pytest) is needed to run the tests.
 
 ## Installation
@@ -22,6 +25,8 @@ Move to the root directory of the grapes source code (the one where `setup.py` i
 pip install -e .
 ```
 The `-e` flag creates an editable installation.
+
+Note that the dependencies related to graph visualization are not installed automatically and should be installed manually as explained in the [Dependencies](#dependencies) section.
 
 ## Roadmap
 Future plans include:
