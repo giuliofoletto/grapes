@@ -205,7 +205,7 @@ class Graph():
         if attribute in attributes and attributes[attribute] is not None:
             return attributes[attribute]
         else:
-            raise ValueError("Node ", node, " has no ", attribute)
+            raise ValueError("Node " + node + " has no " + attribute)
 
     def set_node_attribute(self, node, attribute, value):
         self.nodes[node][attribute] = value
@@ -257,7 +257,7 @@ class Graph():
         if "value" in attributes and attributes["value"] is not None and self.nodes[node]["has_value"]:
             return attributes["value"]
         else:
-            raise ValueError("Node ", node, " has no value")
+            raise ValueError("Node " + node + " has no value")
 
     def set_value(self, node, value):
         self.nodes[node]["value"] = value
@@ -392,7 +392,7 @@ class Graph():
         elif self.get_type(target) == "conditional":
             return self.evaluate_conditional(target, continue_on_fail)
         else:
-            raise ValueError("Evaluation of nodes of type ", self.get_type(target), " is not supported")
+            raise ValueError("Evaluation of nodes of type " + self.get_type(target) + " is not supported")
 
     def evaluate_standard(self, node, continue_on_fail=False):
         """
@@ -441,7 +441,7 @@ class Graph():
                     # Do nothing, we want to keep going
                     return
                 else:
-                    raise ValueError("Node " + condition + " could not be computed.")
+                    raise ValueError("Node " + condition + " could not be computed")
         else:  # Happens if loop is never broken, i.e. when no conditions are true
             index = -1
 
@@ -455,7 +455,7 @@ class Graph():
                 # Do nothing, we want to keep going
                 return
             else:
-                raise ValueError("Node " + possibility + " could not be computed.")
+                raise ValueError("Node " + possibility + " could not be computed")
         # Save results and release
         self.set_value(conditional, res)
 
@@ -528,7 +528,7 @@ class Graph():
         for argument in self.get_kwargs(node_name):
             if argument == dependency_name:
                 if self.get_type(dependency_name) == "conditional" or self.get_type(self.get_recipe(dependency_name)) == "conditional":
-                    raise TypeError("Simplification does not support conditional nodes.")
+                    raise TypeError("Simplification does not support conditional nodes")
                 subfuncs.append(self[self.get_recipe(dependency_name)])  # Get python function
                 subfuncs_dependencies.append(list(self.get_args(dependency_name)) + list(self.get_kwargs(dependency_name).values()))
             else:
