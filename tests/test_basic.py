@@ -277,3 +277,34 @@ def test_remove_step():
         g["b"]
     with pytest.raises(ValueError):
         g.remove_step("d")
+
+
+def test_add_step_quick():
+    def example_function_only_positional(a, b):
+        return a**b
+
+    def example_function_with_kw_only_args(a, b, *, c):
+        return a**b+c
+
+    def example_function_with_no_args():
+        return 1
+
+    g = gr.Graph()
+    g.add_step_quick("c", example_function_only_positional)
+    g.add_step_quick("d", example_function_with_kw_only_args)
+    g.add_step_quick("e", example_function_with_no_args)
+    g.update_internal_context({"a": 2, "b": 3})
+    g.finalize_definition()
+
+    g.execute_to_targets("c", "d", "e")
+    assert g["c"] == 8
+    assert g["d"] == 16
+    assert g["e"] == 1
+
+    def example_function_with_varargs(*args):
+        return 1
+
+    with pytest.raises(ValueError):
+        g.add_step_quick("f", example_function_with_varargs)
+    with pytest.raises(TypeError):
+        g.add_step_quick("g", "a non-function object")

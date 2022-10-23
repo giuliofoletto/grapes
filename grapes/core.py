@@ -5,6 +5,7 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+from typing import ValuesView
 import networkx as nx
 from . import function_composer
 import inspect
@@ -90,6 +91,32 @@ class Graph():
                 if value not in self.nodes:
                     self._nxdg.add_node(value, **starting_node_properties)
                 self._nxdg.add_edge(value, name)
+
+    def add_step_quick(self, name, recipe):
+        """
+        Interface to quickly add a step by passing a name and a function.
+
+        The recipe node takes the name of the passed function.
+        Dependency nodes are built from the args and kwonlyargs of the passed function.
+        """
+        # Check that the passed recipe is a valid function
+        if not inspect.isfunction(recipe):
+            raise TypeError("The passed recipe should be a function, but it is a " + type(recipe))
+        argspec = inspect.getfullargspec(recipe)
+        # varargs and varkw are not supported because add_step_quick needs parameter names to build nodes
+        if argspec.varargs is not None or argspec.varkw is not None:
+            raise ValueError("Functions with varargs or varkwargs are not supported by add_step_quick because there would be no way to name dependency nodes")
+
+        # Get function name and parameters
+        recipe_name = recipe.__name__
+        args = argspec.args
+        kwargs_list = argspec.kwonlyargs
+        # Build a dictionary with identical keys and values so that recipe is called all the keys are used are kwargs
+        kwargs = {kw: kw for kw in kwargs_list}
+        # Add the step: this will create nodes for name, recipe_name and all elements of args and kwargs_list
+        self.add_step(name, recipe_name, *args, **kwargs)
+        # Directly set the value of recipe_name to recipe
+        self.set_value(recipe_name, recipe)
 
     def add_simple_conditional(self, name, condition, value_true, value_false):
         """
