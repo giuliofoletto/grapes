@@ -293,18 +293,20 @@ def test_add_step_quick():
     g.add_step_quick("c", example_function_only_positional)
     g.add_step_quick("d", example_function_with_kw_only_args)
     g.add_step_quick("e", example_function_with_no_args)
+    g.add_step_quick("f", lambda e: 2*e)
     g.update_internal_context({"a": 2, "b": 3})
     g.finalize_definition()
 
-    g.execute_to_targets("c", "d", "e")
+    g.execute_to_targets("d", "f")  # "c" and "e" should be automatically computed
     assert g["c"] == 8
     assert g["d"] == 16
     assert g["e"] == 1
+    assert g["f"] == 2
 
     def example_function_with_varargs(*args):
         return 1
 
     with pytest.raises(ValueError):
-        g.add_step_quick("f", example_function_with_varargs)
+        g.add_step_quick("g", example_function_with_varargs)
     with pytest.raises(TypeError):
-        g.add_step_quick("g", "a non-function object")
+        g.add_step_quick("h", "a non-function object")

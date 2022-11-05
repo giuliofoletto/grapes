@@ -109,6 +109,9 @@ class Graph():
 
         # Get function name and parameters
         recipe_name = recipe.__name__
+        # Lambdas are all automatically named "<lambda>" so we change this
+        if recipe_name == "<lambda>":
+            recipe_name = "recipe_for_" + name
         args = argspec.args
         kwargs_list = argspec.kwonlyargs
         # Build a dictionary with identical keys and values so that recipe is called all the keys are used are kwargs
