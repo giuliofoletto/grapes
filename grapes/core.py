@@ -530,8 +530,10 @@ class Graph():
         subfuncs_dependencies = []
         for argument in self.get_kwargs(node_name):
             if argument == dependency_name:
-                if self.get_type(dependency_name) == "conditional" or self.get_type(self.get_recipe(dependency_name)) == "conditional":
-                    raise TypeError("Simplification does not support conditional nodes")
+                if self.get_type(dependency_name) != "standard":
+                    raise TypeError("Simplification only supports standard nodes, while the type of " + dependency_name + " is " + self.get_type(dependency_name))
+                if self.get_type(self.get_recipe(dependency_name)) != "standard":
+                    raise TypeError("Simplification only supports standard nodes, while the type of " + self.get_recipe(dependency_name) + " is " + self.get_type(self.get_recipe(dependency_name)))
                 subfuncs.append(self[self.get_recipe(dependency_name)])  # Get python function
                 subfuncs_dependencies.append(list(self.get_args(dependency_name)) + list(self.get_kwargs(dependency_name).values()))
             else:
@@ -553,7 +555,7 @@ class Graph():
     def simplify_all_dependencies(self, node_name, exclude=[]):
         dependencies = self.get_args(node_name) + tuple(self.get_kwargs(node_name).values())
         for dependency in dependencies:
-            if dependency not in exclude and self.get_type(dependency) == "standard":
+            if dependency not in exclude:
                 self.simplify_dependency(node_name, dependency)
 
     def freeze(self, *args):
