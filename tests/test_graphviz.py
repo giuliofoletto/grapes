@@ -111,3 +111,10 @@ def test_simplify_all_dependencies(expected_sources):
     name = "postallsimplification"
     gv = gr.visualize.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
+
+
+def test_color_by_generation(expected_sources):
+    g = build_graph()
+    gv = gr.visualize.get_graphviz_digraph(g, color_by_generation=True, colormap="plasma")
+    name = "color_by_generation"
+    assert gv.string() == expected_sources[name]

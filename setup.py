@@ -30,7 +30,7 @@ setup(name='grapes',
           'networkx',
       ],
       extras_require={
-          'visualize': ['pygraphviz'],  # Refer to https://pygraphviz.github.io/documentation/stable/install.html
+          'visualize': ['pygraphviz', 'matplotlib'],  # For installation of pygraphviz, refer to https://pygraphviz.github.io/documentation/stable/install.html
           'testing': ['pytest']
       },
       zip_safe=False)

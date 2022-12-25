@@ -6,7 +6,7 @@ It is inspired by [`pythonflow`](https://github.com/spotify/pythonflow) but with
 ## Dependencies
 The core `grapes` module depends only on [`networkx`](https://github.com/networkx/networkx), which can be found on PyPI and is included in the Anaconda distribution.
 
-To visualize graphs, [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) is also needed, which in turn requires [`Graphviz`](https://graphviz.org/).
+To visualize graphs, [`matplotlib`](https://matplotlib.org/) and [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) (a wrapper for [`Graphviz`](https://graphviz.org/)) are also needed.
 On  Windows, `pygraphviz` requires the [Visual Studio C/C++ build tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) to be installed (including MSVC tools), alongside [`Graphviz` 2.46](https://gitlab.com/graphviz/graphviz/-/package_files/6164164/download) or higher, which should be in `PATH`.
 This is explained in detail in the official [guide](https://pygraphviz.github.io/documentation/stable/install.html) of `pygraphviz`.
 
