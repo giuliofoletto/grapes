@@ -11,7 +11,7 @@ from . import function_composer
 import inspect
 
 
-starting_node_properties = {"type": "standard", "has_value": False, "value": None, "is_frozen": False, "is_recipe": False}
+starting_node_properties = {"type": "standard", "has_value": False, "value": None, "is_frozen": False, "is_recipe": False, "topological_generation_index": -1}
 
 
 class Graph():
@@ -595,6 +595,7 @@ class Graph():
         It also marks dependencies of recipes as recipes themselves.
         """
         self.make_recipe_dependencies_also_recipes()
+        self.update_topological_generation_indexes()
         self.freeze()
 
     def get_topological_order(self):
@@ -602,3 +603,17 @@ class Graph():
         Return list of nodes in topological order, i.e., from dependencies to targets
         """
         return list(nx.topological_sort(self._nxdg))
+
+    def get_topological_generations(self):
+        """
+        Return list of topological generations of the graph
+        """
+        return list(nx.topological_generations(self._nxdg))
+
+    def update_topological_generation_indexes(self):
+        generations = self.get_topological_generations()
+        for node in self.nodes:
+            for index, generation in enumerate(generations):
+                if node in generation:
+                    self.set_node_attribute(node, "topological_generation_index", index)
+                    break

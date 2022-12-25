@@ -310,3 +310,17 @@ def test_add_step_quick():
         g.add_step_quick("g", example_function_with_varargs)
     with pytest.raises(TypeError):
         g.add_step_quick("h", "a non-function object")
+
+
+def test_topological_generations():
+    g = gr.Graph()
+    g.add_step("d", "fd", "b", "c")
+    g.add_step("b", "fb", "a")
+    g.finalize_definition()
+
+    assert g.get_node_attribute("a", "topological_generation_index") == 0
+    assert g.get_node_attribute("b", "topological_generation_index") == 1
+    assert g.get_node_attribute("c", "topological_generation_index") == 0
+    assert g.get_node_attribute("d", "topological_generation_index") == 2
+    assert g.get_node_attribute("fb", "topological_generation_index") == 0
+    assert g.get_node_attribute("fd", "topological_generation_index") == 0

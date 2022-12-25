@@ -8,6 +8,7 @@ strict digraph "" {
 		label=e,
 		recipe=op_e,
 		shape=box,
+		topological_generation_index=1,
 		type=standard,
 		value=None];
 	g	[args="('e', 'f')",
@@ -18,6 +19,7 @@ strict digraph "" {
 		label=g,
 		recipe=op_g,
 		shape=box,
+		topological_generation_index=2,
 		type=standard,
 		value=None];
 	e -> g;
@@ -26,6 +28,7 @@ strict digraph "" {
 		is_recipe=True,
 		label=op_e,
 		shape=ellipse,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	op_e -> e	[arrowhead=dot];
@@ -34,6 +37,7 @@ strict digraph "" {
 		is_recipe=False,
 		label=a,
 		shape=box,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	a -> e;
@@ -42,6 +46,7 @@ strict digraph "" {
 		is_recipe=False,
 		label=b,
 		shape=box,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	b -> e;
@@ -53,6 +58,7 @@ strict digraph "" {
 		label=f,
 		recipe=op_f,
 		shape=box,
+		topological_generation_index=1,
 		type=standard,
 		value=None];
 	f -> g;
@@ -61,6 +67,7 @@ strict digraph "" {
 		is_recipe=True,
 		label=op_f,
 		shape=ellipse,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	op_f -> f	[arrowhead=dot];
@@ -69,6 +76,7 @@ strict digraph "" {
 		is_recipe=False,
 		label=c,
 		shape=box,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	c -> f;
@@ -77,6 +85,7 @@ strict digraph "" {
 		is_recipe=False,
 		label=d,
 		shape=box,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	d -> f;
@@ -85,6 +94,7 @@ strict digraph "" {
 		is_recipe=True,
 		label=op_g,
 		shape=ellipse,
+		topological_generation_index=0,
 		type=standard,
 		value=None];
 	op_g -> g	[arrowhead=dot];

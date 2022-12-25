@@ -36,6 +36,7 @@ def build_graph():
     g.add_step("e", "op_e", "a", "b")
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
+    g.finalize_definition()
     return g
 
 
