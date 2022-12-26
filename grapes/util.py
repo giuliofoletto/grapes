@@ -7,9 +7,10 @@ License: See project-level license file.
 
 import json
 import copy
+import warnings
 
 
-def execute_graph_from_context(graph, context, *targets, inplace=False):
+def execute_graph_from_context(graph, context, *targets, inplace=False, check_feasibility=True):
     """Execute a graph up to a target given a context.
 
     Parameters
@@ -22,12 +23,16 @@ def execute_graph_from_context(graph, context, *targets, inplace=False):
         Indicator of what to compute (desired output).
     inplace : bool
         Whether to modify graph and context inplace (default: False).
+    check_feasibility : bool
+        Whether to check the feasibility of the computation, which slows performance (default: True).
 
     Returns
     -------
     grapes Graph
         Graph with context updated after computation.
     """
+    if check_feasibility:
+        check_feasibility_of_execution(graph, context, *targets)
 
     if not inplace:
         graph = copy.deepcopy(graph)
@@ -98,6 +103,9 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
     if len(input_keys) > 0:
         operational_graph.unfreeze(*input_keys)
         operational_graph.clear_values(*input_keys)
+    # Check feasibility
+    check_feasibility_of_execution(operational_graph, input_keys, *targets)
+    # Move as much as possible towards targets
     operational_graph.progress_towards_targets(*targets)
 
     if input_as_kwargs:
@@ -140,3 +148,20 @@ def lambdify_graph(graph, input_keys, target):
     while not set(graph.get_args(target) + tuple(graph.get_kwargs(target).values())).issubset(set(input_keys)):
         graph.simplify_all_dependencies(target, exclude=input_keys)
     return graph[graph.get_recipe(target)]
+
+
+def check_feasibility_of_execution(graph, context, *targets):
+    graph = copy.deepcopy(graph)
+    context = copy.deepcopy(context)
+
+    if not isinstance(context, dict):
+        # We accept also list of input keys, but we convert it to a true context
+        placeholder_value = 0
+        context = {key: placeholder_value for key in context}
+
+    graph.set_internal_context(context)
+    reachability, missing_dependencies = graph.find_reachability_targets(*targets)
+    if reachability == "unreachable":
+        raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
+    elif reachability == "uncertain":
+        warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies) + ". It will be executed anyway.")

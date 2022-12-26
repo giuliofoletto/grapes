@@ -7,6 +7,7 @@ License: See project-level license file.
 
 import pytest
 import grapes as gr
+import warnings
 
 
 def test_simple():
@@ -440,3 +441,48 @@ def test_multiple_conditional_no_conditions_defined():
     g["vb"] = 1
     g["vc"] = 1
     assert g.find_reachability_targets("name") == ("reachable", set())
+
+
+def test_execution_with_feasibility_check():
+    g = gr.Graph()
+    g.add_step("b", "fb", "a")
+    g["fb"] = lambda a: a
+    g.finalize_definition()
+
+    # a is not available
+    with pytest.raises(ValueError):
+        gr.execute_graph_from_context(g, {}, "b")
+    # Now a becomes available
+    res = gr.execute_graph_from_context(g, {"a": 1}, "b")
+    assert res["b"] == 1
+
+
+def test_execution_with_feasibility_check_uncertain():
+    g = gr.Graph()
+    g.add_simple_conditional("name", "condition", "value_true", "value_false")
+    g.add_step_quick("condition", lambda pre_req: pre_req)
+    g["pre_req"] = True
+    g["value_true"] = 1
+    g.finalize_definition()
+
+    # Reachability is uncertain because condition is reachable and one value also is
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        res = gr.execute_graph_from_context(g, {}, "name")
+        assert len(w) == 1
+        # But the computation is actually feasible
+        assert res["name"] == 1
+
+
+def test_unfeasible_wrap():
+    g = gr.Graph()
+    g.add_step("d", "op_d", "a", "b", "c")
+    g["op_d"] = lambda a, b, c: a + b + c
+    g.finalize_definition()
+
+    with pytest.raises(ValueError):
+        # Pass b as input, c as constant, but do not pass a
+        f1 = gr.wrap_graph_with_function(g, ["b"], "d", constants={"c": 1}, input_as_kwargs=False)
+    # Pass also a
+    f2 = gr.wrap_graph_with_function(g, ["a", "b"], "d", constants={"c": 1}, input_as_kwargs=False)
+    assert f2(1, 1) == 3
