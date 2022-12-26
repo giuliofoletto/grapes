@@ -334,9 +334,9 @@ def test_reachability_simple():
 
     missing_dependencies = set()
     missing_dependencies.add("a")
-    assert g.find_execution_feasibility("b") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("b") == ("unreachable", missing_dependencies)
     g.update_internal_context({"a": 1})
-    assert g.find_execution_feasibility("b") == ("reachable", set())
+    assert g.find_reachability_targets("b") == ("reachable", set())
 
 
 def test_reachability_long_graph():
@@ -347,9 +347,9 @@ def test_reachability_long_graph():
 
     missing_dependencies = set()
     missing_dependencies.add("a")
-    assert g.find_execution_feasibility("b") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("b") == ("unreachable", missing_dependencies)
     g.update_internal_context({"a": 1})
-    assert g.find_execution_feasibility("b") == ("reachable", set())
+    assert g.find_reachability_targets("b") == ("reachable", set())
 
 
 def test_reachability_conditional_with_true_value():
@@ -360,9 +360,9 @@ def test_reachability_conditional_with_true_value():
 
     missing_dependencies = set()
     missing_dependencies.add("value_true")
-    assert g.find_execution_feasibility("name") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("unreachable", missing_dependencies)
     g.update_internal_context({"value_true": 1})
-    assert g.find_execution_feasibility("name") == ("reachable", set())
+    assert g.find_reachability_targets("name") == ("reachable", set())
 
 
 def test_reachability_multiple_conditional_with_true_value():
@@ -373,9 +373,9 @@ def test_reachability_multiple_conditional_with_true_value():
 
     missing_dependencies = set()
     missing_dependencies.add("a")
-    assert g.find_execution_feasibility("name") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("unreachable", missing_dependencies)
     g.update_internal_context({"a": 1})
-    assert g.find_execution_feasibility("name") == ("reachable", set())
+    assert g.find_reachability_targets("name") == ("reachable", set())
 
 
 def test_conditional_no_conditions_defined():
@@ -387,23 +387,23 @@ def test_conditional_no_conditions_defined():
     # Here, condition and possibilities are unreachable
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"pre_req", "value_true", "value_false"})
-    assert g.find_execution_feasibility("name") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("unreachable", missing_dependencies)
 
     # Here, condition is undefined but reachable, but all values are unreachable
     g["pre_req"] = 1
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"value_true", "value_false"})
-    assert g.find_execution_feasibility("name") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("unreachable", missing_dependencies)
 
     # Now one of the possibilities is already available, therefore the conditional might be, depending on condition
     g["value_true"] = 1
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"value_false"})
-    assert g.find_execution_feasibility("name") == ("uncertain", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("uncertain", missing_dependencies)
 
     # Now all of the possibilities are already available, therefore the conditional is certainly reachable
     g["value_false"] = 1
-    assert g.find_execution_feasibility("name") == ("reachable", set())
+    assert g.find_reachability_targets("name") == ("reachable", set())
 
 
 def test_multiple_conditional_no_conditions_defined():
@@ -416,27 +416,27 @@ def test_multiple_conditional_no_conditions_defined():
     # Here, condition and possibilities are unreachable
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"pa", "pb", "va", "vb", "vc"})
-    assert g.find_execution_feasibility("name") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("unreachable", missing_dependencies)
 
     # Here, ca is undefined but reachable, but all values are unreachable
     g["pa"] = 1
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"pb", "va", "vb", "vc"})
-    assert g.find_execution_feasibility("name") == ("unreachable", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("unreachable", missing_dependencies)
 
     # Now one of the possibilities is already available, therefore the conditional might be, depending on condition
     g["va"] = 1
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"pb", "vb", "vc"})
-    assert g.find_execution_feasibility("name") == ("uncertain", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("uncertain", missing_dependencies)
 
     # Now all of the possibilities are reachable, but the conditional is still uncertain because we do not know which condition is True
     g["pb"] = 1
     missing_dependencies = set()
     missing_dependencies = missing_dependencies.union({"vb", "vc"})
-    assert g.find_execution_feasibility("name") == ("uncertain", missing_dependencies)
+    assert g.find_reachability_targets("name") == ("uncertain", missing_dependencies)
 
     # Now all of the possibilities are already available, therefore the conditional is certainly reachable
     g["vb"] = 1
     g["vc"] = 1
-    assert g.find_execution_feasibility("name") == ("reachable", set())
+    assert g.find_reachability_targets("name") == ("reachable", set())

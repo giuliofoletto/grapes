@@ -576,7 +576,7 @@ class Graph():
             reachability = "uncertain"
         return reachability, missing_dependencies.union(new_missing_dependencies)
 
-    def find_execution_feasibility(self, *targets):
+    def find_reachability_targets(self, *targets):
         missing_dependencies = set()
         reachability = "reachable"
         for target in targets:
