@@ -265,6 +265,12 @@ class Graph():
     def set_type(self, node, type):
         return self.set_node_attribute(node, "type", type)
 
+    def get_topological_generation_index(self, node):
+        return self.get_node_attribute(node, "topological_generation_index")
+
+    def set_topological_generation_index(self, node, index):
+        self.set_node_attribute(node, "topological_generation_index", index)
+
     def get_value(self, node):
         attributes = self.nodes[node]
         if "value" in attributes and attributes["value"] is not None and self.nodes[node]["has_value"]:
@@ -722,5 +728,5 @@ class Graph():
         for node in self.nodes:
             for index, generation in enumerate(generations):
                 if node in generation:
-                    self.set_node_attribute(node, "topological_generation_index", index)
+                    self.set_topological_generation_index(node, index)
                     break
