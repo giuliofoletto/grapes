@@ -238,15 +238,25 @@ class Graph():
         return self.set_node_attribute(node, "kwargs", kwargs)
 
     def get_conditions(self, node):
-        return self.get_node_attribute(node, "conditions")
+        conditions = self.get_node_attribute(node, "conditions")
+        if not isinstance(conditions, list):
+            conditions = list(conditions)
+        return conditions
 
     def set_conditions(self, node, conditions):
+        if not isinstance(conditions, list):
+            conditions = list(conditions)
         return self.set_node_attribute(node, "conditions", conditions)
 
     def get_possibilities(self, node):
-        return self.get_node_attribute(node, "possibilities")
+        possibilities = self.get_node_attribute(node, "possibilities")
+        if not isinstance(possibilities, list):
+            possibilities = list(possibilities)
+        return possibilities
 
     def set_possibilities(self, node, possibilities):
+        if not isinstance(possibilities, list):
+            possibilities = list(possibilities)
         return self.set_node_attribute(node, "possibilities", possibilities)
 
     def get_type(self, node):
@@ -475,6 +485,103 @@ class Graph():
         """
         for target in targets:
             self.evaluate_target(target, True)
+
+    def find_reachability_target(self, target):
+        """
+        Generic interface to find the reachability of a GenericNode.
+        """
+        if self.get_type(target) == "standard":
+            return self.find_reachability_standard(target)
+        elif self.get_type(target) == "conditional":
+            return self.find_reachability_conditional(target)
+        else:
+            raise ValueError("Finding the reachability of nodes of type " + self.get_type(target) + " is not supported")
+
+    def find_reachability_standard(self, node):
+        """
+        Find the reachability of a standard node.
+        """
+        # Check if it already has a value
+        if self.has_value(node):
+            self.get_value(node)
+            return "reachable", set()
+        # If not, check the missing dependencies of all arguments
+        dependencies = set(self._nxdg.predecessors(node))
+        if len(dependencies) == 0:
+            # If this node does not have predecessors (and does not have a value itself), it is a missing dependency
+            missing_dependencies = set()
+            missing_dependencies.add(node)
+            return "unreachable", missing_dependencies
+        else:
+            # Otherwise, dependencies must be checked
+            missing_dependencies = set()
+            reachability = "reachable"
+            for dependency_name in dependencies:
+                reachability, missing_dependencies = self.get_updated_reachability(*self.find_reachability_target(dependency_name), reachability, missing_dependencies)
+            return reachability, missing_dependencies
+
+    def find_reachability_conditional(self, conditional):
+        """
+        Find the reachability of a conditional.
+        """
+        # Check if it already has a value
+        if self.has_value(conditional):
+            self.get_value(conditional)
+            return "reachable", set()
+        # If not, evaluate the conditions until one is found true
+        for index, condition in enumerate(self.get_conditions(conditional)):
+            if self.has_value(condition) and self.get_value(condition):
+                # A condition is true
+                possibility = self.get_possibilities(conditional)[index]
+                return self.find_reachability_target(possibility)
+        else:
+            # Happens if loop is never broken, i.e. when no conditions are true
+            # If all conditions and possibilities are reachable -> reachable
+            # If all conditions and possibilities are unreachable -> unreachable
+            # If some conditions are reachable or uncertain but the corresponding possibilities are all unreachable -> unreachable
+            # In all other cases -> uncertain
+            list_reachabilities_conditions = []
+            list_missing_dependencies_conditions = []
+            list_reachabilities_possibilities = []
+            list_missing_dependencies_possibilities = []
+            for condition in self.get_conditions(conditional):
+                reachability, missing_dependencies = self.find_reachability_target(condition)
+                list_reachabilities_conditions.append(reachability)
+                list_missing_dependencies_conditions.append(missing_dependencies)
+            for possibility in self.get_possibilities(conditional):
+                reachability, missing_dependencies = self.find_reachability_target(possibility)
+                list_reachabilities_possibilities.append(reachability)
+                list_missing_dependencies_possibilities.append(missing_dependencies)
+            if "uncertain" not in list_reachabilities_conditions+list_reachabilities_possibilities and "unreachable" not in list_reachabilities_conditions+list_reachabilities_possibilities:
+                # All conditions and possibilities are reachable -> reachable
+                return "reachable", set()
+            elif "uncertain" not in list_reachabilities_conditions+list_reachabilities_possibilities and "reachable" not in list_reachabilities_conditions+list_reachabilities_possibilities:
+                # All conditions and possibilities are unreachable -> unreachable
+                return "unreachable", set().union(*(list_missing_dependencies_conditions+list_missing_dependencies_possibilities))
+            else:
+                not_unreachable_condition_indexes = [i for i, x in enumerate(list_reachabilities_conditions) if x != "unreachable"]
+                sublist_reachabilities_possibilities = []
+                for index in not_unreachable_condition_indexes:
+                    sublist_reachabilities_possibilities.append(list_reachabilities_possibilities[index])
+                if "uncertain" not in sublist_reachabilities_possibilities and "reachable" not in sublist_reachabilities_possibilities:
+                    # All corresponding possibilities are unreachable -> unreachable
+                    return "unreachable", set().union(*(list_missing_dependencies_conditions+list_missing_dependencies_possibilities))
+                else:
+                    return "uncertain", set().union(*(list_missing_dependencies_conditions+list_missing_dependencies_possibilities))
+
+    def get_updated_reachability(self, new_reachability, new_missing_dependencies, reachability="reachable", missing_dependencies=set()):
+        if reachability in ("reachable", "uncertain") and new_reachability == "unreachable":
+            reachability = "unreachable"
+        elif reachability == "reachable" and new_reachability == "uncertain":
+            reachability = "uncertain"
+        return reachability, missing_dependencies.union(new_missing_dependencies)
+
+    def find_execution_feasibility(self, *targets):
+        missing_dependencies = set()
+        reachability = "reachable"
+        for target in targets:
+            reachability, missing_dependencies = self.get_updated_reachability(*self.find_reachability_target(target), reachability, missing_dependencies)
+        return reachability, missing_dependencies
 
     def is_other_node_compatible(self, node, other, other_node):
         # If types differ, return False
