@@ -32,7 +32,7 @@ def execute_graph_from_context(graph, context, *targets, inplace=False, check_fe
         Graph with context updated after computation.
     """
     if check_feasibility:
-        check_feasibility_of_execution(graph, context, *targets)
+        check_feasibility_of_execution(graph, context, *targets, inplace=inplace)
 
     if not inplace:
         graph = copy.deepcopy(graph)
@@ -103,10 +103,12 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
     if len(input_keys) > 0:
         operational_graph.unfreeze(*input_keys)
         operational_graph.clear_values(*input_keys)
-    # Check feasibility
-    check_feasibility_of_execution(operational_graph, input_keys, *targets)
     # Move as much as possible towards targets
     operational_graph.progress_towards_targets(*targets)
+    # Check feasibility
+    placeholder_value = 0
+    context = {key: placeholder_value for key in input_keys}
+    check_feasibility_of_execution(operational_graph, context, *targets)
 
     if input_as_kwargs:
         def specific_function(**kwargs):
@@ -150,18 +152,23 @@ def lambdify_graph(graph, input_keys, target):
     return graph[graph.get_recipe(target)]
 
 
-def check_feasibility_of_execution(graph, context, *targets):
-    graph = copy.deepcopy(graph)
-    context = copy.deepcopy(context)
+def check_feasibility_of_execution(graph, context, *targets, inplace=False):
+    if not inplace:
+        graph = copy.deepcopy(graph)
+        context = copy.deepcopy(context)
 
-    if not isinstance(context, dict):
-        # We accept also list of input keys, but we convert it to a true context
-        placeholder_value = 0
-        context = {key: placeholder_value for key in context}
-
+    graph.clear_reachabilities()
     graph.set_internal_context(context)
-    reachability, missing_dependencies = graph.find_reachability_targets(*targets)
+    graph.find_reachability_targets(*targets)
+    reachability = graph.get_worst_reachability(*targets)
+    missing_dependencies = set()
     if reachability == "unreachable":
+        for node in graph.nodes:
+            if graph.get_topological_generation_index(node) == 0 and graph.has_reachability(node) and graph.get_reachability(node) != "reachable":
+                missing_dependencies.add(node)
         raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
     elif reachability == "uncertain":
-        warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies) + ". It will be executed anyway.")
+        for node in graph.nodes:
+            if graph.get_topological_generation_index(node) == 0 and graph.has_reachability(node) and graph.get_reachability(node) != "reachable":
+                missing_dependencies.add(node)
+        warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies))
