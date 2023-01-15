@@ -32,7 +32,11 @@ def execute_graph_from_context(graph, context, *targets, inplace=False, check_fe
         Graph with context updated after computation.
     """
     if check_feasibility:
-        check_feasibility_of_execution(graph, context, *targets, inplace=inplace)
+        feasibility, missing_dependencies = check_feasibility_of_execution(graph, context, *targets, inplace=inplace)
+        if feasibility == "unreachable":
+            raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
+        elif feasibility == "uncertain":
+            warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies))
 
     if not inplace:
         graph = copy.deepcopy(graph)
@@ -108,7 +112,11 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
     # Check feasibility
     placeholder_value = 0
     context = {key: placeholder_value for key in input_keys}
-    check_feasibility_of_execution(operational_graph, context, *targets)
+    feasibility, missing_dependencies = check_feasibility_of_execution(operational_graph, context, *targets)
+    if feasibility == "unreachable":
+        raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
+    elif feasibility == "uncertain":
+        warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies))
 
     if input_as_kwargs:
         def specific_function(**kwargs):
@@ -160,15 +168,10 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
     graph.clear_reachabilities()
     graph.set_internal_context(context)
     graph.find_reachability_targets(*targets)
-    reachability = graph.get_worst_reachability(*targets)
+    feasibility = graph.get_worst_reachability(*targets)
     missing_dependencies = set()
-    if reachability == "unreachable":
+    if feasibility in {"unreachable", "uncertain"}:
         for node in graph.nodes:
             if graph.get_topological_generation_index(node) == 0 and graph.has_reachability(node) and graph.get_reachability(node) != "reachable":
                 missing_dependencies.add(node)
-        raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
-    elif reachability == "uncertain":
-        for node in graph.nodes:
-            if graph.get_topological_generation_index(node) == 0 and graph.has_reachability(node) and graph.get_reachability(node) != "reachable":
-                missing_dependencies.add(node)
-        warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies))
+    return feasibility, missing_dependencies
