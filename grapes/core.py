@@ -781,3 +781,21 @@ class Graph():
                 if node in generation:
                     self.set_topological_generation_index(node, index)
                     break
+
+    def get_all_sources(self, exclude_recipes=False):
+        sources = set()
+        for node in self.nodes:
+            if exclude_recipes and self.is_recipe(node):
+                continue
+            if self._nxdg.in_degree(node) == 0:
+                sources.add(node)
+        return sources
+
+    def get_all_sinks(self, exclude_recipes=False):
+        sinks = set()
+        for node in self.nodes:
+            if exclude_recipes and self.is_recipe(node):
+                continue
+            if self._nxdg.out_degree(node) == 0:
+                sinks.add(node)
+        return sinks

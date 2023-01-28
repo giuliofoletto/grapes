@@ -496,3 +496,16 @@ def test_unfeasible_wrap():
     # Pass also a
     f2 = gr.wrap_graph_with_function(g, ["a", "b"], "d", constants={"c": 1}, input_as_kwargs=False)
     assert f2(1, 1) == 3
+
+
+def test_sources_and_sinks():
+    g = gr.Graph()
+    g.add_step("c", "op_c", "a", "b")
+    g.add_step("e", "op_e", "d")
+    g.add_step("op_c", "b_op_c", "d_op_c")
+    g.finalize_definition()
+
+    assert g.get_all_sources(exclude_recipes=True) == {"a", "b", "d"}
+    assert g.get_all_sources(exclude_recipes=False) == {"a", "b", "d", "b_op_c", "d_op_c", "op_e"}
+    assert g.get_all_sinks(exclude_recipes=True) == {"c", "e"}
+    assert g.get_all_sinks(exclude_recipes=False) == {"c", "e"}
