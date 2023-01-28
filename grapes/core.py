@@ -55,13 +55,15 @@ class Graph():
             raise ValueError("Cannot add node with dependencies without a recipe")
 
         elif recipe is None:  # Accept nodes with no dependencies
-            # The node is readded even if already existing
-            self._nxdg.add_node(name, **starting_node_properties)
+            # Avoid adding existing node so as not to overwrite attributes
+            if name not in self.nodes:
+                self._nxdg.add_node(name, **starting_node_properties)
 
         else:  # Standard case
             # Add the node
-            # The node is readded even if already existing
-            self._nxdg.add_node(name, **starting_node_properties)
+            # Avoid adding existing node so as not to overwrite attributes
+            if name not in self.nodes:
+                self._nxdg.add_node(name, **starting_node_properties)
             # Set attributes
             # Note: This could be done in the constructor, but doing it separately adds flexibility
             # Indeed, we might want to change how attributes work, and we can do it by modifying setters
@@ -126,7 +128,9 @@ class Graph():
         Interface to add a conditional to the graph.
         """
         # Add all nodes
-        self._nxdg.add_node(name, **starting_node_properties)
+        # Avoid adding existing node so as not to overwrite attributes
+        if name not in self.nodes:
+            self._nxdg.add_node(name, **starting_node_properties)
         for node in [condition, value_true, value_false]:
             # Avoid adding existing dependencies so as not to overwrite attributes
             if node not in self.nodes:
@@ -151,7 +155,9 @@ class Graph():
         Interface to add a multiple conditional to the graph.
         """
         # Add all nodes and connect all edges
-        self._nxdg.add_node(name, **starting_node_properties)
+        # Avoid adding existing node so as not to overwrite attributes
+        if name not in self.nodes:
+            self._nxdg.add_node(name, **starting_node_properties)
         for node in conditions + possibilities:
             # Avoid adding existing dependencies so as not to overwrite attributes
             if node not in self.nodes:
