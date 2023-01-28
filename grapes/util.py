@@ -31,6 +31,10 @@ def execute_graph_from_context(graph, context, *targets, inplace=False, check_fe
     grapes Graph
         Graph with context updated after computation.
     """
+    # No target is interpreted as compute everything
+    if len(targets) == 0:
+        targets = graph.get_all_sinks(exclude_recipes=True)
+
     if check_feasibility:
         feasibility, missing_dependencies = check_feasibility_of_execution(graph, context, *targets, inplace=inplace)
         if feasibility == "unreachable":
@@ -107,6 +111,9 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
     if len(input_keys) > 0:
         operational_graph.unfreeze(*input_keys)
         operational_graph.clear_values(*input_keys)
+    # No target is interpreted as compute everything
+    if len(targets) == 0:
+        targets = operational_graph.get_all_sinks(exclude_recipes=True)
     # Move as much as possible towards targets
     operational_graph.progress_towards_targets(*targets)
     # Check feasibility
@@ -161,6 +168,10 @@ def lambdify_graph(graph, input_keys, target):
 
 
 def check_feasibility_of_execution(graph, context, *targets, inplace=False):
+    # No target is interpreted as compute everything
+    if len(targets) == 0:
+        targets = graph.get_all_sinks(exclude_recipes=True)
+
     if not inplace:
         graph = copy.deepcopy(graph)
         context = copy.deepcopy(context)

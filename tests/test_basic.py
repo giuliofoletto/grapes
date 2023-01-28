@@ -509,3 +509,17 @@ def test_sources_and_sinks():
     assert g.get_all_sources(exclude_recipes=False) == {"a", "b", "d", "b_op_c", "d_op_c", "op_e"}
     assert g.get_all_sinks(exclude_recipes=True) == {"c", "e"}
     assert g.get_all_sinks(exclude_recipes=False) == {"c", "e"}
+
+
+def test_execution_of_all_graph():
+    g = gr.Graph()
+    g.add_step("c", "f_c", "a", "b")
+    g.add_step("f", "f_f", "d", "e")
+    g["f_c"] = lambda a, b: a + b
+    g["f_f"] = lambda d, e: d * e
+    g.finalize_definition()
+
+    # No target means that everything is a target
+    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "d": 3, "e": 4})
+    assert res["c"] == 3
+    assert res["f"] == 12
