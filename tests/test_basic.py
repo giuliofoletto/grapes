@@ -22,9 +22,12 @@ def test_simple():
     g.add_step("e", "op_e", "a", "b")
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
+    g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}, "g")
-    assert res["g"] == -9
+    g.update_internal_context({"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y})
+    g.execute_to_targets("g")
+
+    assert g["g"] == -9
 
 
 def test_simplified_input():
@@ -32,9 +35,12 @@ def test_simplified_input():
     g.add_step("e", "op_e", "a", "b")
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
+    g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}, "g")
-    assert res["g"] == -9
+    g.update_internal_context({"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y})
+    g.execute_to_targets("g")
+
+    assert g["g"] == -9
 
 
 def test_diamond():
@@ -44,9 +50,12 @@ def test_diamond():
     g.add_step("c", "op_c", "b")
     g.add_step("d", "op_d", "b")
     g.add_step("e", "op_e", "c", "d")
+    g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 2*x, "op_d": lambda x: 2*x, "op_e": lambda x, y: x-y}, "e")
-    assert res["e"] == 0
+    g.update_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 2*x, "op_d": lambda x: 2*x, "op_e": lambda x, y: x-y})
+    g.execute_to_targets("e")
+
+    assert g["e"] == 0
 
 
 def test_inverted_input():
@@ -55,16 +64,23 @@ def test_inverted_input():
     g = gr.Graph()
     g.add_step("c", "op_c", "b")
     g.add_step("b", "op_b", "a")
+    g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x}, "c")
-    assert res["c"] == 6
+    g.update_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x})
+    g.execute_to_targets("c")
+
+    assert g["c"] == 6
 
 
 def test_conditional():
     g = gr.Graph()
     g.add_simple_conditional("d", "c", "a", "b")
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "c": True}, "d")
-    assert res["d"] == res["a"]
+    g.finalize_definition()
+
+    g.update_internal_context({"a": 1, "b": 2, "c": True})
+    g.execute_to_targets("d")
+
+    assert g["d"] == g["a"]
 
 
 def test_compatibility():
@@ -107,22 +123,30 @@ def test_merge_and_execute():
     h = gr.Graph()
     h.add_step("e", "op_e", "c", "d")
     g.merge(h)
+    g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "d": 4, "op_c": lambda x, y: x+y, "op_e": lambda x, y: x*y}, "e")
-    assert res["e"] == 12
+    g.update_internal_context({"a": 1, "b": 2, "d": 4, "op_c": lambda x, y: x+y, "op_e": lambda x, y: x*y})
+    g.execute_to_targets("e")
+
+    assert g["e"] == 12
 
 
 def test_kwargs():
     g = gr.Graph()
     g.add_step("c", "op_c", "a", exponent="b")
+    g.finalize_definition()
 
     def example_exponentiation_func(base, exponent):
         return base**exponent
-    res = gr.execute_graph_from_context(g, {"a": 5, "b": 2, "op_c": example_exponentiation_func}, "c")
-    assert res["c"] == 25
+
+    g.update_internal_context({"a": 5, "b": 2, "op_c": example_exponentiation_func})
+    g.execute_to_targets("c")
+
+    assert g["c"] == 25
 
 
 def test_wrap_with_function():
+    # TODO use separate test suite for test of utils
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
     g.add_step("f", "op_f", "c", "d")
@@ -141,6 +165,7 @@ def test_wrap_with_function():
 
 
 def test_lambdify():
+    # TODO use separate test suite for test of utils
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
     g.add_step("f", "op_f", "c", "d")
@@ -167,8 +192,10 @@ def test_simplify_dependency():
     g.simplify_dependency("g", "f")
     g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
-    assert res["g"] == -9
+    g.update_internal_context({"a": 1, "b": 2, "c": 3, "d": 4})
+    g.execute_to_targets("g")
+
+    assert g["g"] == -9
 
 
 def test_simplify_all_dependencies():
@@ -183,8 +210,10 @@ def test_simplify_all_dependencies():
     g.simplify_all_dependencies("g")
     g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "c": 3, "d": 4}, "g")
-    assert res["g"] == -9
+    g.update_internal_context({"a": 1, "b": 2, "c": 3, "d": 4})
+    g.execute_to_targets("g")
+
+    assert g["g"] == -9
 
 
 def test_progress_towards_targets():
@@ -454,6 +483,7 @@ def test_multiple_conditional_no_conditions_defined():
 
 
 def test_execution_with_feasibility_check():
+    # TODO use separate test suite for test of utils
     g = gr.Graph()
     g.add_step("b", "fb", "a")
     g["fb"] = lambda a: a
@@ -468,6 +498,7 @@ def test_execution_with_feasibility_check():
 
 
 def test_execution_with_feasibility_check_uncertain():
+    # TODO use separate test suite for test of utils
     g = gr.Graph()
     g.add_simple_conditional("name", "condition", "value_true", "value_false")
     g.add_step_quick("condition", lambda pre_req: pre_req)
@@ -485,6 +516,7 @@ def test_execution_with_feasibility_check_uncertain():
 
 
 def test_unfeasible_wrap():
+    # TODO use separate test suite for test of utils
     g = gr.Graph()
     g.add_step("d", "op_d", "a", "b", "c")
     g["op_d"] = lambda a, b, c: a + b + c
@@ -512,6 +544,7 @@ def test_sources_and_sinks():
 
 
 def test_execution_of_all_graph():
+    # TODO use separate test suite for test of utils
     g = gr.Graph()
     g.add_step("c", "f_c", "a", "b")
     g.add_step("f", "f_f", "d", "e")
