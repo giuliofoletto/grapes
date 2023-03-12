@@ -515,6 +515,21 @@ class Graph():
         for target in targets:
             self.evaluate_target(target, True)
 
+    def execute_towards_conditions(self, *conditions):
+        """
+        Move towards the conditions, stop if one is found true.
+        """
+        for condition in conditions:
+            self.evaluate_target(condition, True)
+            if self.has_value(condition) and self[condition]:
+                break
+
+    def execute_towards_all_conditions_of_conditional(self, conditional):
+        """
+        Move towards the conditions of a specific conditional, stop if one is found true.
+        """
+        self.execute_towards_conditions(*self.get_conditions(conditional))
+
     def find_reachability_target(self, target):
         """
         Generic interface to find the reachability of a GenericNode.

@@ -457,3 +457,33 @@ def test_sources_and_sinks():
     assert g.get_all_sources(exclude_recipes=False) == {"a", "b", "d", "b_op_c", "d_op_c", "op_e"}
     assert g.get_all_sinks(exclude_recipes=True) == {"c", "e"}
     assert g.get_all_sinks(exclude_recipes=False) == {"c", "e"}
+
+
+def test_execute_towards_conditions():
+    g = gr.Graph()
+    g.add_step("c2", "identity_recipe", "pre_c2")
+    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    g["pre_c2"] = True
+    g["identity_recipe"] = lambda x: x
+    g.finalize_definition()
+
+    g.execute_towards_conditions("c1", "c2", "c3")
+
+    assert not g.has_value("c1")
+    assert not g.has_value("c3")
+    assert g["c2"] == True
+
+
+def test_execute_towards_all_conditions_of_conditional():
+    g = gr.Graph()
+    g.add_step("c2", "identity_recipe", "pre_c2")
+    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    g["pre_c2"] = True
+    g["identity_recipe"] = lambda x: x
+    g.finalize_definition()
+
+    g.execute_towards_all_conditions_of_conditional("conditional")
+
+    assert not g.has_value("c1")
+    assert not g.has_value("c3")
+    assert g["c2"] == True
