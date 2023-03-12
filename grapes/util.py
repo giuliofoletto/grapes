@@ -123,6 +123,31 @@ def context_from_toml_file(file_name):
     return data
 
 
+def context_from_file(file_name):
+    """
+    Load a file (any of the supported formats) into a dictionary.
+
+    Parameters
+    ----------
+    file_name: str
+        Path to the file.
+
+    Returns
+    dict
+        Content of the file as dictionary.
+    """
+    supported_formats = ["JSON", "TOML"]
+    reading_functions = [context_from_json_file, context_from_toml_file]
+    for func in reading_functions:
+        try:
+            data = func(file_name)
+            return data
+        except (json.decoder.JSONDecodeError, tomllib.TOMLDecodeError):
+            pass
+    # If we arrive here, there has been an issue in all reading functions
+    raise ValueError("File " + file_name + " is not valid in any of the supported formats (" + ",".join(supported_formats) + ")")
+
+
 def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as_kwargs=True):
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
