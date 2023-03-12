@@ -4,7 +4,9 @@ A simple library for dataflow programming in python.
 It is inspired by [`pythonflow`](https://github.com/spotify/pythonflow) but with substantial modifications.
 
 ## Dependencies
-The core `grapes` module depends only on [`networkx`](https://github.com/networkx/networkx), which can be found on PyPI and is included in the Anaconda distribution.
+The core `grapes` module depends on [`networkx`](https://github.com/networkx/networkx), which can be found on PyPI and is included in the Anaconda distribution.
+
+For TOML support, `tomli` is needed before python 3.11 (in python 3.11, `tomllib` is part of the standard).
 
 To visualize graphs, [`matplotlib`](https://matplotlib.org/) and [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) (a wrapper for [`Graphviz`](https://graphviz.org/)) are also needed.
 On  Windows, `pygraphviz` requires the [Visual Studio C/C++ build tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) to be installed (including MSVC tools), alongside [`Graphviz` 2.46](https://gitlab.com/graphviz/graphviz/-/package_files/6164164/download) or higher, which should be in `PATH`.

@@ -28,6 +28,7 @@ setup(name='grapes',
       packages=['grapes'],
       install_requires=[
           'networkx',
+          "tomli;python_version<'3.11'"
       ],
       extras_require={
           'visualize': ['pygraphviz', 'matplotlib'],  # For installation of pygraphviz, refer to https://pygraphviz.github.io/documentation/stable/install.html
