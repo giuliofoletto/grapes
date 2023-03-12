@@ -558,3 +558,22 @@ def test_get_all_conditionals():
     g.finalize_definition()
 
     assert g.get_all_conditionals() == {"conditional1", "conditional2"}
+
+
+def test_convert_all_conditionals_to_trivial_steps():
+    g = gr.Graph()
+    g.add_simple_conditional("conditional1", "c1", "vt", "vf")
+    g.add_simple_conditional("conditional2", "c2", "vt", "vf")
+    g["c1"] = True
+    g["c2"] = False
+    g["vt"] = 1
+    g["vf"] = 2
+    g.finalize_definition()
+
+    g.convert_all_conditionals_to_trivial_steps()
+    assert g.get_type("conditional1") == "standard"
+    assert g.get_type("conditional2") == "standard"
+
+    g.execute_to_targets("conditional1", "conditional2")
+    assert g["conditional1"] == g["vt"]
+    assert g["conditional2"] == g["vf"]

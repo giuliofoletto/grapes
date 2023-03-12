@@ -847,3 +847,8 @@ class Graph():
             if self.get_type(node) == "conditional":
                 conditionals.add(node)
         return conditionals
+
+    def convert_all_conditionals_to_trivial_steps(self, execute_towards_conditions=False):
+        conditionals = self.get_all_conditionals()
+        for conditional in conditionals:
+            self.convert_conditional_to_trivial_step(conditional, execute_towards_conditions)
