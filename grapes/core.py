@@ -812,7 +812,7 @@ class Graph():
                 # We assume that the last possibility is considered a default
                 index = -1
             else:
-                raise ValueError("Cannot convert a conditional if no condition is true")
+                raise ValueError("Cannot convert conditional " + conditional + " if no condition is true")
         # Get the correct possibility
         selected_possibility = self.get_possibilities(conditional)[index]
 
