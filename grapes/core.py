@@ -472,20 +472,26 @@ class Graph():
         if self.has_value(conditional):
             self.get_value(conditional)
             return
-        # If not, evaluate the conditions until one is found true
+        # If not, check if one of the conditions already has a true value
         for index, condition in enumerate(self.get_conditions(conditional)):
-            self.evaluate_target(condition, continue_on_fail)
             if self.has_value(condition) and self.get_value(condition):
                 break
-            elif not self.has_value(condition):
-                # Computing failed
-                if continue_on_fail:
-                    # Do nothing, we want to keep going
-                    return
-                else:
-                    raise ValueError("Node " + condition + " could not be computed")
-        else:  # Happens if loop is never broken, i.e. when no conditions are true
-            index = -1
+        else:
+            # Happens only if loop is never broken
+            # In this case, evaluate the conditions until one is found true
+            for index, condition in enumerate(self.get_conditions(conditional)):
+                self.evaluate_target(condition, continue_on_fail)
+                if self.has_value(condition) and self.get_value(condition):
+                    break
+                elif not self.has_value(condition):
+                    # Computing failed
+                    if continue_on_fail:
+                        # Do nothing, we want to keep going
+                        return
+                    else:
+                        raise ValueError("Node " + condition + " could not be computed")
+            else:  # Happens if loop is never broken, i.e. when no conditions are true
+                index = -1
 
         # Actual computation happens here
         try:
