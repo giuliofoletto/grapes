@@ -153,6 +153,18 @@ def test_context_from_json_file():
     assert context == expected_context
 
 
+def test_context_from_toml_file():
+    file_name = data_directory + "/example.toml"
+    context = gr.context_from_toml_file(file_name)
+    expected_context = {
+        "a": 1,
+        "b": 2,
+        "c": "hello"
+    }
+
+    assert context == expected_context
+
+
 def test_wrap_with_function():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")

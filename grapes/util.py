@@ -8,6 +8,12 @@ License: See project-level license file.
 import json
 import copy
 import warnings
+# Since tomllib is only standard in 3.11, we import tomli in prior versions
+import sys
+if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
+    import tomllib
+else:
+    import tomli as tomllib
 
 
 def execute_graph_from_context(graph, context, *targets, inplace=False, check_feasibility=True):
@@ -96,6 +102,24 @@ def context_from_json_file(file_name):
     """
     with open(file_name, encoding='utf-8') as json_file:
         data = json.load(json_file)
+    return data
+
+
+def context_from_toml_file(file_name):
+    """
+    Load a toml file into a dictionary.
+
+    Parameters
+    ----------
+    file_name: str
+        Path to the toml file.
+
+    Returns
+    dict
+        Content of the file as dictionary.
+    """
+    with open(file_name, "rb") as toml_file:
+        data = tomllib.load(toml_file)
     return data
 
 
