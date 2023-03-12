@@ -487,3 +487,65 @@ def test_execute_towards_all_conditions_of_conditional():
     assert not g.has_value("c1")
     assert not g.has_value("c3")
     assert g["c2"] == True
+
+
+def test_convert_conditional_to_trivial_step():
+    g = gr.Graph()
+    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    g["c2"] = True
+    g["v2"] = 2
+    g.finalize_definition()
+
+    g.convert_conditional_to_trivial_step("conditional")
+    assert g.get_type("conditional") == "standard"
+
+    g.execute_to_targets("conditional")
+    assert g["conditional"] == g["v2"]
+
+
+def test_convert_conditional_to_trivial_step_with_evaluation():
+    g = gr.Graph()
+    g.add_step("v2", "identity_recipe", "pre_v2")
+    g.add_step("c2", "identity_recipe", "pre_c2")
+    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    g["pre_c2"] = True
+    g["pre_v2"] = 2
+    g["identity_recipe"] = lambda x: x
+    g.finalize_definition()
+
+    g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)
+    assert g.get_type("conditional") == "standard"
+
+    g.execute_to_targets("conditional")
+    assert g["conditional"] == g["v2"]
+
+
+def test_convert_conditional_to_trivial_step_with_default():
+    g = gr.Graph()
+    g.add_step("default", "identity_recipe", "pre_default")
+    g.add_step("c", "identity_recipe", "pre_c")
+    g.add_multiple_conditional("conditional", ["c"], ["v", "default"])
+    g["pre_c"] = False
+    g["pre_default"] = 1
+    g["identity_recipe"] = lambda x: x
+    g.finalize_definition()
+
+    g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)
+    assert g.get_type("conditional") == "standard"
+
+    g.execute_to_targets("conditional")
+    assert g["conditional"] == g["default"]
+
+
+def test_convert_conditional_to_trivial_step_without_true_values():
+    g = gr.Graph()
+    g.add_step("v2", "identity_recipe", "pre_v2")
+    g.add_step("c2", "identity_recipe", "pre_c2")
+    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    g["pre_c2"] = False
+    g["pre_v2"] = 2
+    g["identity_recipe"] = lambda x: x
+    g.finalize_definition()
+
+    with pytest.raises(ValueError):
+        g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)

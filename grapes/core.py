@@ -799,3 +799,44 @@ class Graph():
             if self._nxdg.out_degree(node) == 0:
                 sinks.add(node)
         return sinks
+
+    def convert_conditional_to_trivial_step(self, conditional, execute_towards_conditions=False):
+        if execute_towards_conditions:
+            self.execute_towards_all_conditions_of_conditional(conditional)
+
+        for index, condition in enumerate(self.get_conditions(conditional)):
+            if self.has_value(condition) and self.get_value(condition):
+                break
+        else:  # Happens if loop is never broken, i.e. when no conditions are true
+            if len(self.get_conditions(conditional)) == len(self.get_possibilities(conditional)) - 1:
+                # We assume that the last possibility is considered a default
+                index = -1
+            else:
+                raise ValueError("Cannot convert a conditional if no condition is true")
+        # Get the correct possibility
+        selected_possibility = self.get_possibilities(conditional)[index]
+
+        # Remove all previous edges (the correct one will be readded later)
+        for condition in self.get_conditions(conditional):
+            self._nxdg.remove_edge(condition, conditional)
+        for possibility in self.get_possibilities(conditional):
+            self._nxdg.remove_edge(possibility, conditional)
+        # Rewrite node attributes
+        nx.set_node_attributes(self._nxdg, {conditional: starting_node_properties})
+        # Add a trivial recipe
+        recipe = "trivial_recipe_for_" + conditional
+        self.set_recipe(conditional, recipe)
+        self.set_args(conditional, [selected_possibility])
+        self.set_kwargs(conditional, dict())
+
+        # Add and connect the recipe
+        # Avoid adding existing recipe so as not to overwrite attributes
+        if recipe not in self.nodes:
+            self._nxdg.add_node(recipe, **starting_node_properties)
+        self.set_is_recipe(recipe, True)
+        self._nxdg.add_edge(recipe, conditional)
+        # Assign value of identity function to recipe
+        self.set_value(recipe, lambda x: x)
+
+        # Add and connect the possibility
+        self._nxdg.add_edge(selected_possibility, conditional)
