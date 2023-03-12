@@ -549,3 +549,12 @@ def test_convert_conditional_to_trivial_step_without_true_values():
 
     with pytest.raises(ValueError):
         g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)
+
+
+def test_get_all_conditionals():
+    g = gr.Graph()
+    g.add_simple_conditional("conditional1", "c1", "vt", "vf")
+    g.add_simple_conditional("conditional2", "c2", "vt", "vf")
+    g.finalize_definition()
+
+    assert g.get_all_conditionals() == {"conditional1", "conditional2"}

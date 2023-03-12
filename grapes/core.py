@@ -840,3 +840,10 @@ class Graph():
 
         # Add and connect the possibility
         self._nxdg.add_edge(selected_possibility, conditional)
+
+    def get_all_conditionals(self):
+        conditionals = set()
+        for node in self.nodes:
+            if self.get_type(node) == "conditional":
+                conditionals.add(node)
+        return conditionals
