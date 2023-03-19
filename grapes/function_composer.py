@@ -26,12 +26,12 @@ def function_compose(func, subfuncs, func_dependencies, subfuncs_dependencies, f
     subfuncs: list of callables
         List of internal functions to be composed with func. If identity_token is passed here, it is replaced by the value of the argument.
     func_dependencies: list of hashables
-        Names of the arguments of the new function (usually they should correspond to node names in a graph)
+        Names of the arguments of func (usually they should correspond to node names in a graph)
     subfuncs_dependencies: list of lists of hashables
         Names of the arguments that are passed to the subfuncs when calling the new function (usually they should correspond to node names in a graph)
     func_signature: list of hashables
         Names of the arguments of the old func
-    subfuncs_dependencies: list of lists of hashables
+    subfuncs_signatures: list of lists of hashables
         Names of the arguments of the old subfuncs
     """
     return lambda **kwargs: func(**{func_signature[i]: (subfuncs[i](**{signature_name: kwargs[dependency_name] for signature_name, dependency_name in zip(subfuncs_signatures[i], subfuncs_dependencies[i])}) if subfuncs[i] is not identity_token else kwargs[func_dependencies[i]]) for i in range(len(subfuncs))})
@@ -53,7 +53,7 @@ def function_compose_simple(func, subfuncs, func_dependencies, subfuncs_dependen
         Names of the arguments that are passed to the subfuncs when calling the new function (usually they should correspond to node names in a graph)
     func_signature: list of hashables
         Names of the arguments of the old func
-    subfuncs_dependencies: list of lists of hashables
+    subfuncs_signatures: list of lists of hashables
         Names of the arguments of the old subfuncs
     """
     if func_signature is None:
