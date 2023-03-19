@@ -25,7 +25,8 @@ setup(name='grapes',
       author_email='giulio.foletto@outlook.com',
       license='Apache',
       license_files=('LICENSE.txt', 'NOTICE.txt'),
-      packages=['grapes'],
+      packages=['grapes', 'grapes.visualize'],
+      package_dir={'grapes': 'grapes', 'grapes.visualize': 'grapes/visualize'},
       install_requires=[
           'networkx',
           "tomli;python_version<'3.11'"
