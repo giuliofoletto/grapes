@@ -801,6 +801,16 @@ class Graph():
         return sinks
 
     def convert_conditional_to_trivial_step(self, conditional, execute_towards_conditions=False):
+        """
+        Convert a conditional to a trivial step that returns the dependency corresponding to the true condition.
+
+        Parameters
+        ----------
+        conditional: hashable (typically string)
+            The name of the conditional node to be converted
+        execute_towards_conditions: bool
+            Whether to execute the graph towards the conditions until one is found true (default: False)
+        """
         if execute_towards_conditions:
             self.execute_towards_all_conditions_of_conditional(conditional)
 
@@ -842,6 +852,9 @@ class Graph():
         self._nxdg.add_edge(selected_possibility, conditional)
 
     def get_all_conditionals(self):
+        """
+        Get set of all conditional nodes in the graph.
+        """
         conditionals = set()
         for node in self.nodes:
             if self.get_type(node) == "conditional":
@@ -849,6 +862,14 @@ class Graph():
         return conditionals
 
     def convert_all_conditionals_to_trivial_steps(self, execute_towards_conditions=False):
+        """
+        Convert all conditionals in the graph to trivial steps that return the dependency corresponding to the true condition.
+
+        Parameters
+        ----------
+        execute_towards_conditions: bool
+            Whether to execute the graph towards the conditions until one is found true (default: False)
+        """
         conditionals = self.get_all_conditionals()
         for conditional in conditionals:
             self.convert_conditional_to_trivial_step(conditional, execute_towards_conditions)

@@ -460,6 +460,9 @@ def test_sources_and_sinks():
 
 
 def test_execute_towards_conditions():
+    """
+    Execute towards the conditions of conditional by computing c2.
+    """
     g = gr.Graph()
     g.add_step("c2", "identity_recipe", "pre_c2")
     g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
@@ -475,6 +478,9 @@ def test_execute_towards_conditions():
 
 
 def test_execute_towards_all_conditions_of_conditional():
+    """
+    Execute towards the conditions of conditional by computing c2 (the conditional is passed instead of the conditions).
+    """
     g = gr.Graph()
     g.add_step("c2", "identity_recipe", "pre_c2")
     g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
@@ -490,6 +496,9 @@ def test_execute_towards_all_conditions_of_conditional():
 
 
 def test_convert_conditional_to_trivial_step():
+    """
+    Convert conditional to a trivial step since its condition c2 already has true value.
+    """
     g = gr.Graph()
     g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
     g["c2"] = True
@@ -504,6 +513,9 @@ def test_convert_conditional_to_trivial_step():
 
 
 def test_convert_conditional_to_trivial_step_with_evaluation():
+    """
+    Convert conditional to a trivial step but compute the conditions.
+    """
     g = gr.Graph()
     g.add_step("v2", "identity_recipe", "pre_v2")
     g.add_step("c2", "identity_recipe", "pre_c2")
@@ -521,6 +533,9 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
 
 
 def test_convert_conditional_to_trivial_step_with_default():
+    """
+    Convert conditional to a trivial step, computing conditions, but use default value since no condition is true.
+    """
     g = gr.Graph()
     g.add_step("default", "identity_recipe", "pre_default")
     g.add_step("c", "identity_recipe", "pre_c")
@@ -538,6 +553,9 @@ def test_convert_conditional_to_trivial_step_with_default():
 
 
 def test_convert_conditional_to_trivial_step_without_true_values():
+    """
+    Try to convert conditional to trivial step but no conditions can be evaluated to true.
+    """
     g = gr.Graph()
     g.add_step("v2", "identity_recipe", "pre_v2")
     g.add_step("c2", "identity_recipe", "pre_c2")
@@ -552,6 +570,9 @@ def test_convert_conditional_to_trivial_step_without_true_values():
 
 
 def test_get_all_conditionals():
+    """
+    Get set of all conditionals in the graph.
+    """
     g = gr.Graph()
     g.add_simple_conditional("conditional1", "c1", "vt", "vf")
     g.add_simple_conditional("conditional2", "c2", "vt", "vf")
@@ -561,6 +582,9 @@ def test_get_all_conditionals():
 
 
 def test_convert_all_conditionals_to_trivial_steps():
+    """
+    Convert all conditionals to trivial steps.
+    """
     g = gr.Graph()
     g.add_simple_conditional("conditional1", "c1", "vt", "vf")
     g.add_simple_conditional("conditional2", "c2", "vt", "vf")
