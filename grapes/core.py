@@ -9,6 +9,7 @@ from typing import ValuesView
 import networkx as nx
 from . import function_composer
 import inspect
+import copy
 
 
 starting_node_properties = {"type": "standard", "has_value": False, "value": None, "is_frozen": False, "is_recipe": False, "topological_generation_index": -1, "has_reachability": False, "reachability": None}
@@ -873,3 +874,8 @@ class Graph():
         conditionals = self.get_all_conditionals()
         for conditional in conditionals:
             self.convert_conditional_to_trivial_step(conditional, execute_towards_conditions)
+
+    def get_subgraph(self, nodes):
+        h = copy.deepcopy(self)
+        h._nxdg.remove_nodes_from([n for n in self._nxdg if n not in nodes])
+        return h

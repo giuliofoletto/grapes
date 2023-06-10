@@ -601,3 +601,16 @@ def test_convert_all_conditionals_to_trivial_steps():
     g.execute_to_targets("conditional1", "conditional2")
     assert g["conditional1"] == g["vt"]
     assert g["conditional2"] == g["vf"]
+
+
+def test_get_subgraph():
+    g = gr.Graph()
+    g.add_step("e", "op_e", "a", "b")
+    g.add_step("f", "op_f", "c", "d")
+    g.add_step("g", "op_g", "e", "f")
+    g.finalize_definition()
+
+    h = g.get_subgraph({"g", "e", "f", "op_g"})
+    h.set_internal_context({"e": 1, "f": 2, "op_g": lambda x, y: x+y})
+    h.execute_to_targets("g")
+    assert h["g"] == 3
