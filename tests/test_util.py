@@ -5,9 +5,11 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
-import pytest
-import grapes as gr
 import warnings
+
+import pytest
+
+import grapes as gr
 
 data_directory = "tests/data"
 
@@ -26,7 +28,18 @@ def test_simple_execution():
     g.add_step("g", "op_g", "e", "f")
     g.finalize_definition()
 
-    res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}, "g")
+    res = gr.execute_graph_from_context(
+        g,
+        {
+            "a": 1,
+            "b": 2,
+            "f": 12,
+            "op_e": lambda x, y: x + y,
+            "op_f": lambda x, y: x * y,
+            "op_g": lambda x, y: x - y,
+        },
+        "g",
+    )
 
     assert res["g"] == -9
 
@@ -100,7 +113,9 @@ def test_execution_with_feasibility_check():
     with pytest.raises(ValueError):
         gr.execute_graph_from_context(g, {}, "b")
     # Now a becomes available
-    feasibility, missing_dependencies = gr.check_feasibility_of_execution(g, {"a": 1}, "b")
+    feasibility, missing_dependencies = gr.check_feasibility_of_execution(
+        g, {"a": 1}, "b"
+    )
     assert feasibility == "reachable"
     assert missing_dependencies == set()
     res = gr.execute_graph_from_context(g, {"a": 1}, "b")
@@ -118,7 +133,9 @@ def test_execution_with_feasibility_check_uncertain():
     # Reachability is uncertain because condition is reachable and one value also is
     feasibility, missing_dependencies = gr.check_feasibility_of_execution(g, {}, "name")
     assert feasibility == "uncertain"
-    assert missing_dependencies == {"value_false"}  # Note that set("value_false") splits the string into chars
+    assert missing_dependencies == {
+        "value_false"
+    }  # Note that set("value_false") splits the string into chars
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         res = gr.execute_graph_from_context(g, {}, "name")
@@ -136,7 +153,7 @@ def test_json_from_graph():
     g.finalize_definition()
 
     json_string = gr.json_from_graph(g)
-    expected_string = "{\n    \"a\": 1,\n    \"b\": 2\n}"  # Spacing and separators are defined in the json_from_graph function
+    expected_string = '{\n    "a": 1,\n    "b": 2\n}'  # Spacing and separators are defined in the json_from_graph function
 
     assert json_string == expected_string
 
@@ -144,11 +161,7 @@ def test_json_from_graph():
 def test_context_from_json_file():
     file_name = data_directory + "/example.json"
     context = gr.context_from_json_file(file_name)
-    expected_context = {
-        "a": 1,
-        "b": 2,
-        "c": "hello"
-    }
+    expected_context = {"a": 1, "b": 2, "c": "hello"}
 
     assert context == expected_context
 
@@ -156,21 +169,13 @@ def test_context_from_json_file():
 def test_context_from_toml_file():
     file_name = data_directory + "/example.toml"
     context = gr.context_from_toml_file(file_name)
-    expected_context = {
-        "a": 1,
-        "b": 2,
-        "c": "hello"
-    }
+    expected_context = {"a": 1, "b": 2, "c": "hello"}
 
     assert context == expected_context
 
 
 def test_context_from_file():
-    expected_context = {
-        "a": 1,
-        "b": 2,
-        "c": "hello"
-    }
+    expected_context = {"a": 1, "b": 2, "c": "hello"}
 
     file_name = data_directory + "/example.json"
     context = gr.context_from_file(file_name)
@@ -187,14 +192,22 @@ def test_wrap_with_function():
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
 
-    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
     g.set_internal_context(operations)
     g.finalize_definition()
 
     # Get a function a,b,c,d -> g
-    f1 = gr.wrap_graph_with_function(g, ["a", "b", "c", "d"], "g", input_as_kwargs=False)
+    f1 = gr.wrap_graph_with_function(
+        g, ["a", "b", "c", "d"], "g", input_as_kwargs=False
+    )
     # Get a function a,b,c,d -> [e,f,g]
-    f2 = gr.wrap_graph_with_function(g, ["a", "b", "c", "d"], "e", "f", "g", input_as_kwargs=False)
+    f2 = gr.wrap_graph_with_function(
+        g, ["a", "b", "c", "d"], "e", "f", "g", input_as_kwargs=False
+    )
     assert f1(1, 2, 3, 4) == -9
     assert f2(1, 2, 3, 4) == [3, 12, -9]
 
@@ -205,7 +218,11 @@ def test_lambdify():
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
 
-    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
     g.set_internal_context(operations)
     g.finalize_definition()
 
@@ -222,7 +239,11 @@ def test_unfeasible_wrap():
 
     with pytest.raises(ValueError):
         # Pass b as input, c as constant, but do not pass a
-        f1 = gr.wrap_graph_with_function(g, ["b"], "d", constants={"c": 1}, input_as_kwargs=False)
+        f1 = gr.wrap_graph_with_function(
+            g, ["b"], "d", constants={"c": 1}, input_as_kwargs=False
+        )
     # Pass also a
-    f2 = gr.wrap_graph_with_function(g, ["a", "b"], "d", constants={"c": 1}, input_as_kwargs=False)
+    f2 = gr.wrap_graph_with_function(
+        g, ["a", "b"], "d", constants={"c": 1}, input_as_kwargs=False
+    )
     assert f2(1, 1) == 3

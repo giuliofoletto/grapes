@@ -5,18 +5,21 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
-import json
 import copy
-import warnings
-# Since tomllib is only standard in 3.11, we import tomli in prior versions
+import json
 import sys
+import warnings
+
+# Since tomllib is only standard in 3.11, we import tomli in prior versions
 if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
     import tomllib
 else:
     import tomli as tomllib
 
 
-def execute_graph_from_context(graph, context, *targets, inplace=False, check_feasibility=True):
+def execute_graph_from_context(
+    graph, context, *targets, inplace=False, check_feasibility=True
+):
     """Execute a graph up to a target given a context.
 
     Parameters
@@ -42,11 +45,19 @@ def execute_graph_from_context(graph, context, *targets, inplace=False, check_fe
         targets = graph.get_all_sinks(exclude_recipes=True)
 
     if check_feasibility:
-        feasibility, missing_dependencies = check_feasibility_of_execution(graph, context, *targets, inplace=inplace)
+        feasibility, missing_dependencies = check_feasibility_of_execution(
+            graph, context, *targets, inplace=inplace
+        )
         if feasibility == "unreachable":
-            raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
+            raise ValueError(
+                "The requested computation is unfeasible because of the following missing dependencies: "
+                + ", ".join(missing_dependencies)
+            )
         elif feasibility == "uncertain":
-            warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies))
+            warnings.warn(
+                "The feasibility of the requested computation is uncertain because of the following missing dependencies: "
+                + ", ".join(missing_dependencies)
+            )
 
     if not inplace:
         graph = copy.deepcopy(graph)
@@ -79,12 +90,14 @@ def json_from_graph(graph):
             json.dumps(value)
         except:
             non_serializable_items.update({key: str(value)})
-    if len(non_serializable_items) > 0:  # We must copy the context, to preserve it, and dump a modified version of it
+    if (
+        len(non_serializable_items) > 0
+    ):  # We must copy the context, to preserve it, and dump a modified version of it
         res = copy.deepcopy(context)
         res.update(non_serializable_items)
     else:
         res = context
-    return json.dumps(res, sort_keys=True, indent=4, separators=(',', ': '))
+    return json.dumps(res, sort_keys=True, indent=4, separators=(",", ": "))
 
 
 def context_from_json_file(file_name):
@@ -100,7 +113,7 @@ def context_from_json_file(file_name):
     dict
         Content of the file as dictionary.
     """
-    with open(file_name, encoding='utf-8') as json_file:
+    with open(file_name, encoding="utf-8") as json_file:
         data = json.load(json_file)
     return data
 
@@ -145,10 +158,18 @@ def context_from_file(file_name):
         except (json.decoder.JSONDecodeError, tomllib.TOMLDecodeError):
             pass
     # If we arrive here, there has been an issue in all reading functions
-    raise ValueError("File " + file_name + " is not valid in any of the supported formats (" + ",".join(supported_formats) + ")")
+    raise ValueError(
+        "File "
+        + file_name
+        + " is not valid in any of the supported formats ("
+        + ",".join(supported_formats)
+        + ")"
+    )
 
 
-def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as_kwargs=True):
+def wrap_graph_with_function(
+    graph, input_keys, *targets, constants={}, input_as_kwargs=True
+):
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
     # Pass all constants to the graph
@@ -168,13 +189,22 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
     # Check feasibility
     placeholder_value = 0
     context = {key: placeholder_value for key in input_keys}
-    feasibility, missing_dependencies = check_feasibility_of_execution(operational_graph, context, *targets)
+    feasibility, missing_dependencies = check_feasibility_of_execution(
+        operational_graph, context, *targets
+    )
     if feasibility == "unreachable":
-        raise ValueError("The requested computation is unfeasible because of the following missing dependencies: " + ", ".join(missing_dependencies))
+        raise ValueError(
+            "The requested computation is unfeasible because of the following missing dependencies: "
+            + ", ".join(missing_dependencies)
+        )
     elif feasibility == "uncertain":
-        warnings.warn("The feasibility of the requested computation is uncertain because of the following missing dependencies: " + ", ".join(missing_dependencies))
+        warnings.warn(
+            "The feasibility of the requested computation is uncertain because of the following missing dependencies: "
+            + ", ".join(missing_dependencies)
+        )
 
     if input_as_kwargs:
+
         def specific_function(**kwargs):
             # Use for loop rather than dict comprehension because it is a more basic operation
             for key in input_keys:
@@ -187,6 +217,7 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
                 return list_of_values[0]
             else:
                 return list_of_values
+
     else:
         input_keys = list(input_keys)
 
@@ -202,6 +233,7 @@ def wrap_graph_with_function(graph, input_keys, *targets, constants={}, input_as
                 return list_of_values[0]
             else:
                 return list_of_values
+
     return specific_function
 
 
@@ -211,7 +243,9 @@ def lambdify_graph(graph, input_keys, target):
     if len(input_keys) > 0:
         graph.clear_values(*input_keys)
     graph.progress_towards_targets(target)
-    while not set(graph.get_args(target) + tuple(graph.get_kwargs(target).values())).issubset(set(input_keys)):
+    while not set(
+        graph.get_args(target) + tuple(graph.get_kwargs(target).values())
+    ).issubset(set(input_keys)):
         graph.simplify_all_dependencies(target, exclude=input_keys)
     return graph[graph.get_recipe(target)]
 
@@ -232,6 +266,10 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
     missing_dependencies = set()
     if feasibility in {"unreachable", "uncertain"}:
         for node in graph.nodes:
-            if graph.get_topological_generation_index(node) == 0 and graph.has_reachability(node) and graph.get_reachability(node) != "reachable":
+            if (
+                graph.get_topological_generation_index(node) == 0
+                and graph.has_reachability(node)
+                and graph.get_reachability(node) != "reachable"
+            ):
                 missing_dependencies.add(node)
     return feasibility, missing_dependencies

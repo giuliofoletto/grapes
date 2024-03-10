@@ -6,6 +6,7 @@ License: See project-level license file.
 """
 
 import pytest
+
 import grapes as gr
 
 
@@ -23,7 +24,16 @@ def test_simple():
     g.add_step("g", "op_g", "e", "f")
     g.finalize_definition()
 
-    g.update_internal_context({"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y})
+    g.update_internal_context(
+        {
+            "a": 1,
+            "b": 2,
+            "f": 12,
+            "op_e": lambda x, y: x + y,
+            "op_f": lambda x, y: x * y,
+            "op_g": lambda x, y: x - y,
+        }
+    )
     g.execute_to_targets("g")
 
     assert g["g"] == -9
@@ -36,7 +46,16 @@ def test_simplified_input():
     g.add_step("g", "op_g", "e", "f")
     g.finalize_definition()
 
-    g.update_internal_context({"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y})
+    g.update_internal_context(
+        {
+            "a": 1,
+            "b": 2,
+            "f": 12,
+            "op_e": lambda x, y: x + y,
+            "op_f": lambda x, y: x * y,
+            "op_g": lambda x, y: x - y,
+        }
+    )
     g.execute_to_targets("g")
 
     assert g["g"] == -9
@@ -51,7 +70,15 @@ def test_diamond():
     g.add_step("e", "op_e", "c", "d")
     g.finalize_definition()
 
-    g.update_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 2*x, "op_d": lambda x: 2*x, "op_e": lambda x, y: x-y})
+    g.update_internal_context(
+        {
+            "a": 1,
+            "op_b": lambda x: 2 * x,
+            "op_c": lambda x: 2 * x,
+            "op_d": lambda x: 2 * x,
+            "op_e": lambda x, y: x - y,
+        }
+    )
     g.execute_to_targets("e")
 
     assert g["e"] == 0
@@ -65,7 +92,9 @@ def test_inverted_input():
     g.add_step("b", "op_b", "a")
     g.finalize_definition()
 
-    g.update_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x})
+    g.update_internal_context(
+        {"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x}
+    )
     g.execute_to_targets("c")
 
     assert g["c"] == 6
@@ -124,7 +153,9 @@ def test_merge_and_execute():
     g.merge(h)
     g.finalize_definition()
 
-    g.update_internal_context({"a": 1, "b": 2, "d": 4, "op_c": lambda x, y: x+y, "op_e": lambda x, y: x*y})
+    g.update_internal_context(
+        {"a": 1, "b": 2, "d": 4, "op_c": lambda x, y: x + y, "op_e": lambda x, y: x * y}
+    )
     g.execute_to_targets("e")
 
     assert g["e"] == 12
@@ -136,7 +167,7 @@ def test_kwargs():
     g.finalize_definition()
 
     def example_exponentiation_func(base, exponent):
-        return base**exponent
+        return base ** exponent
 
     g.update_internal_context({"a": 5, "b": 2, "op_c": example_exponentiation_func})
     g.execute_to_targets("c")
@@ -150,7 +181,11 @@ def test_simplify_dependency():
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
 
-    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
     g.set_internal_context(operations)
 
     g.simplify_dependency("g", "f")
@@ -168,7 +203,11 @@ def test_simplify_all_dependencies():
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
 
-    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
     g.set_internal_context(operations)
 
     g.simplify_all_dependencies("g")
@@ -186,7 +225,13 @@ def test_progress_towards_targets():
     g.add_step("f", "op_f", "b", "c", "e")
     g.add_step("e", "op_e", "d")
 
-    context = {"op_b": lambda x: 2*x, "op_e": lambda x: 3*x, "op_f": lambda x, y, z: x + y + z, "a": 5, "d": 4}
+    context = {
+        "op_b": lambda x: 2 * x,
+        "op_e": lambda x: 3 * x,
+        "op_f": lambda x, y, z: x + y + z,
+        "a": 5,
+        "d": 4,
+    }
     g.set_internal_context(context)
     g.finalize_definition()
 
@@ -198,7 +243,11 @@ def test_progress_towards_targets():
 
 def test_multiple_conditional():
     g = gr.Graph()
-    g.add_multiple_conditional("result", ["condition_1", "condition_2", "condition_3"], ["node_1", "node_2", "node_3"])
+    g.add_multiple_conditional(
+        "result",
+        ["condition_1", "condition_2", "condition_3"],
+        ["node_1", "node_2", "node_3"],
+    )
     context = {
         "condition_1": False,
         "condition_2": True,
@@ -217,7 +266,11 @@ def test_multiple_conditional():
 
 def test_multiple_conditional_with_default():
     g = gr.Graph()
-    g.add_multiple_conditional("result", ["condition_1", "condition_2", "condition_3"], ["node_1", "node_2", "node_3", "node_default"])
+    g.add_multiple_conditional(
+        "result",
+        ["condition_1", "condition_2", "condition_3"],
+        ["node_1", "node_2", "node_3", "node_default"],
+    )
     context = {
         "condition_1": False,
         "condition_2": False,
@@ -225,7 +278,7 @@ def test_multiple_conditional_with_default():
         "node_1": 1,
         "node_2": 2,
         "node_3": 3,
-        "node_default": 4
+        "node_default": 4,
     }
     g.set_internal_context(context)
     g.finalize_definition()
@@ -239,7 +292,7 @@ def test_edit_step():
     g = gr.Graph()
     g.add_step("b", "op_b", "a")
     g.add_step("c", "op_c", "b")
-    g.set_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x})
+    g.set_internal_context({"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x})
     g.finalize_definition()
 
     g.execute_to_targets("c")
@@ -263,7 +316,7 @@ def test_remove_step():
     g = gr.Graph()
     g.add_step("b", "op_b", "a")
     g.add_step("c", "op_c", "b")
-    g.set_internal_context({"a": 1, "op_b": lambda x: 2*x, "op_c": lambda x: 3*x})
+    g.set_internal_context({"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x})
     g.finalize_definition()
 
     g.remove_step("b")
@@ -275,10 +328,10 @@ def test_remove_step():
 
 def test_add_step_quick():
     def example_function_only_positional(a, b):
-        return a**b
+        return a ** b
 
     def example_function_with_kw_only_args(a, b, *, c):
-        return a**b+c
+        return a ** b + c
 
     def example_function_with_no_args():
         return 1
@@ -287,7 +340,7 @@ def test_add_step_quick():
     g.add_step_quick("c", example_function_only_positional)
     g.add_step_quick("d", example_function_with_kw_only_args)
     g.add_step_quick("e", example_function_with_no_args)
-    g.add_step_quick("f", lambda e: 2*e)
+    g.add_step_quick("f", lambda e: 2 * e)
     g.update_internal_context({"a": 2, "b": 3})
     g.finalize_definition()
 
@@ -454,7 +507,14 @@ def test_sources_and_sinks():
     g.finalize_definition()
 
     assert g.get_all_sources(exclude_recipes=True) == {"a", "b", "d"}
-    assert g.get_all_sources(exclude_recipes=False) == {"a", "b", "d", "b_op_c", "d_op_c", "op_e"}
+    assert g.get_all_sources(exclude_recipes=False) == {
+        "a",
+        "b",
+        "d",
+        "b_op_c",
+        "d_op_c",
+        "op_e",
+    }
     assert g.get_all_sinks(exclude_recipes=True) == {"c", "e"}
     assert g.get_all_sinks(exclude_recipes=False) == {"c", "e"}
 
@@ -525,7 +585,9 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
     g["identity_recipe"] = lambda x: x
     g.finalize_definition()
 
-    g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)
+    g.convert_conditional_to_trivial_step(
+        "conditional", execute_towards_conditions=True
+    )
     assert g.get_type("conditional") == "standard"
 
     g.execute_to_targets("conditional")
@@ -545,7 +607,9 @@ def test_convert_conditional_to_trivial_step_with_default():
     g["identity_recipe"] = lambda x: x
     g.finalize_definition()
 
-    g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)
+    g.convert_conditional_to_trivial_step(
+        "conditional", execute_towards_conditions=True
+    )
     assert g.get_type("conditional") == "standard"
 
     g.execute_to_targets("conditional")
@@ -566,7 +630,9 @@ def test_convert_conditional_to_trivial_step_without_true_values():
     g.finalize_definition()
 
     with pytest.raises(ValueError):
-        g.convert_conditional_to_trivial_step("conditional", execute_towards_conditions=True)
+        g.convert_conditional_to_trivial_step(
+            "conditional", execute_towards_conditions=True
+        )
 
 
 def test_get_all_conditionals():
@@ -611,6 +677,6 @@ def test_get_subgraph():
     g.finalize_definition()
 
     h = g.get_subgraph({"g", "e", "f", "op_g"})
-    h.set_internal_context({"e": 1, "f": 2, "op_g": lambda x, y: x+y})
+    h.set_internal_context({"e": 1, "f": 2, "op_g": lambda x, y: x + y})
     h.execute_to_targets("g")
     assert h["g"] == 3

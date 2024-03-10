@@ -12,11 +12,13 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
-import pytest
-import grapes as gr
-import grapes.visualize
 import filecmp
 import pickle
+
+import pytest
+
+import grapes as gr
+import grapes.visualize
 
 output_directory = "tests/visualizations"
 expected_directory = "tests/expected"
@@ -49,7 +51,16 @@ def test_simple(expected_sources):
 
 def test_with_values(expected_sources):
     g = build_graph()
-    g.set_internal_context({"a": 1, "b": 2, "f": 12, "op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y})
+    g.set_internal_context(
+        {
+            "a": 1,
+            "b": 2,
+            "f": 12,
+            "op_e": lambda x, y: x + y,
+            "op_f": lambda x, y: x * y,
+            "op_g": lambda x, y: x - y,
+        }
+    )
     name = "with_values"
     gv = gr.visualize.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
@@ -74,9 +85,14 @@ def test_save_and_render(expected_sources):
     name = "simple"
     gv = gr.visualize.get_graphviz_digraph(g)
     gv.write(output_directory + "/" + name + ".gv")
-    assert filecmp.cmp(output_directory + "/" + name + ".gv", expected_directory + "/" + name + ".gv")
+    assert filecmp.cmp(
+        output_directory + "/" + name + ".gv", expected_directory + "/" + name + ".gv"
+    )
     gv.draw(output_directory + "/" + name + ".gv.pdf", format="pdf", prog="dot")
-    assert filecmp.cmp(output_directory + "/" + name + ".gv.pdf", expected_directory + "/" + name + ".gv.pdf")
+    assert filecmp.cmp(
+        output_directory + "/" + name + ".gv.pdf",
+        expected_directory + "/" + name + ".gv.pdf",
+    )
 
 
 def test_conditional(expected_sources):
@@ -89,7 +105,11 @@ def test_conditional(expected_sources):
 
 def test_simplify_dependency(expected_sources):
     g = build_graph()
-    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
     g.set_internal_context(operations)
 
     name = "presimplification"
@@ -104,7 +124,11 @@ def test_simplify_dependency(expected_sources):
 
 def test_simplify_all_dependencies(expected_sources):
     g = build_graph()
-    operations = {"op_e": lambda x, y: x+y, "op_f": lambda x, y: x*y, "op_g": lambda x, y: x-y}
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
     g.set_internal_context(operations)
 
     g.simplify_all_dependencies("g")
@@ -115,6 +139,8 @@ def test_simplify_all_dependencies(expected_sources):
 
 def test_color_by_generation(expected_sources):
     g = build_graph()
-    gv = gr.visualize.get_graphviz_digraph(g, color_by_generation=True, colormap="plasma")
+    gv = gr.visualize.get_graphviz_digraph(
+        g, color_by_generation=True, colormap="plasma"
+    )
     name = "color_by_generation"
     assert gv.string() == expected_sources[name]

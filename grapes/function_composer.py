@@ -15,7 +15,14 @@ def identity_token():
     pass
 
 
-def function_compose(func, subfuncs, func_dependencies, subfuncs_dependencies, func_signature, subfuncs_signatures):
+def function_compose(
+    func,
+    subfuncs,
+    func_dependencies,
+    subfuncs_dependencies,
+    func_signature,
+    subfuncs_signatures,
+):
     """
     Compose functions.
 
@@ -34,10 +41,33 @@ def function_compose(func, subfuncs, func_dependencies, subfuncs_dependencies, f
     subfuncs_dependencies: list of lists of hashables
         Names of the arguments of the old subfuncs
     """
-    return lambda **kwargs: func(**{func_signature[i]: (subfuncs[i](**{signature_name: kwargs[dependency_name] for signature_name, dependency_name in zip(subfuncs_signatures[i], subfuncs_dependencies[i])}) if subfuncs[i] is not identity_token else kwargs[func_dependencies[i]]) for i in range(len(subfuncs))})
+    return lambda **kwargs: func(
+        **{
+            func_signature[i]: (
+                subfuncs[i](
+                    **{
+                        signature_name: kwargs[dependency_name]
+                        for signature_name, dependency_name in zip(
+                            subfuncs_signatures[i], subfuncs_dependencies[i]
+                        )
+                    }
+                )
+                if subfuncs[i] is not identity_token
+                else kwargs[func_dependencies[i]]
+            )
+            for i in range(len(subfuncs))
+        }
+    )
 
 
-def function_compose_simple(func, subfuncs, func_dependencies, subfuncs_dependencies, func_signature=None, subfuncs_signatures=None):
+def function_compose_simple(
+    func,
+    subfuncs,
+    func_dependencies,
+    subfuncs_dependencies,
+    func_signature=None,
+    subfuncs_signatures=None,
+):
     """
     Compose functions, without the need to pass signatures, as they are found automatically.
 
@@ -58,8 +88,13 @@ def function_compose_simple(func, subfuncs, func_dependencies, subfuncs_dependen
     """
     if func_signature is None:
         if inspect.getfullargspec(func).varargs is not None:
-            raise ValueError("Functions with varargs are not supported by Function Composer")
-        elif inspect.getfullargspec(func).varargs is None and inspect.getfullargspec(func).varkw is None:  # Well defined spec
+            raise ValueError(
+                "Functions with varargs are not supported by Function Composer"
+            )
+        elif (
+            inspect.getfullargspec(func).varargs is None
+            and inspect.getfullargspec(func).varkw is None
+        ):  # Well defined spec
             func_signature = list(inspect.signature(func).parameters.keys())
         else:
             func_signature = func_dependencies
@@ -67,10 +102,22 @@ def function_compose_simple(func, subfuncs, func_dependencies, subfuncs_dependen
         subfuncs_signatures = []
         for index, subfunc in enumerate(subfuncs):
             if inspect.getfullargspec(func).varargs is not None:
-                raise ValueError("Functions with varargs are not supported by Function Composer")
-            elif inspect.getfullargspec(subfunc).varargs is None and inspect.getfullargspec(subfunc).varkw is None:  # Well defined spec
+                raise ValueError(
+                    "Functions with varargs are not supported by Function Composer"
+                )
+            elif (
+                inspect.getfullargspec(subfunc).varargs is None
+                and inspect.getfullargspec(subfunc).varkw is None
+            ):  # Well defined spec
                 this_signature = list(inspect.signature(subfunc).parameters.keys())
             else:
                 this_signature = subfuncs_dependencies[index]
             subfuncs_signatures.append(this_signature)
-    return function_compose(func, subfuncs, func_dependencies, subfuncs_dependencies, func_signature, subfuncs_signatures)
+    return function_compose(
+        func,
+        subfuncs,
+        func_dependencies,
+        subfuncs_dependencies,
+        func_signature,
+        subfuncs_signatures,
+    )
