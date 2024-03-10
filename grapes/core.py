@@ -7,7 +7,6 @@ License: See project-level license file.
 
 import copy
 import inspect
-from typing import ValuesView
 
 import networkx as nx
 

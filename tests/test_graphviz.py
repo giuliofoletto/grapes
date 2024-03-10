@@ -18,7 +18,7 @@ import pickle
 import pytest
 
 import grapes as gr
-import grapes.visualize
+import grapes.visualize  # Needed even if visualize is called as gr.visualize
 
 output_directory = "tests/visualizations"
 expected_directory = "tests/expected"
