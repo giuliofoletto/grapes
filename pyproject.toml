@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "grapes"
+dynamic = ["version"]
+description = "Helper for dataflow based programming"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
+]
+dependencies = [
+    "networkx",
+    "tomli;python_version<'3.11'",
+]
+
+[project.optional-dependencies]
+testing = [
+    "pytest",
+]
+visualize = [
+    "matplotlib",
+    "pygraphviz", # For installation of pygraphviz, refer to https://pygraphviz.github.io/documentation/stable/install.html
+]
+
+[project.urls]
+Homepage = "https://github.com/giuliofoletto/grapes"
+
+[tool.hatch.version]
+path = "grapes/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/grapes",
+]
