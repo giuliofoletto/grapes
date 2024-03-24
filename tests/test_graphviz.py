@@ -80,7 +80,7 @@ def test_no_operations(expected_sources):
     assert gv.string() == expected_sources[name]
 
 
-def test_save_and_render(expected_sources):
+def test_save_dot(expected_sources):
     g = build_graph()
     name = "simple"
     gv = gr.visualize.get_graphviz_digraph(g)
@@ -88,11 +88,8 @@ def test_save_and_render(expected_sources):
     assert filecmp.cmp(
         output_directory + "/" + name + ".gv", expected_directory + "/" + name + ".gv"
     )
-    gv.draw(output_directory + "/" + name + ".gv.pdf", format="pdf", prog="dot")
-    assert filecmp.cmp(
-        output_directory + "/" + name + ".gv.pdf",
-        expected_directory + "/" + name + ".gv.pdf",
-    )
+    # Note: as of 2024, dot no longer draws reproducible (to the binary level) pdf files
+    # so we are no longer checking for equality of the drawn file
 
 
 def test_conditional(expected_sources):
