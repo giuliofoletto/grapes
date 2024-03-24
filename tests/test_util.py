@@ -247,3 +247,30 @@ def test_unfeasible_wrap():
         g, ["a", "b"], "d", constants={"c": 1}, input_as_kwargs=False
     )
     assert f2(1, 1) == 3
+
+
+def test_get_execution_subgraph():
+    g = gr.Graph()
+    g.add_step("e", "op_e", "a", "b")
+    g.add_step("f", "op_f", "c", "d")
+    g.add_step("g", "op_g", "e", "f")
+    g.add_step("h", "op_h", "e")
+    g.add_simple_conditional("j", "i", "g", "h")
+    g.finalize_definition()
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+        "op_h": lambda x: x,
+    }
+    g.set_internal_context(operations)
+    g.finalize_definition()
+    context = {"e": 1, "f": 1, "i": True}
+
+    h = gr.get_execution_subgraph(g, context, "j", "h")
+
+    assert set(h.nodes) == {"j", "i", "g", "h", "op_h", "e", "op_g", "f"}
+
+    res = gr.execute_graph_from_context(h, context, "j", "h")
+    assert res["j"] == 0
+    assert res["h"] == 1

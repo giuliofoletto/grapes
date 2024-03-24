@@ -273,3 +273,13 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
             ):
                 missing_dependencies.add(node)
     return feasibility, missing_dependencies
+
+
+def get_execution_subgraph(graph, context, *targets):
+    graph = copy.deepcopy(graph)
+    context = copy.deepcopy(context)
+    graph.set_internal_context(context)
+    path = set()
+    for target in targets:
+        path = path | graph.get_path_to_target(target)
+    return graph.get_subgraph(path)
