@@ -167,7 +167,7 @@ def test_kwargs():
     g.finalize_definition()
 
     def example_exponentiation_func(base, exponent):
-        return base ** exponent
+        return base**exponent
 
     g.update_internal_context({"a": 5, "b": 2, "op_c": example_exponentiation_func})
     g.execute_to_targets("c")
@@ -328,10 +328,10 @@ def test_remove_step():
 
 def test_add_step_quick():
     def example_function_only_positional(a, b):
-        return a ** b
+        return a**b
 
     def example_function_with_kw_only_args(a, b, *, c):
-        return a ** b + c
+        return a**b + c
 
     def example_function_with_no_args():
         return 1
@@ -680,3 +680,57 @@ def test_get_subgraph():
     h.set_internal_context({"e": 1, "f": 2, "op_g": lambda x, y: x + y})
     h.execute_to_targets("g")
     assert h["g"] == 3
+
+
+def test_get_all_ancestors():
+    g = gr.Graph()
+    g.add_step("e", "op_e", "a", "b")
+    g.add_step("f", "op_f", "c", "d")
+    g.add_step("g", "op_g", "e", "f")
+    g.add_step("h", "op_h", "e")
+    g.add_simple_conditional("j", "i", "g", "h")
+    g.finalize_definition()
+
+    result_g = g.get_all_ancestors_target("g")
+    result_h = g.get_all_ancestors_target("h")
+    result_j = g.get_all_ancestors_target("j")
+
+    assert result_g == {"g", "op_g", "e", "f", "op_f", "c", "d", "op_e", "a", "b"}
+    assert result_h == {"h", "op_h", "e", "op_e", "a", "b"}
+    assert result_j == {
+        "j",
+        "i",
+        "h",
+        "op_h",
+        "g",
+        "op_g",
+        "e",
+        "f",
+        "op_f",
+        "c",
+        "d",
+        "op_e",
+        "a",
+        "b",
+    }
+
+
+def test_get_all_ancestors_valued():
+    g = gr.Graph()
+    g.add_step("e", "op_e", "a", "b")
+    g.add_step("f", "op_f", "c", "d")
+    g.add_step("g", "op_g", "e", "f")
+    g.add_step("h", "op_h", "e")
+    g.add_simple_conditional("j", "i", "g", "h")
+    g.finalize_definition()
+
+    context = {"e": 1, "f": 1, "i": True}
+    g.set_internal_context(context)
+
+    result_g = g.get_all_ancestors_target("g", stop_at_valued=True)
+    result_h = g.get_all_ancestors_target("h", stop_at_valued=True)
+    result_j = g.get_all_ancestors_target("j", stop_at_valued=True)
+
+    assert result_g == {"g", "op_g", "e", "f"}
+    assert result_h == {"h", "op_h", "e"}
+    assert result_j == {"j", "i", "g", "op_g", "e", "f"}
