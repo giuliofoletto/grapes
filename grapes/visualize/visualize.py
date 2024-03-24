@@ -5,8 +5,8 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+import matplotlib
 import networkx
-from matplotlib.cm import get_cmap
 
 from .. import *
 
@@ -26,7 +26,7 @@ def get_graphviz_digraph(
     g.graph_attr.update(**attrs)
     # Save some values that will be useful later
     max_topological_generation_index = len(graph.get_topological_generations()) - 1
-    cmap = get_cmap(colormap)
+    cmap = matplotlib.colormaps[colormap]
 
     for node_name in g.nodes():
         new_attrs = {}
