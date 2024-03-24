@@ -827,7 +827,11 @@ class Graph:
         }
         self.set_kwargs(node_name, new_kwargs)
 
-    def simplify_all_dependencies(self, node_name, exclude=[]):
+    def simplify_all_dependencies(self, node_name, exclude=set()):
+        if not isinstance(exclude, set):
+            exclude = set(exclude)
+        # If a dependency is a source, it cannot be simplified
+        exclude |= self.get_all_sources()
         dependencies = self.get_args(node_name) + tuple(
             self.get_kwargs(node_name).values()
         )
@@ -958,7 +962,7 @@ class Graph:
         # Add a trivial recipe
         recipe = "trivial_recipe_for_" + conditional
         self.set_recipe(conditional, recipe)
-        self.set_args(conditional, [selected_possibility])
+        self.set_args(conditional, (selected_possibility,))
         self.set_kwargs(conditional, dict())
 
         # Add and connect the recipe
