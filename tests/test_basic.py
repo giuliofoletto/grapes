@@ -695,10 +695,9 @@ def test_get_all_ancestors():
     result_h = g.get_all_ancestors_target("h")
     result_j = g.get_all_ancestors_target("j")
 
-    assert result_g == {"g", "op_g", "e", "f", "op_f", "c", "d", "op_e", "a", "b"}
-    assert result_h == {"h", "op_h", "e", "op_e", "a", "b"}
+    assert result_g == {"op_g", "e", "f", "op_f", "c", "d", "op_e", "a", "b"}
+    assert result_h == {"op_h", "e", "op_e", "a", "b"}
     assert result_j == {
-        "j",
         "i",
         "h",
         "op_h",
@@ -715,22 +714,25 @@ def test_get_all_ancestors():
     }
 
 
-def test_get_all_ancestors_valued():
+def test_get_path_to_target():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
     g.add_step("f", "op_f", "c", "d")
     g.add_step("g", "op_g", "e", "f")
     g.add_step("h", "op_h", "e")
     g.add_simple_conditional("j", "i", "g", "h")
+    g.add_simple_conditional("l", "k", "g", "h")
     g.finalize_definition()
 
     context = {"e": 1, "f": 1, "i": True}
     g.set_internal_context(context)
 
-    result_g = g.get_all_ancestors_target("g", stop_at_valued=True)
-    result_h = g.get_all_ancestors_target("h", stop_at_valued=True)
-    result_j = g.get_all_ancestors_target("j", stop_at_valued=True)
+    result_g = g.get_path_to_target("g")
+    result_h = g.get_path_to_target("h")
+    result_j = g.get_path_to_target("j")
+    result_l = g.get_path_to_target("l")
 
     assert result_g == {"g", "op_g", "e", "f"}
     assert result_h == {"h", "op_h", "e"}
     assert result_j == {"j", "i", "g", "op_g", "e", "f"}
+    assert result_l == {"l", "k", "g", "op_g", "e", "f", "h", "op_h"}

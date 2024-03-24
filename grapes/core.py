@@ -1005,14 +1005,20 @@ class Graph:
         h._nxdg.remove_nodes_from([n for n in self._nxdg if n not in nodes])
         return h
 
-    def get_all_ancestors_target(self, target, stop_at_valued=False):
+    def get_all_ancestors_target(self, target):
         """
-        Generic interface to get all the ancestors of a GenericNode.
+        Get all the ancestors of a node.
+        """
+        return nx.ancestors(self._nxdg, target)
+
+    def get_path_to_target(self, target):
+        """
+        Generic interface to get the path from the last valued nodes to a target.
         """
         if self.get_type(target) == "standard":
-            return self.get_all_ancestors_standard(target, stop_at_valued)
+            return self.get_path_to_standard(target)
         elif self.get_type(target) == "conditional":
-            return self.get_all_ancestors_conditional(target, stop_at_valued)
+            return self.get_path_to_conditional(target)
         else:
             raise ValueError(
                 "Getting the ancestors of nodes of type "
@@ -1020,39 +1026,33 @@ class Graph:
                 + " is not supported"
             )
 
-    def get_all_ancestors_standard(self, node, stop_at_valued=False):
+    def get_path_to_standard(self, node):
         """
-        Get all ancestors of a standard node.
+        Get the path from the last valued nodes to a standard node.
         """
         result = set((node,))
-        if stop_at_valued and self.has_value(node):
+        if self.has_value(node):
             return result
         dependencies = self._nxdg.predecessors(node)
         for dependency in dependencies:
-            result = result | self.get_all_ancestors_target(dependency, stop_at_valued)
+            result = result | self.get_path_to_target(dependency)
         return result
 
-    def get_all_ancestors_conditional(self, conditional, stop_at_valued=False):
+    def get_path_to_conditional(self, conditional):
         """
-        Get all ancestors of a conditional node.
+        Get the path from the last valued nodes to a conditional node.
         """
         result = set((conditional,))
-        if stop_at_valued:
-            if self.has_value(conditional):
+        if self.has_value(conditional):
+            return result
+        # If not, evaluate the conditions until one is found true
+        for index, condition in enumerate(self.get_conditions(conditional)):
+            if self.has_value(condition) and self.get_value(condition):
+                # A condition is true
+                possibility = self.get_possibilities(conditional)[index]
+                result = result | self.get_path_to_standard(condition)
+                result = result | self.get_path_to_standard(possibility)
                 return result
-            # If not, evaluate the conditions until one is found true
-            for index, condition in enumerate(self.get_conditions(conditional)):
-                if self.has_value(condition) and self.get_value(condition):
-                    # A condition is true
-                    possibility = self.get_possibilities(conditional)[index]
-                    result = result | self.get_all_ancestors_standard(
-                        condition, stop_at_valued
-                    )
-                    result = result | self.get_all_ancestors_standard(
-                        possibility, stop_at_valued
-                    )
-                    return result
-        # If no conditions are true or if we should not stop at valued nodes, treat conditional as standard node
-        # I.e., get all predecessors
-        result = result | self.get_all_ancestors_standard(conditional)
+        # If no conditions are true, we need to compute them, so all ancestors are in the path
+        result = self.get_path_to_standard(conditional)
         return result
