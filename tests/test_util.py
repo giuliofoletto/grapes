@@ -231,6 +231,25 @@ def test_lambdify():
     assert f1(a=1, b=2, c=3, d=4) == -9
 
 
+def test_lambdify_with_constants():
+    g = gr.Graph()
+    g.add_step("e", "op_e", "a", "b")
+    g.add_step("f", "op_f", "c", "d")
+    g.add_step("g", "op_g", "e", "f")
+
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
+    g.set_internal_context(operations)
+    g.finalize_definition()
+
+    # Get a function a,b,c,d -> g
+    f1 = gr.lambdify_graph(g, ["c", "d"], "g", {"a": 1, "b": 2})
+    assert f1(c=3, d=4) == -9
+
+
 def test_unfeasible_wrap():
     g = gr.Graph()
     g.add_step("d", "op_d", "a", "b", "c")

@@ -237,17 +237,44 @@ def wrap_graph_with_function(
     return specific_function
 
 
-def lambdify_graph(graph, input_keys, target):
-    graph = copy.deepcopy(graph)
-    graph.unfreeze()
+def lambdify_graph(graph, input_keys, target, constants={}):
+    # Copy graph so as not to pollute the original
+    operational_graph = copy.deepcopy(graph)
+    # Pass all constants to the graph
+    operational_graph.update_internal_context(constants)
+    # Freeze so that the constants are fixed
+    operational_graph.freeze()
+    # Unfreeze the input.
+    # Note that this has precedence over constants (i.e., if a key is both input and constant, it is treated as input)
     if len(input_keys) > 0:
-        graph.clear_values(*input_keys)
-    graph.progress_towards_targets(target)
+        operational_graph.unfreeze(*input_keys)
+        operational_graph.clear_values(*input_keys)
+    # Convert all conditional, progressing to the conditions
+    operational_graph.convert_all_conditionals_to_trivial_steps(
+        execute_towards_conditions=True
+    )
+    # Progress as much as possible
+    operational_graph.progress_towards_targets(target)
+    # The starting point of the computation will include the constants
+    initial_keys = set(input_keys) | set(constants.keys())
+    # Simplify until the graph is a single function
     while not set(
-        graph.get_args(target) + tuple(graph.get_kwargs(target).values())
-    ).issubset(set(input_keys)):
-        graph.simplify_all_dependencies(target, exclude=input_keys)
-    return graph[graph.get_recipe(target)]
+        operational_graph.get_args(target)
+        + tuple(operational_graph.get_kwargs(target).values())
+    ).issubset(initial_keys):
+        operational_graph.simplify_all_dependencies(target, exclude=initial_keys)
+    # Get the function representing the graph
+    function = operational_graph[operational_graph.get_recipe(target)]
+    # If needed, get a function only of the input keys
+    if len(constants) > 0:
+
+        def function_only_input_keys(**kwargs):
+            kwargs.update(constants)
+            return function(**kwargs)
+
+        return function_only_input_keys
+    else:
+        return function
 
 
 def check_feasibility_of_execution(graph, context, *targets, inplace=False):
@@ -278,7 +305,7 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
 def get_execution_subgraph(graph, context, *targets):
     graph = copy.deepcopy(graph)
     context = copy.deepcopy(context)
-    graph.set_internal_context(context)
+    graph.update_internal_context(context)
     path = set()
     for target in targets:
         path = path | graph.get_path_to_target(target)
