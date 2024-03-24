@@ -669,6 +669,31 @@ def test_convert_all_conditionals_to_trivial_steps():
     assert g["conditional2"] == g["vf"]
 
 
+def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
+    """
+    Convert all conditionals to trivial steps, computing the conditions.
+    """
+    g = gr.Graph()
+    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    g.add_step("c1", "op_id", "pre_c1")
+    g.add_step("c2", "op_id", "pre_c2")
+    g.add_step("c3", "op_id", "pre_c3")
+    g["pre_c1"] = True
+    g["pre_c2"] = False
+    g["pre_c3"] = False
+    g["op_id"] = lambda x: x
+    g["v1"] = 1
+    g["v2"] = 2
+    g["v3"] = 3
+    g.finalize_definition()
+
+    g.convert_all_conditionals_to_trivial_steps(execute_towards_conditions=True)
+    assert g.get_type("conditional") == "standard"
+
+    g.execute_to_targets("conditional")
+    assert g["conditional"] == g["v1"]
+
+
 def test_get_subgraph():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
