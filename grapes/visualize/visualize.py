@@ -26,6 +26,8 @@ def get_graphviz_digraph(
     g.graph_attr.update(**attrs)
     # Save some values that will be useful later
     max_topological_generation_index = len(graph.get_topological_generations()) - 1
+    sources = graph.get_all_sources()
+    sinks = graph.get_all_sinks()
     cmap = matplotlib.colormaps[colormap]
 
     for node_name in g.nodes():
@@ -75,10 +77,10 @@ def get_graphviz_digraph(
             )
             must_be_colored = True
         elif color_mode.lower() == "sources_and_sinks":
-            if node_name in graph.get_all_sources():
+            if node_name in sources:
                 color_rgba = cmap(0.0)
                 must_be_colored = True
-            elif node_name in graph.get_all_sinks():
+            elif node_name in sinks:
                 color_rgba = cmap(1.0)
                 must_be_colored = True
         if must_be_colored:
@@ -94,15 +96,14 @@ def get_graphviz_digraph(
         g.get_node(node_name).attr.update(new_attrs)
 
         # Handle edge shapes
-        special_dependencies = []
         if node["type"] == "standard" and "recipe" in node:
-            if not hide_recipes:
+            # This condition might be false for example because of hide_recipes
+            if node["recipe"] in g.nodes():
                 g.get_edge(node["recipe"], node_name).attr.update(arrowhead="dot")
-            special_dependencies.append(node["recipe"])
         elif node["type"] == "conditional":
             for condition in node["conditions"]:
-                g.get_edge(condition, node_name).attr.update(arrowhead="diamond")
-            special_dependencies.extend(node["conditions"])
+                if condition in g.nodes():
+                    g.get_edge(condition, node_name).attr.update(arrowhead="diamond")
 
     # Return the AGraph (no layout is computed yet)
     return g
