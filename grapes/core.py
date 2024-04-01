@@ -860,13 +860,20 @@ class Graph:
 
     def make_recipe_dependencies_also_recipes(self):
         """
-        Make dependencies (parents) of recipes also recipes
+        Make dependencies (predecessors) of recipes also recipes, if they have only recipe successors
         """
-        # Work in reverse topological order, to get children before parents
+        # Work in reverse topological order, to get successors before predecessors
         for node in reversed(self.get_topological_order()):
             if self.is_recipe(node):
                 for parent in self._nxdg.predecessors(node):
-                    self.set_is_recipe(parent, True)
+                    if not self.is_recipe(parent):
+                        all_children_are_recipes = True
+                        for child in self._nxdg.successors(parent):
+                            if not self.is_recipe(child):
+                                all_children_are_recipes = False
+                                break
+                        if all_children_are_recipes:
+                            self.set_is_recipe(parent, True)
 
     def finalize_definition(self):
         """

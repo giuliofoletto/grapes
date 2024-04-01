@@ -761,3 +761,14 @@ def test_get_path_to_target():
     assert result_h == {"h", "op_h", "e"}
     assert result_j == {"j", "i", "g", "op_g", "e", "f"}
     assert result_l == {"l", "k", "g", "op_g", "e", "f", "h", "op_h"}
+
+
+def test_make_recipe_dependencies_also_recipes():
+    g = gr.Graph()
+    g.add_step("a", "op_a", "b")
+    g.add_step("op_a", "build_op_a", "c", "d")  # c and d will be converted to recipes
+    g.add_step("b", "op_b", "c")  # c will no longer be converted to recipe
+    g.finalize_definition()  # calls make_recipe_dependencies_also_recipes
+
+    assert g.is_recipe("d")
+    assert not g.is_recipe("c")
