@@ -16,7 +16,7 @@ def get_graphviz_digraph(
     hide_recipes=False,
     pretty_names=False,
     include_values=False,
-    color_by_generation=False,
+    color_mode="none",
     colormap="viridis",
     **attrs,
 ):
@@ -63,7 +63,8 @@ def get_graphviz_digraph(
         new_attrs.update(shape=shape)
 
         # Manipulate colors
-        if color_by_generation:
+        must_be_colored = False
+        if color_mode.lower() == "by_generation":
             topological_generation_index = graph.get_node_attribute(
                 node_name, "topological_generation_index"
             )
@@ -72,6 +73,15 @@ def get_graphviz_digraph(
             color_rgba = cmap(
                 topological_generation_index / max_topological_generation_index
             )
+            must_be_colored = True
+        elif color_mode.lower() == "sources_and_sinks":
+            if node_name in graph.get_all_sources():
+                color_rgba = cmap(0.0)
+                must_be_colored = True
+            elif node_name in graph.get_all_sinks():
+                color_rgba = cmap(1.0)
+                must_be_colored = True
+        if must_be_colored:
             # Note that graphviz wants colors in hex form
             new_attrs.update(
                 style="filled",
@@ -80,7 +90,6 @@ def get_graphviz_digraph(
                     *best_text_from_background_color(*color_rgba)
                 ),
             )
-
         # Pass these attributes to the actual AGraph
         g.get_node(node_name).attr.update(new_attrs)
 

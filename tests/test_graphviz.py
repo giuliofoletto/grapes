@@ -137,7 +137,16 @@ def test_simplify_all_dependencies(expected_sources):
 def test_color_by_generation(expected_sources):
     g = build_graph()
     gv = gr.visualize.get_graphviz_digraph(
-        g, color_by_generation=True, colormap="plasma"
+        g, color_mode="by_generation", colormap="plasma"
     )
     name = "color_by_generation"
+    assert gv.string() == expected_sources[name]
+
+
+def test_color_sources_and_sinks(expected_sources):
+    g = build_graph()
+    gv = gr.visualize.get_graphviz_digraph(
+        g, color_mode="sources_and_sinks", colormap="plasma"
+    )
+    name = "color_sources_and_sinks"
     assert gv.string() == expected_sources[name]
