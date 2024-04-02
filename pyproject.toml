@@ -12,17 +12,15 @@ authors = [
     { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
 ]
 dependencies = [
+    "matplotlib",
     "networkx",
     "tomli;python_version<'3.11'",
+    "pygraphviz", # For installation of pygraphviz, refer to https://pygraphviz.github.io/documentation/stable/install.html
 ]
 
 [project.optional-dependencies]
 testing = [
     "pytest",
-]
-visualize = [
-    "matplotlib",
-    "pygraphviz", # For installation of pygraphviz, refer to https://pygraphviz.github.io/documentation/stable/install.html
 ]
 
 [project.urls]

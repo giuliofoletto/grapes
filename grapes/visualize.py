@@ -6,9 +6,7 @@ License: See project-level license file.
 """
 
 import matplotlib
-import networkx
-
-from .. import *
+import networkx as nx
 
 
 def get_graphviz_digraph(

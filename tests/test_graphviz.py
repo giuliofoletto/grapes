@@ -18,7 +18,6 @@ import pickle
 import pytest
 
 import grapes as gr
-import grapes.visualize  # Needed even if visualize is called as gr.visualize
 
 output_directory = "tests/visualizations"
 expected_directory = "tests/expected"
@@ -45,7 +44,7 @@ def build_graph():
 def test_simple(expected_sources):
     g = build_graph()
     name = "simple"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
 
@@ -62,28 +61,28 @@ def test_with_values(expected_sources):
         }
     )
     name = "with_values"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
 
 def test_attrs(expected_sources):
     g = build_graph()
     name = "attrs"
-    gv = gr.visualize.get_graphviz_digraph(g, rankdir="LR")
+    gv = gr.get_graphviz_digraph(g, rankdir="LR")
     assert gv.string() == expected_sources[name]
 
 
 def test_no_operations(expected_sources):
     g = build_graph()
     name = "no_operations"
-    gv = gr.visualize.get_graphviz_digraph(g, hide_recipes=True)
+    gv = gr.get_graphviz_digraph(g, hide_recipes=True)
     assert gv.string() == expected_sources[name]
 
 
 def test_save_dot(expected_sources):
     g = build_graph()
     name = "simple"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     gv.write(output_directory + "/" + name + ".gv")
     assert filecmp.cmp(
         output_directory + "/" + name + ".gv", expected_directory + "/" + name + ".gv"
@@ -96,7 +95,7 @@ def test_conditional(expected_sources):
     g = gr.Graph()
     g.add_simple_conditional("d", "c", "a", "b")
     name = "conditional"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
 
@@ -110,12 +109,12 @@ def test_simplify_dependency(expected_sources):
     g.set_internal_context(operations)
 
     name = "presimplification"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
     g.simplify_dependency("g", "f")
     name = "postsimplification"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
 
@@ -130,23 +129,19 @@ def test_simplify_all_dependencies(expected_sources):
 
     g.simplify_all_dependencies("g")
     name = "postallsimplification"
-    gv = gr.visualize.get_graphviz_digraph(g)
+    gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
 
 def test_color_by_generation(expected_sources):
     g = build_graph()
-    gv = gr.visualize.get_graphviz_digraph(
-        g, color_mode="by_generation", colormap="plasma"
-    )
+    gv = gr.get_graphviz_digraph(g, color_mode="by_generation", colormap="plasma")
     name = "color_by_generation"
     assert gv.string() == expected_sources[name]
 
 
 def test_color_sources_and_sinks(expected_sources):
     g = build_graph()
-    gv = gr.visualize.get_graphviz_digraph(
-        g, color_mode="sources_and_sinks", colormap="plasma"
-    )
+    gv = gr.get_graphviz_digraph(g, color_mode="sources_and_sinks", colormap="plasma")
     name = "color_sources_and_sinks"
     assert gv.string() == expected_sources[name]
