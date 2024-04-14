@@ -73,6 +73,46 @@ class Graph:
         self.nodes[node][attribute] = value
 
     # Get/Set
+    def get_value(self, node):
+        if self.get_node_attribute(node, "value") is not None and self.get_has_value(
+            node
+        ):
+            return self.get_node_attribute(node, "value")
+        else:
+            raise ValueError("Node " + node + " has no value")
+
+    # Get/Set
+    def set_value(self, node, value):
+        # Note: This changes reachability
+        self.set_node_attribute(node, "value", value)
+        self.set_has_value(node, True)
+
+    # Get/Set
+    def unset_value(self, node):
+        # Note: This changes reachability
+        self.set_has_value(node, False)
+
+    # Get/Set
+    def get_reachability(self, node):
+        if self.get_node_attribute(
+            node, "reachability"
+        ) is not None and self.get_node_attribute(node, "has_reachability"):
+            return self.get_node_attribute(node, "reachability")
+        else:
+            raise ValueError("Node " + node + " has no reachability")
+
+    # Get/Set
+    def set_reachability(self, node, reachability):
+        if reachability not in ("unreachable", "uncertain", "reachable"):
+            raise ValueError(reachability + " is not a valid reachability value.")
+        self.set_node_attribute(node, "reachability", reachability)
+        self.set_node_attribute(node, "has_reachability", True)
+
+    # Get/Set
+    def unset_reachability(self, node):
+        self.set_node_attribute(node, "has_reachability", False)
+
+    # Get/Set
     def get_is_recipe(self, node):
         return self.get_node_attribute(node, "is_recipe")
 
@@ -145,52 +185,6 @@ class Graph:
     # Get/Set
     def set_topological_generation_index(self, node, index):
         self.set_node_attribute(node, "topological_generation_index", index)
-
-    # Get/Set
-    def get_value(self, node):
-        attributes = self.nodes[node]
-        if (
-            "value" in attributes
-            and attributes["value"] is not None
-            and self.nodes[node]["has_value"]
-        ):
-            return attributes["value"]
-        else:
-            raise ValueError("Node " + node + " has no value")
-
-    # Get/Set
-    def set_value(self, node, value):
-        # Note: This changes reachability
-        self.nodes[node]["value"] = value
-        self.nodes[node]["has_value"] = True
-
-    # Get/Set
-    def unset_value(self, node):
-        # Note: This changes reachability
-        self.nodes[node]["has_value"] = False
-
-    # Get/Set
-    def get_reachability(self, node):
-        attributes = self.nodes[node]
-        if (
-            "reachability" in attributes
-            and attributes["reachability"] is not None
-            and self.nodes[node]["has_reachability"]
-        ):
-            return attributes["reachability"]
-        else:
-            raise ValueError("Node " + node + " has no reachability")
-
-    # Get/Set
-    def set_reachability(self, node, reachability):
-        if reachability not in ("unreachable", "uncertain", "reachable"):
-            raise ValueError(reachability + " is not a valid reachability value.")
-        self.nodes[node]["reachability"] = reachability
-        self.nodes[node]["has_reachability"] = True
-
-    # Get/Set
-    def unset_reachability(self, node):
-        self.nodes[node]["has_reachability"] = False
 
     # Get/Set
     def get_is_frozen(self, node):
