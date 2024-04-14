@@ -1,5 +1,11 @@
 from .core import Graph
 from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
+from .simplify import (
+    convert_all_conditionals_to_trivial_steps,
+    convert_conditional_to_trivial_step,
+    simplify_all_dependencies,
+    simplify_dependency,
+)
 from .util import (
     check_feasibility_of_execution,
     context_from_file,

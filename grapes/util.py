@@ -17,6 +17,10 @@ else:
     import tomli as tomllib
 
 from .path import get_path_to_target
+from .simplify import (
+    convert_all_conditionals_to_trivial_steps,
+    simplify_all_dependencies,
+)
 
 
 def execute_graph_from_context(
@@ -252,8 +256,8 @@ def lambdify_graph(graph, input_keys, target, constants={}):
         operational_graph.unfreeze(*input_keys)
         operational_graph.clear_values(*input_keys)
     # Convert all conditional, progressing to the conditions
-    operational_graph.convert_all_conditionals_to_trivial_steps(
-        execute_towards_conditions=True
+    convert_all_conditionals_to_trivial_steps(
+        operational_graph, execute_towards_conditions=True
     )
     # Progress as much as possible
     operational_graph.progress_towards_targets(target)
@@ -264,7 +268,7 @@ def lambdify_graph(graph, input_keys, target, constants={}):
         operational_graph.get_args(target)
         + tuple(operational_graph.get_kwargs(target).values())
     ).issubset(initial_keys):
-        operational_graph.simplify_all_dependencies(target, exclude=initial_keys)
+        simplify_all_dependencies(operational_graph, target, exclude=initial_keys)
     # Get the function representing the graph
     function = operational_graph[operational_graph.get_recipe(target)]
     # If needed, get a function only of the input keys

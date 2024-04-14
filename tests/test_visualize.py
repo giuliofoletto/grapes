@@ -112,7 +112,7 @@ def test_simplify_dependency(expected_sources):
     gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
 
-    g.simplify_dependency("g", "f")
+    gr.simplify_dependency(g, "g", "f")
     name = "postsimplification"
     gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
@@ -127,7 +127,7 @@ def test_simplify_all_dependencies(expected_sources):
     }
     g.set_internal_context(operations)
 
-    g.simplify_all_dependencies("g")
+    gr.simplify_all_dependencies(g, "g")
     name = "postallsimplification"
     gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
