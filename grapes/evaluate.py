@@ -5,6 +5,8 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+from .design import get_kwargs_values, get_list_of_values
+
 
 def evaluate_target(graph, target, continue_on_fail=False):
     """
@@ -39,8 +41,8 @@ def evaluate_standard(graph, node, continue_on_fail=False):
         recipe = graph.get_recipe(node)
         func = graph.get_value(recipe)
         res = func(
-            *graph.get_list_of_values(graph.get_args(node)),
-            **graph.get_kwargs_values(graph.get_kwargs(node))
+            *get_list_of_values(graph, graph.get_args(node)),
+            **get_kwargs_values(graph, graph.get_kwargs(node))
         )
     except Exception as e:
         if continue_on_fail:

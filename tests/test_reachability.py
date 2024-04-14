@@ -13,15 +13,15 @@ import grapes as gr
 # Design, context, reachability
 def test_reachability_simple():
     g = gr.Graph()
-    g.add_step("b", "fb", "a")
+    gr.add_step(g, "b", "fb", "a")
     g["fb"] = lambda a: a
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "b")
     assert g.get_reachability("b") == "unreachable"
     gr.clear_reachabilities(g)
 
-    g.update_internal_context({"a": 1})
+    gr.update_internal_context(g, {"a": 1})
     gr.find_reachability_targets(g, "b")
     assert g.get_reachability("b") == "reachable"
 
@@ -29,15 +29,15 @@ def test_reachability_simple():
 # Design, context, reachability
 def test_reachability_long_graph():
     g = gr.Graph()
-    g.add_step_quick("c", lambda b: b)
-    g.add_step_quick("b", lambda a: a)
-    g.finalize_definition()
+    gr.add_step_quick(g, "c", lambda b: b)
+    gr.add_step_quick(g, "b", lambda a: a)
+    gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "b")
     assert g.get_reachability("b") == "unreachable"
     gr.clear_reachabilities(g)
 
-    g.update_internal_context({"a": 1})
+    gr.update_internal_context(g, {"a": 1})
     gr.find_reachability_targets(g, "b")
     assert g.get_reachability("b") == "reachable"
 
@@ -45,15 +45,15 @@ def test_reachability_long_graph():
 # Design, context, reachability
 def test_reachability_conditional_with_true_value():
     g = gr.Graph()
-    g.add_simple_conditional("name", "condition", "value_true", "value_false")
+    gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
     g["condition"] = True
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "name")
     assert g.get_reachability("name") == "unreachable"
     gr.clear_reachabilities(g)
 
-    g.update_internal_context({"value_true": 1})
+    gr.update_internal_context(g, {"value_true": 1})
     gr.find_reachability_targets(g, "name")
     assert g.get_reachability("name") == "reachable"
 
@@ -61,15 +61,15 @@ def test_reachability_conditional_with_true_value():
 # Design, context, reachability
 def test_reachability_multiple_conditional_with_true_value():
     g = gr.Graph()
-    g.add_multiple_conditional("name", ["ca", "cb"], ["a", "b", "c"])
+    gr.add_multiple_conditional(g, "name", ["ca", "cb"], ["a", "b", "c"])
     g["ca"] = True
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "name")
     assert g.get_reachability("name") == "unreachable"
     gr.clear_reachabilities(g)
 
-    g.update_internal_context({"a": 1})
+    gr.update_internal_context(g, {"a": 1})
     gr.find_reachability_targets(g, "name")
     assert g.get_reachability("name") == "reachable"
 
@@ -77,9 +77,9 @@ def test_reachability_multiple_conditional_with_true_value():
 # Design, context, reachability
 def test_conditional_no_conditions_defined():
     g = gr.Graph()
-    g.add_simple_conditional("name", "condition", "value_true", "value_false")
-    g.add_step_quick("condition", lambda pre_req: pre_req)
-    g.finalize_definition()
+    gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
+    gr.add_step_quick(g, "condition", lambda pre_req: pre_req)
+    gr.finalize_definition(g)
 
     # Here, condition and possibilities are unreachable
     gr.find_reachability_targets(g, "name")
@@ -107,10 +107,10 @@ def test_conditional_no_conditions_defined():
 # Design, context, reachability
 def test_multiple_conditional_no_conditions_defined():
     g = gr.Graph()
-    g.add_multiple_conditional("name", ["ca", "cb"], ["va", "vb", "vc"])
-    g.add_step_quick("ca", lambda pa: pa)
-    g.add_step_quick("cb", lambda pb: pb)
-    g.finalize_definition()
+    gr.add_multiple_conditional(g, "name", ["ca", "cb"], ["va", "vb", "vc"])
+    gr.add_step_quick(g, "ca", lambda pa: pa)
+    gr.add_step_quick(g, "cb", lambda pb: pb)
+    gr.finalize_definition(g)
 
     # Here, condition and possibilities are unreachable
     gr.find_reachability_targets(g, "name")

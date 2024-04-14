@@ -34,10 +34,10 @@ def expected_sources():
 
 def build_graph():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.finalize_definition()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.finalize_definition(g)
     return g
 
 
@@ -50,7 +50,8 @@ def test_simple(expected_sources):
 
 def test_with_values(expected_sources):
     g = build_graph()
-    g.set_internal_context(
+    gr.set_internal_context(
+        g,
         {
             "a": 1,
             "b": 2,
@@ -58,7 +59,7 @@ def test_with_values(expected_sources):
             "op_e": lambda x, y: x + y,
             "op_f": lambda x, y: x * y,
             "op_g": lambda x, y: x - y,
-        }
+        },
     )
     name = "with_values"
     gv = gr.get_graphviz_digraph(g)
@@ -93,7 +94,7 @@ def test_save_dot(expected_sources):
 
 def test_conditional(expected_sources):
     g = gr.Graph()
-    g.add_simple_conditional("d", "c", "a", "b")
+    gr.add_simple_conditional(g, "d", "c", "a", "b")
     name = "conditional"
     gv = gr.get_graphviz_digraph(g)
     assert gv.string() == expected_sources[name]
@@ -106,7 +107,7 @@ def test_simplify_dependency(expected_sources):
         "op_f": lambda x, y: x * y,
         "op_g": lambda x, y: x - y,
     }
-    g.set_internal_context(operations)
+    gr.set_internal_context(g, operations)
 
     name = "presimplification"
     gv = gr.get_graphviz_digraph(g)
@@ -125,7 +126,7 @@ def test_simplify_all_dependencies(expected_sources):
         "op_f": lambda x, y: x * y,
         "op_g": lambda x, y: x - y,
     }
-    g.set_internal_context(operations)
+    gr.set_internal_context(g, operations)
 
     gr.simplify_all_dependencies(g, "g")
     name = "postallsimplification"

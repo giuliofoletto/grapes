@@ -13,19 +13,20 @@ import grapes as gr
 # Design, context, evaluate
 def test_simple():
     g = gr.Graph()
-    g.add_step("a")
-    g.add_step("b")
-    g.add_step("c")
-    g.add_step("d")
-    g.add_step("op_e")
-    g.add_step("op_f")
-    g.add_step("op_g")
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.finalize_definition()
+    gr.add_step(g, "a")
+    gr.add_step(g, "b")
+    gr.add_step(g, "c")
+    gr.add_step(g, "d")
+    gr.add_step(g, "op_e")
+    gr.add_step(g, "op_f")
+    gr.add_step(g, "op_g")
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.finalize_definition(g)
 
-    g.update_internal_context(
+    gr.update_internal_context(
+        g,
         {
             "a": 1,
             "b": 2,
@@ -33,7 +34,7 @@ def test_simple():
             "op_e": lambda x, y: x + y,
             "op_f": lambda x, y: x * y,
             "op_g": lambda x, y: x - y,
-        }
+        },
     )
     gr.execute_to_targets(g, "g")
 
@@ -43,12 +44,13 @@ def test_simple():
 # Design, context, evaluate
 def test_simplified_input():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.finalize_definition()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.finalize_definition(g)
 
-    g.update_internal_context(
+    gr.update_internal_context(
+        g,
         {
             "a": 1,
             "b": 2,
@@ -56,7 +58,7 @@ def test_simplified_input():
             "op_e": lambda x, y: x + y,
             "op_f": lambda x, y: x * y,
             "op_g": lambda x, y: x - y,
-        }
+        },
     )
     gr.execute_to_targets(g, "g")
 
@@ -66,21 +68,22 @@ def test_simplified_input():
 # Design, context, evaluate
 def test_diamond():
     g = gr.Graph()
-    g.add_step("a")
-    g.add_step("b", "op_b", "a")
-    g.add_step("c", "op_c", "b")
-    g.add_step("d", "op_d", "b")
-    g.add_step("e", "op_e", "c", "d")
-    g.finalize_definition()
+    gr.add_step(g, "a")
+    gr.add_step(g, "b", "op_b", "a")
+    gr.add_step(g, "c", "op_c", "b")
+    gr.add_step(g, "d", "op_d", "b")
+    gr.add_step(g, "e", "op_e", "c", "d")
+    gr.finalize_definition(g)
 
-    g.update_internal_context(
+    gr.update_internal_context(
+        g,
         {
             "a": 1,
             "op_b": lambda x: 2 * x,
             "op_c": lambda x: 2 * x,
             "op_d": lambda x: 2 * x,
             "op_e": lambda x, y: x - y,
-        }
+        },
     )
     gr.execute_to_targets(g, "e")
 
@@ -92,12 +95,12 @@ def test_inverted_input():
     # Typically, we proceed from bottom to top
     # Here we test the opposite
     g = gr.Graph()
-    g.add_step("c", "op_c", "b")
-    g.add_step("b", "op_b", "a")
-    g.finalize_definition()
+    gr.add_step(g, "c", "op_c", "b")
+    gr.add_step(g, "b", "op_b", "a")
+    gr.finalize_definition(g)
 
-    g.update_internal_context(
-        {"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x}
+    gr.update_internal_context(
+        g, {"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x}
     )
     gr.execute_to_targets(g, "c")
 
@@ -107,10 +110,10 @@ def test_inverted_input():
 # Design, context, evaluate
 def test_conditional():
     g = gr.Graph()
-    g.add_simple_conditional("d", "c", "a", "b")
-    g.finalize_definition()
+    gr.add_simple_conditional(g, "d", "c", "a", "b")
+    gr.finalize_definition(g)
 
-    g.update_internal_context({"a": 1, "b": 2, "c": True})
+    gr.update_internal_context(g, {"a": 1, "b": 2, "c": True})
     gr.execute_to_targets(g, "d")
 
     assert g["d"] == g["a"]
@@ -119,13 +122,13 @@ def test_conditional():
 # Design, context, evaluate
 def test_kwargs():
     g = gr.Graph()
-    g.add_step("c", "op_c", "a", exponent="b")
-    g.finalize_definition()
+    gr.add_step(g, "c", "op_c", "a", exponent="b")
+    gr.finalize_definition(g)
 
     def example_exponentiation_func(base, exponent):
         return base**exponent
 
-    g.update_internal_context({"a": 5, "b": 2, "op_c": example_exponentiation_func})
+    gr.update_internal_context(g, {"a": 5, "b": 2, "op_c": example_exponentiation_func})
     gr.execute_to_targets(g, "c")
 
     assert g["c"] == 25
@@ -134,9 +137,9 @@ def test_kwargs():
 # Design, context, evaluate
 def test_progress_towards_targets():
     g = gr.Graph()
-    g.add_step("b", "op_b", "a")
-    g.add_step("f", "op_f", "b", "c", "e")
-    g.add_step("e", "op_e", "d")
+    gr.add_step(g, "b", "op_b", "a")
+    gr.add_step(g, "f", "op_f", "b", "c", "e")
+    gr.add_step(g, "e", "op_e", "d")
 
     context = {
         "op_b": lambda x: 2 * x,
@@ -145,8 +148,8 @@ def test_progress_towards_targets():
         "a": 5,
         "d": 4,
     }
-    g.set_internal_context(context)
-    g.finalize_definition()
+    gr.set_internal_context(g, context)
+    gr.finalize_definition(g)
 
     # f cannot be reached because c is not in context, but b and e can be computed
     gr.progress_towards_targets(g, "f")
@@ -157,7 +160,8 @@ def test_progress_towards_targets():
 # Design, context, evaluate
 def test_multiple_conditional():
     g = gr.Graph()
-    g.add_multiple_conditional(
+    gr.add_multiple_conditional(
+        g,
         "result",
         ["condition_1", "condition_2", "condition_3"],
         ["node_1", "node_2", "node_3"],
@@ -170,8 +174,8 @@ def test_multiple_conditional():
         "node_2": 2,
         "node_3": 3,
     }
-    g.set_internal_context(context)
-    g.finalize_definition()
+    gr.set_internal_context(g, context)
+    gr.finalize_definition(g)
 
     gr.execute_to_targets(g, "result")
 
@@ -181,7 +185,8 @@ def test_multiple_conditional():
 # Design, context, evaluate
 def test_multiple_conditional_with_default():
     g = gr.Graph()
-    g.add_multiple_conditional(
+    gr.add_multiple_conditional(
+        g,
         "result",
         ["condition_1", "condition_2", "condition_3"],
         ["node_1", "node_2", "node_3", "node_default"],
@@ -195,8 +200,8 @@ def test_multiple_conditional_with_default():
         "node_3": 3,
         "node_default": 4,
     }
-    g.set_internal_context(context)
-    g.finalize_definition()
+    gr.set_internal_context(g, context)
+    gr.finalize_definition(g)
 
     gr.execute_to_targets(g, "result")
 
@@ -206,22 +211,24 @@ def test_multiple_conditional_with_default():
 # Design, context, evaluate
 def test_edit_step():
     g = gr.Graph()
-    g.add_step("b", "op_b", "a")
-    g.add_step("c", "op_c", "b")
-    g.set_internal_context({"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x})
-    g.finalize_definition()
+    gr.add_step(g, "b", "op_b", "a")
+    gr.add_step(g, "c", "op_c", "b")
+    gr.set_internal_context(
+        g, {"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x}
+    )
+    gr.finalize_definition(g)
 
     gr.execute_to_targets(g, "c")
     assert g["b"] == 2
     assert g["c"] == 6
 
-    g.edit_step("b", "new_op_b", "a", "d")
+    gr.edit_step(g, "b", "new_op_b", "a", "d")
     assert g["b"] == 2  # Value is unchanged
     assert g["c"] == 6  # Value is unchanged
 
-    g.clear_values("b", "c")
-    g.update_internal_context({"d": 3, "new_op_b": lambda x, y: x + y})
-    g.finalize_definition()
+    gr.clear_values(g, "b", "c")
+    gr.update_internal_context(g, {"d": 3, "new_op_b": lambda x, y: x + y})
+    gr.finalize_definition(g)
 
     gr.execute_to_targets(g, "c")
     assert g["b"] == 4
@@ -231,16 +238,18 @@ def test_edit_step():
 # Design, context, evaluate
 def test_remove_step():
     g = gr.Graph()
-    g.add_step("b", "op_b", "a")
-    g.add_step("c", "op_c", "b")
-    g.set_internal_context({"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x})
-    g.finalize_definition()
+    gr.add_step(g, "b", "op_b", "a")
+    gr.add_step(g, "c", "op_c", "b")
+    gr.set_internal_context(
+        g, {"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x}
+    )
+    gr.finalize_definition(g)
 
-    g.remove_step("b")
+    gr.remove_step(g, "b")
     with pytest.raises(KeyError):
         g["b"]
     with pytest.raises(ValueError):
-        g.remove_step("d")
+        gr.remove_step(g, "d")
 
 
 # Design, context, evaluate
@@ -255,12 +264,12 @@ def test_add_step_quick():
         return 1
 
     g = gr.Graph()
-    g.add_step_quick("c", example_function_only_positional)
-    g.add_step_quick("d", example_function_with_kw_only_args)
-    g.add_step_quick("e", example_function_with_no_args)
-    g.add_step_quick("f", lambda e: 2 * e)
-    g.update_internal_context({"a": 2, "b": 3})
-    g.finalize_definition()
+    gr.add_step_quick(g, "c", example_function_only_positional)
+    gr.add_step_quick(g, "d", example_function_with_kw_only_args)
+    gr.add_step_quick(g, "e", example_function_with_no_args)
+    gr.add_step_quick(g, "f", lambda e: 2 * e)
+    gr.update_internal_context(g, {"a": 2, "b": 3})
+    gr.finalize_definition(g)
 
     gr.execute_to_targets(g, "d", "f")  # "c" and "e" should be automatically computed
     assert g["c"] == 8
@@ -272,17 +281,17 @@ def test_add_step_quick():
         return 1
 
     with pytest.raises(ValueError):
-        g.add_step_quick("g", example_function_with_varargs)
+        gr.add_step_quick(g, "g", example_function_with_varargs)
     with pytest.raises(TypeError):
-        g.add_step_quick("h", "a non-function object")
+        gr.add_step_quick(g, "h", "a non-function object")
 
 
 # Design
 def test_topological_generations():
     g = gr.Graph()
-    g.add_step("d", "fd", "b", "c")
-    g.add_step("b", "fb", "a")
-    g.finalize_definition()
+    gr.add_step(g, "d", "fd", "b", "c")
+    gr.add_step(g, "b", "fb", "a")
+    gr.finalize_definition(g)
 
     assert g.get_node_attribute("a", "topological_generation_index") == 0
     assert g.get_node_attribute("b", "topological_generation_index") == 1
@@ -295,13 +304,13 @@ def test_topological_generations():
 # Design, features
 def test_sources_and_sinks():
     g = gr.Graph()
-    g.add_step("c", "op_c", "a", "b")
-    g.add_step("e", "op_e", "d")
-    g.add_step("op_c", "b_op_c", "d_op_c")
-    g.finalize_definition()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.add_step(g, "e", "op_e", "d")
+    gr.add_step(g, "op_c", "b_op_c", "d_op_c")
+    gr.finalize_definition(g)
 
-    assert g.get_all_sources(exclude_recipes=True) == {"a", "b", "d"}
-    assert g.get_all_sources(exclude_recipes=False) == {
+    assert gr.get_all_sources(g, exclude_recipes=True) == {"a", "b", "d"}
+    assert gr.get_all_sources(g, exclude_recipes=False) == {
         "a",
         "b",
         "d",
@@ -309,8 +318,8 @@ def test_sources_and_sinks():
         "d_op_c",
         "op_e",
     }
-    assert g.get_all_sinks(exclude_recipes=True) == {"c", "e"}
-    assert g.get_all_sinks(exclude_recipes=False) == {"c", "e"}
+    assert gr.get_all_sinks(g, exclude_recipes=True) == {"c", "e"}
+    assert gr.get_all_sinks(g, exclude_recipes=False) == {"c", "e"}
 
 
 # Design, evaluate
@@ -319,11 +328,13 @@ def test_execute_towards_conditions():
     Execute towards the conditions of conditional by computing c2.
     """
     g = gr.Graph()
-    g.add_step("c2", "identity_recipe", "pre_c2")
-    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    gr.add_step(g, "c2", "identity_recipe", "pre_c2")
+    gr.add_multiple_conditional(
+        g, "conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"]
+    )
     g["pre_c2"] = True
     g["identity_recipe"] = lambda x: x
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     gr.execute_towards_conditions(g, "c1", "c2", "c3")
 
@@ -338,11 +349,13 @@ def test_execute_towards_all_conditions_of_conditional():
     Execute towards the conditions of conditional by computing c2 (the conditional is passed instead of the conditions).
     """
     g = gr.Graph()
-    g.add_step("c2", "identity_recipe", "pre_c2")
-    g.add_multiple_conditional("conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"])
+    gr.add_step(g, "c2", "identity_recipe", "pre_c2")
+    gr.add_multiple_conditional(
+        g, "conditional", ["c1", "c2", "c3"], ["v1", "v2", "v3"]
+    )
     g["pre_c2"] = True
     g["identity_recipe"] = lambda x: x
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     gr.execute_towards_all_conditions_of_conditional(g, "conditional")
 
@@ -357,26 +370,26 @@ def test_get_all_conditionals():
     Get set of all conditionals in the graph.
     """
     g = gr.Graph()
-    g.add_simple_conditional("conditional1", "c1", "vt", "vf")
-    g.add_simple_conditional("conditional2", "c2", "vt", "vf")
-    g.finalize_definition()
+    gr.add_simple_conditional(g, "conditional1", "c1", "vt", "vf")
+    gr.add_simple_conditional(g, "conditional2", "c2", "vt", "vf")
+    gr.finalize_definition(g)
 
-    assert g.get_all_conditionals() == {"conditional1", "conditional2"}
+    assert gr.get_all_conditionals(g) == {"conditional1", "conditional2"}
 
 
 # Design, features
 def test_get_all_ancestors():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.add_step("h", "op_h", "e")
-    g.add_simple_conditional("j", "i", "g", "h")
-    g.finalize_definition()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.add_step(g, "h", "op_h", "e")
+    gr.add_simple_conditional(g, "j", "i", "g", "h")
+    gr.finalize_definition(g)
 
-    result_g = g.get_all_ancestors_target("g")
-    result_h = g.get_all_ancestors_target("h")
-    result_j = g.get_all_ancestors_target("j")
+    result_g = gr.get_all_ancestors_target(g, "g")
+    result_h = gr.get_all_ancestors_target(g, "h")
+    result_j = gr.get_all_ancestors_target(g, "j")
 
     assert result_g == {"op_g", "e", "f", "op_f", "c", "d", "op_e", "a", "b"}
     assert result_h == {"op_h", "e", "op_e", "a", "b"}
@@ -400,10 +413,12 @@ def test_get_all_ancestors():
 # Design
 def test_make_recipe_dependencies_also_recipes():
     g = gr.Graph()
-    g.add_step("a", "op_a", "b")
-    g.add_step("op_a", "build_op_a", "c", "d")  # c and d will be converted to recipes
-    g.add_step("b", "op_b", "c")  # c will no longer be converted to recipe
-    g.finalize_definition()  # calls make_recipe_dependencies_also_recipes
+    gr.add_step(g, "a", "op_a", "b")
+    gr.add_step(
+        g, "op_a", "build_op_a", "c", "d"
+    )  # c and d will be converted to recipes
+    gr.add_step(g, "b", "op_b", "c")  # c will no longer be converted to recipe
+    gr.finalize_definition(g)  # calls make_recipe_dependencies_also_recipes
 
     assert g.is_recipe("d")
     assert not g.is_recipe("c")

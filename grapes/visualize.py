@@ -8,6 +8,8 @@ License: See project-level license file.
 import matplotlib
 import networkx as nx
 
+from .design import get_all_sinks, get_all_sources, get_topological_generations
+
 
 def get_graphviz_digraph(
     graph,
@@ -23,9 +25,9 @@ def get_graphviz_digraph(
     # Add attributes to the AGraph
     g.graph_attr.update(**attrs)
     # Save some values that will be useful later
-    max_topological_generation_index = len(graph.get_topological_generations()) - 1
-    sources = graph.get_all_sources()
-    sinks = graph.get_all_sinks()
+    max_topological_generation_index = len(get_topological_generations(graph)) - 1
+    sources = get_all_sources(graph)
+    sinks = get_all_sinks(graph)
     cmap = matplotlib.colormaps[colormap]
 
     for node_name in g.nodes():

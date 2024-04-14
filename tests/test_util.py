@@ -16,17 +16,17 @@ data_directory = "tests/data"
 
 def test_simple_execution():
     g = gr.Graph()
-    g.add_step("a")
-    g.add_step("b")
-    g.add_step("c")
-    g.add_step("d")
-    g.add_step("op_e")
-    g.add_step("op_f")
-    g.add_step("op_g")
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.finalize_definition()
+    gr.add_step(g, "a")
+    gr.add_step(g, "b")
+    gr.add_step(g, "c")
+    gr.add_step(g, "d")
+    gr.add_step(g, "op_e")
+    gr.add_step(g, "op_f")
+    gr.add_step(g, "op_g")
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.finalize_definition(g)
 
     res = gr.execute_graph_from_context(
         g,
@@ -46,11 +46,11 @@ def test_simple_execution():
 
 def test_execution_more_targets():
     g = gr.Graph()
-    g.add_step("c", "op_c", "a", "b")
-    g.add_step("f", "op_f", "d", "e")
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.add_step(g, "f", "op_f", "d", "e")
     g["op_c"] = lambda a, b: a + b
     g["op_f"] = lambda d, e: d * e
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "d": 3, "e": 4}, "c", "f")
 
@@ -60,27 +60,27 @@ def test_execution_more_targets():
 
 def test_execution_inplace():
     g = gr.Graph()
-    g.add_step("c", "op_c", "a", "b")
+    gr.add_step(g, "c", "op_c", "a", "b")
     g["op_c"] = lambda a, b: a + b
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     res = gr.execute_graph_from_context(g, {"a": 1, "b": 2}, "c", inplace=True)
 
     assert res["c"] == 3
     assert g["c"] == 3
-    assert res.get_internal_context() == g.get_internal_context()
+    assert gr.get_internal_context(res) == gr.get_internal_context(g)
 
 
 def test_execution_not_inplace_does_not_change_context():
     g = gr.Graph()
-    g.add_step("c", "op_c", "a", "b")
+    gr.add_step(g, "c", "op_c", "a", "b")
     g["op_c"] = lambda a, b: a + b
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
-    current_context = g.get_internal_context()
+    current_context = gr.get_internal_context(g)
 
     res = gr.execute_graph_from_context(g, {"a": 1, "b": 2}, "c", inplace=False)
-    new_context = g.get_internal_context()
+    new_context = gr.get_internal_context(g)
 
     assert res["c"] == 3
     assert current_context == new_context
@@ -88,11 +88,11 @@ def test_execution_not_inplace_does_not_change_context():
 
 def test_execution_of_all_graph():
     g = gr.Graph()
-    g.add_step("c", "f_c", "a", "b")
-    g.add_step("f", "f_f", "d", "e")
+    gr.add_step(g, "c", "f_c", "a", "b")
+    gr.add_step(g, "f", "f_f", "d", "e")
     g["f_c"] = lambda a, b: a + b
     g["f_f"] = lambda d, e: d * e
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     # No target means that everything is a target
     res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "d": 3, "e": 4})
@@ -102,9 +102,9 @@ def test_execution_of_all_graph():
 
 def test_execution_with_feasibility_check():
     g = gr.Graph()
-    g.add_step("b", "fb", "a")
+    gr.add_step(g, "b", "fb", "a")
     g["fb"] = lambda a: a
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     # a is not available
     feasibility, missing_dependencies = gr.check_feasibility_of_execution(g, {}, "b")
@@ -124,11 +124,11 @@ def test_execution_with_feasibility_check():
 
 def test_execution_with_feasibility_check_uncertain():
     g = gr.Graph()
-    g.add_simple_conditional("name", "condition", "value_true", "value_false")
-    g.add_step_quick("condition", lambda pre_req: pre_req)
+    gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
+    gr.add_step_quick(g, "condition", lambda pre_req: pre_req)
     g["pre_req"] = True
     g["value_true"] = 1
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     # Reachability is uncertain because condition is reachable and one value also is
     feasibility, missing_dependencies = gr.check_feasibility_of_execution(g, {}, "name")
@@ -146,11 +146,11 @@ def test_execution_with_feasibility_check_uncertain():
 
 def test_json_from_graph():
     g = gr.Graph()
-    g.add_step("c", "op_c", "a", "b")
+    gr.add_step(g, "c", "op_c", "a", "b")
     g["a"] = 1
     g["b"] = 2
     g["op_c"] = lambda a, b: a + b
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     json_string = gr.json_from_graph(g)
     expected_string = '{\n    "a": 1,\n    "b": 2\n}'  # Spacing and separators are defined in the json_from_graph function
@@ -188,17 +188,17 @@ def test_context_from_file():
 
 def test_wrap_with_function():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
 
     operations = {
         "op_e": lambda x, y: x + y,
         "op_f": lambda x, y: x * y,
         "op_g": lambda x, y: x - y,
     }
-    g.set_internal_context(operations)
-    g.finalize_definition()
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
 
     # Get a function a,b,c,d -> g
     f1 = gr.wrap_graph_with_function(
@@ -214,17 +214,17 @@ def test_wrap_with_function():
 
 def test_lambdify():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
 
     operations = {
         "op_e": lambda x, y: x + y,
         "op_f": lambda x, y: x * y,
         "op_g": lambda x, y: x - y,
     }
-    g.set_internal_context(operations)
-    g.finalize_definition()
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
 
     # Get a function a,b,c,d -> g
     f1 = gr.lambdify_graph(g, ["a", "b", "c", "d"], "g")
@@ -233,17 +233,17 @@ def test_lambdify():
 
 def test_lambdify_with_constants():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
 
     operations = {
         "op_e": lambda x, y: x + y,
         "op_f": lambda x, y: x * y,
         "op_g": lambda x, y: x - y,
     }
-    g.set_internal_context(operations)
-    g.finalize_definition()
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
 
     # Get a function a,b,c,d -> g
     f1 = gr.lambdify_graph(g, ["c", "d"], "g", {"a": 1, "b": 2})
@@ -252,9 +252,9 @@ def test_lambdify_with_constants():
 
 def test_unfeasible_wrap():
     g = gr.Graph()
-    g.add_step("d", "op_d", "a", "b", "c")
+    gr.add_step(g, "d", "op_d", "a", "b", "c")
     g["op_d"] = lambda a, b, c: a + b + c
-    g.finalize_definition()
+    gr.finalize_definition(g)
 
     with pytest.raises(ValueError):
         # Pass b as input, c as constant, but do not pass a
@@ -270,20 +270,20 @@ def test_unfeasible_wrap():
 
 def test_get_execution_subgraph():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.add_step("h", "op_h", "e")
-    g.add_simple_conditional("j", "i", "g", "h")
-    g.finalize_definition()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.add_step(g, "h", "op_h", "e")
+    gr.add_simple_conditional(g, "j", "i", "g", "h")
+    gr.finalize_definition(g)
     operations = {
         "op_e": lambda x, y: x + y,
         "op_f": lambda x, y: x * y,
         "op_g": lambda x, y: x - y,
         "op_h": lambda x: x,
     }
-    g.set_internal_context(operations)
-    g.finalize_definition()
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
     context = {"e": 1, "f": 1, "i": True}
 
     h = gr.get_execution_subgraph(g, context, "j", "h")

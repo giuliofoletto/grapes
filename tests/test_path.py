@@ -13,16 +13,16 @@ import grapes as gr
 # Design, context, path
 def test_get_path_to_target():
     g = gr.Graph()
-    g.add_step("e", "op_e", "a", "b")
-    g.add_step("f", "op_f", "c", "d")
-    g.add_step("g", "op_g", "e", "f")
-    g.add_step("h", "op_h", "e")
-    g.add_simple_conditional("j", "i", "g", "h")
-    g.add_simple_conditional("l", "k", "g", "h")
-    g.finalize_definition()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+    gr.add_step(g, "h", "op_h", "e")
+    gr.add_simple_conditional(g, "j", "i", "g", "h")
+    gr.add_simple_conditional(g, "l", "k", "g", "h")
+    gr.finalize_definition(g)
 
     context = {"e": 1, "f": 1, "i": True}
-    g.set_internal_context(context)
+    gr.set_internal_context(g, context)
 
     result_g = gr.get_path_to_target(g, "g")
     result_h = gr.get_path_to_target(g, "h")

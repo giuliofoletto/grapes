@@ -9,6 +9,7 @@ import networkx as nx
 
 from . import function_composer
 from .core import starting_node_properties
+from .design import get_all_conditionals, get_all_sources
 from .evaluate import execute_towards_all_conditions_of_conditional
 
 
@@ -80,7 +81,7 @@ def simplify_all_dependencies(graph, node_name, exclude=set()):
     if not isinstance(exclude, set):
         exclude = set(exclude)
     # If a dependency is a source, it cannot be simplified
-    exclude |= graph.get_all_sources()
+    exclude |= get_all_sources(graph)
     dependencies = graph.get_args(node_name) + tuple(
         graph.get_kwargs(node_name).values()
     )
@@ -157,7 +158,7 @@ def convert_all_conditionals_to_trivial_steps(graph, execute_towards_conditions=
     execute_towards_conditions: bool
         Whether to execute the graph towards the conditions until one is found true (default: False)
     """
-    conditionals = graph.get_all_conditionals()
+    conditionals = get_all_conditionals(graph)
     for conditional in conditionals:
         convert_conditional_to_trivial_step(
             graph, conditional, execute_towards_conditions

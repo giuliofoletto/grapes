@@ -16,6 +16,16 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
+from .design import (
+    clear_values,
+    freeze,
+    get_all_sinks,
+    get_internal_context,
+    get_list_of_values,
+    set_internal_context,
+    unfreeze,
+    update_internal_context,
+)
 from .evaluate import execute_to_targets, progress_towards_targets
 from .merge import get_subgraph
 from .path import get_path_to_target
@@ -55,7 +65,7 @@ def execute_graph_from_context(
     """
     # No target is interpreted as compute everything
     if len(targets) == 0:
-        targets = graph.get_all_sinks(exclude_recipes=True)
+        targets = get_all_sinks(graph, exclude_recipes=True)
 
     if check_feasibility:
         feasibility, missing_dependencies = check_feasibility_of_execution(
@@ -76,7 +86,7 @@ def execute_graph_from_context(
         graph = copy.deepcopy(graph)
         context = copy.deepcopy(context)
 
-    graph.set_internal_context(context)
+    set_internal_context(graph, context)
     execute_to_targets(graph, *targets)
 
     return graph
@@ -96,7 +106,7 @@ def json_from_graph(graph):
         JSON string that prettily represents the context of the graph.
     """
 
-    context = graph.get_internal_context(exclude_recipes=True)
+    context = get_internal_context(graph, exclude_recipes=True)
     non_serializable_items = {}
     for key, value in context.items():
         try:
@@ -186,17 +196,17 @@ def wrap_graph_with_function(
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
     # Pass all constants to the graph
-    operational_graph.update_internal_context(constants)
+    update_internal_context(operational_graph, constants)
     # Freeze so that the constants are fixed
-    operational_graph.freeze()
+    freeze(operational_graph)
     # Unfreeze the input.
     # Note that this has precedence over constants (i.e., if a key is both input and constant, it is treated as input)
     if len(input_keys) > 0:
-        operational_graph.unfreeze(*input_keys)
-        operational_graph.clear_values(*input_keys)
+        unfreeze(operational_graph, *input_keys)
+        clear_values(operational_graph, *input_keys)
     # No target is interpreted as compute everything
     if len(targets) == 0:
-        targets = operational_graph.get_all_sinks(exclude_recipes=True)
+        targets = get_all_sinks(operational_graph, exclude_recipes=True)
     # Move as much as possible towards targets
     progress_towards_targets(operational_graph, *targets)
     # Check feasibility
@@ -223,9 +233,9 @@ def wrap_graph_with_function(
             for key in input_keys:
                 operational_graph[key] = kwargs[key]
             execute_to_targets(operational_graph, *targets)
-            list_of_values = operational_graph.get_list_of_values(targets)
+            list_of_values = get_list_of_values(operational_graph, targets)
             # Clear values so that the function can be called again
-            operational_graph.clear_values()
+            clear_values(operational_graph)
             if len(list_of_values) == 1:
                 return list_of_values[0]
             else:
@@ -239,9 +249,9 @@ def wrap_graph_with_function(
             for i in range(len(input_keys)):
                 operational_graph[input_keys[i]] = args[i]
             execute_to_targets(operational_graph, *targets)
-            list_of_values = operational_graph.get_list_of_values(targets)
+            list_of_values = get_list_of_values(operational_graph, targets)
             # Clear values so that the function can be called again
-            operational_graph.clear_values()
+            clear_values(operational_graph)
             if len(list_of_values) == 1:
                 return list_of_values[0]
             else:
@@ -254,14 +264,14 @@ def lambdify_graph(graph, input_keys, target, constants={}):
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
     # Pass all constants to the graph
-    operational_graph.update_internal_context(constants)
+    update_internal_context(operational_graph, constants)
     # Freeze so that the constants are fixed
-    operational_graph.freeze()
+    freeze(operational_graph)
     # Unfreeze the input.
     # Note that this has precedence over constants (i.e., if a key is both input and constant, it is treated as input)
     if len(input_keys) > 0:
-        operational_graph.unfreeze(*input_keys)
-        operational_graph.clear_values(*input_keys)
+        unfreeze(operational_graph, *input_keys)
+        clear_values(operational_graph, *input_keys)
     # Convert all conditional, progressing to the conditions
     convert_all_conditionals_to_trivial_steps(
         operational_graph, execute_towards_conditions=True
@@ -300,7 +310,7 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
         context = copy.deepcopy(context)
 
     clear_reachabilities(graph)
-    graph.set_internal_context(context)
+    set_internal_context(graph, context)
     find_reachability_targets(graph, *targets)
     feasibility = get_worst_reachability(graph, *targets)
     missing_dependencies = set()
@@ -318,7 +328,7 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
 def get_execution_subgraph(graph, context, *targets):
     graph = copy.deepcopy(graph)
     context = copy.deepcopy(context)
-    graph.update_internal_context(context)
+    update_internal_context(graph, context)
     path = set()
     for target in targets:
         path = path | get_path_to_target(graph, target)
