@@ -16,6 +16,8 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
+from .path import get_path_to_target
+
 
 def execute_graph_from_context(
     graph, context, *targets, inplace=False, check_feasibility=True
@@ -308,5 +310,5 @@ def get_execution_subgraph(graph, context, *targets):
     graph.update_internal_context(context)
     path = set()
     for target in targets:
-        path = path | graph.get_path_to_target(target)
+        path = path | get_path_to_target(graph, target)
     return graph.get_subgraph(path)

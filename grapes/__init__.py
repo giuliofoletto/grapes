@@ -1,4 +1,5 @@
 from .core import Graph
+from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
 from .util import (
     check_feasibility_of_execution,
     context_from_file,
