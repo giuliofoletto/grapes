@@ -18,6 +18,11 @@ else:
 
 from .merge import get_subgraph
 from .path import get_path_to_target
+from .reachability import (
+    clear_reachabilities,
+    find_reachability_targets,
+    get_worst_reachability,
+)
 from .simplify import (
     convert_all_conditionals_to_trivial_steps,
     simplify_all_dependencies,
@@ -293,10 +298,10 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
         graph = copy.deepcopy(graph)
         context = copy.deepcopy(context)
 
-    graph.clear_reachabilities()
+    clear_reachabilities(graph)
     graph.set_internal_context(context)
-    graph.find_reachability_targets(*targets)
-    feasibility = graph.get_worst_reachability(*targets)
+    find_reachability_targets(graph, *targets)
+    feasibility = get_worst_reachability(graph, *targets)
     missing_dependencies = set()
     if feasibility in {"unreachable", "uncertain"}:
         for node in graph.nodes:

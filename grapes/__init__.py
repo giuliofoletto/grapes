@@ -1,6 +1,15 @@
 from .core import Graph
 from .merge import check_compatibility, check_compatibility_nodes, get_subgraph, merge
 from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
+from .reachability import (
+    clear_reachabilities,
+    find_reachability_conditional,
+    find_reachability_standard,
+    find_reachability_target,
+    find_reachability_targets,
+    get_best_reachability,
+    get_worst_reachability,
+)
 from .simplify import (
     convert_all_conditionals_to_trivial_steps,
     convert_conditional_to_trivial_step,
