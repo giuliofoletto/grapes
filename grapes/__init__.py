@@ -1,4 +1,10 @@
 from .core import Graph
+from .evaluate import (
+    execute_to_targets,
+    execute_towards_all_conditions_of_conditional,
+    execute_towards_conditions,
+    progress_towards_targets,
+)
 from .merge import check_compatibility, check_compatibility_nodes, get_subgraph, merge
 from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
 from .reachability import (

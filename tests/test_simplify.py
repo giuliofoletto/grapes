@@ -28,7 +28,7 @@ def test_simplify_dependency():
     g.finalize_definition()
 
     g.update_internal_context({"a": 1, "b": 2, "c": 3, "d": 4})
-    g.execute_to_targets("g")
+    gr.execute_to_targets(g, "g")
 
     assert g["g"] == -9
 
@@ -51,7 +51,7 @@ def test_simplify_all_dependencies():
     g.finalize_definition()
 
     g.update_internal_context({"a": 1, "b": 2, "c": 3, "d": 4})
-    g.execute_to_targets("g")
+    gr.execute_to_targets(g, "g")
 
     assert g["g"] == -9
 
@@ -70,7 +70,7 @@ def test_convert_conditional_to_trivial_step():
     gr.convert_conditional_to_trivial_step(g, "conditional")
     assert g.get_type("conditional") == "standard"
 
-    g.execute_to_targets("conditional")
+    gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["v2"]
 
 
@@ -93,7 +93,7 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
     )
     assert g.get_type("conditional") == "standard"
 
-    g.execute_to_targets("conditional")
+    gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["v2"]
 
 
@@ -116,7 +116,7 @@ def test_convert_conditional_to_trivial_step_with_default():
     )
     assert g.get_type("conditional") == "standard"
 
-    g.execute_to_targets("conditional")
+    gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["default"]
 
 
@@ -158,7 +158,7 @@ def test_convert_all_conditionals_to_trivial_steps():
     assert g.get_type("conditional1") == "standard"
     assert g.get_type("conditional2") == "standard"
 
-    g.execute_to_targets("conditional1", "conditional2")
+    gr.execute_to_targets(g, "conditional1", "conditional2")
     assert g["conditional1"] == g["vt"]
     assert g["conditional2"] == g["vf"]
 
@@ -185,5 +185,5 @@ def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
     gr.convert_all_conditionals_to_trivial_steps(g, execute_towards_conditions=True)
     assert g.get_type("conditional") == "standard"
 
-    g.execute_to_targets("conditional")
+    gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["v1"]

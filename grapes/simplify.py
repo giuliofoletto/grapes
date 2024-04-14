@@ -9,6 +9,7 @@ import networkx as nx
 
 from . import function_composer
 from .core import starting_node_properties
+from .evaluate import execute_towards_all_conditions_of_conditional
 
 
 def simplify_dependency(graph, node_name, dependency_name):
@@ -102,7 +103,7 @@ def convert_conditional_to_trivial_step(
         Whether to execute the graph towards the conditions until one is found true (default: False)
     """
     if execute_towards_conditions:
-        graph.execute_towards_all_conditions_of_conditional(conditional)
+        execute_towards_all_conditions_of_conditional(graph, conditional)
 
     for index, condition in enumerate(graph.get_conditions(conditional)):
         if graph.has_value(condition) and graph.get_value(condition):

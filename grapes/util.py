@@ -16,6 +16,7 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
+from .evaluate import execute_to_targets, progress_towards_targets
 from .merge import get_subgraph
 from .path import get_path_to_target
 from .reachability import (
@@ -76,7 +77,7 @@ def execute_graph_from_context(
         context = copy.deepcopy(context)
 
     graph.set_internal_context(context)
-    graph.execute_to_targets(*targets)
+    execute_to_targets(graph, *targets)
 
     return graph
 
@@ -197,7 +198,7 @@ def wrap_graph_with_function(
     if len(targets) == 0:
         targets = operational_graph.get_all_sinks(exclude_recipes=True)
     # Move as much as possible towards targets
-    operational_graph.progress_towards_targets(*targets)
+    progress_towards_targets(operational_graph, *targets)
     # Check feasibility
     placeholder_value = 0
     context = {key: placeholder_value for key in input_keys}
@@ -221,7 +222,7 @@ def wrap_graph_with_function(
             # Use for loop rather than dict comprehension because it is a more basic operation
             for key in input_keys:
                 operational_graph[key] = kwargs[key]
-            operational_graph.execute_to_targets(*targets)
+            execute_to_targets(operational_graph, *targets)
             list_of_values = operational_graph.get_list_of_values(targets)
             # Clear values so that the function can be called again
             operational_graph.clear_values()
@@ -237,7 +238,7 @@ def wrap_graph_with_function(
             # Use for loop rather than dict comprehension because it is a more basic operation
             for i in range(len(input_keys)):
                 operational_graph[input_keys[i]] = args[i]
-            operational_graph.execute_to_targets(*targets)
+            execute_to_targets(operational_graph, *targets)
             list_of_values = operational_graph.get_list_of_values(targets)
             # Clear values so that the function can be called again
             operational_graph.clear_values()
@@ -266,7 +267,7 @@ def lambdify_graph(graph, input_keys, target, constants={}):
         operational_graph, execute_towards_conditions=True
     )
     # Progress as much as possible
-    operational_graph.progress_towards_targets(target)
+    progress_towards_targets(operational_graph, target)
     # The starting point of the computation will include the constants
     initial_keys = set(input_keys) | set(constants.keys())
     # Simplify until the graph is a single function

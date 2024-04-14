@@ -35,7 +35,7 @@ def test_simple():
             "op_g": lambda x, y: x - y,
         }
     )
-    g.execute_to_targets("g")
+    gr.execute_to_targets(g, "g")
 
     assert g["g"] == -9
 
@@ -58,7 +58,7 @@ def test_simplified_input():
             "op_g": lambda x, y: x - y,
         }
     )
-    g.execute_to_targets("g")
+    gr.execute_to_targets(g, "g")
 
     assert g["g"] == -9
 
@@ -82,7 +82,7 @@ def test_diamond():
             "op_e": lambda x, y: x - y,
         }
     )
-    g.execute_to_targets("e")
+    gr.execute_to_targets(g, "e")
 
     assert g["e"] == 0
 
@@ -99,7 +99,7 @@ def test_inverted_input():
     g.update_internal_context(
         {"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x}
     )
-    g.execute_to_targets("c")
+    gr.execute_to_targets(g, "c")
 
     assert g["c"] == 6
 
@@ -111,7 +111,7 @@ def test_conditional():
     g.finalize_definition()
 
     g.update_internal_context({"a": 1, "b": 2, "c": True})
-    g.execute_to_targets("d")
+    gr.execute_to_targets(g, "d")
 
     assert g["d"] == g["a"]
 
@@ -126,7 +126,7 @@ def test_kwargs():
         return base**exponent
 
     g.update_internal_context({"a": 5, "b": 2, "op_c": example_exponentiation_func})
-    g.execute_to_targets("c")
+    gr.execute_to_targets(g, "c")
 
     assert g["c"] == 25
 
@@ -149,7 +149,7 @@ def test_progress_towards_targets():
     g.finalize_definition()
 
     # f cannot be reached because c is not in context, but b and e can be computed
-    g.progress_towards_targets("f")
+    gr.progress_towards_targets(g, "f")
     assert g["b"] == 10
     assert g["e"] == 12
 
@@ -173,7 +173,7 @@ def test_multiple_conditional():
     g.set_internal_context(context)
     g.finalize_definition()
 
-    g.execute_to_targets("result")
+    gr.execute_to_targets(g, "result")
 
     assert g["result"] == 2
 
@@ -198,7 +198,7 @@ def test_multiple_conditional_with_default():
     g.set_internal_context(context)
     g.finalize_definition()
 
-    g.execute_to_targets("result")
+    gr.execute_to_targets(g, "result")
 
     assert g["result"] == 4
 
@@ -211,7 +211,7 @@ def test_edit_step():
     g.set_internal_context({"a": 1, "op_b": lambda x: 2 * x, "op_c": lambda x: 3 * x})
     g.finalize_definition()
 
-    g.execute_to_targets("c")
+    gr.execute_to_targets(g, "c")
     assert g["b"] == 2
     assert g["c"] == 6
 
@@ -223,7 +223,7 @@ def test_edit_step():
     g.update_internal_context({"d": 3, "new_op_b": lambda x, y: x + y})
     g.finalize_definition()
 
-    g.execute_to_targets("c")
+    gr.execute_to_targets(g, "c")
     assert g["b"] == 4
     assert g["c"] == 12
 
@@ -262,7 +262,7 @@ def test_add_step_quick():
     g.update_internal_context({"a": 2, "b": 3})
     g.finalize_definition()
 
-    g.execute_to_targets("d", "f")  # "c" and "e" should be automatically computed
+    gr.execute_to_targets(g, "d", "f")  # "c" and "e" should be automatically computed
     assert g["c"] == 8
     assert g["d"] == 16
     assert g["e"] == 1
@@ -325,7 +325,7 @@ def test_execute_towards_conditions():
     g["identity_recipe"] = lambda x: x
     g.finalize_definition()
 
-    g.execute_towards_conditions("c1", "c2", "c3")
+    gr.execute_towards_conditions(g, "c1", "c2", "c3")
 
     assert not g.has_value("c1")
     assert not g.has_value("c3")
@@ -344,7 +344,7 @@ def test_execute_towards_all_conditions_of_conditional():
     g["identity_recipe"] = lambda x: x
     g.finalize_definition()
 
-    g.execute_towards_all_conditions_of_conditional("conditional")
+    gr.execute_towards_all_conditions_of_conditional(g, "conditional")
 
     assert not g.has_value("c1")
     assert not g.has_value("c3")

@@ -59,7 +59,7 @@ def test_merge_and_execute():
     g.update_internal_context(
         {"a": 1, "b": 2, "d": 4, "op_c": lambda x, y: x + y, "op_e": lambda x, y: x * y}
     )
-    g.execute_to_targets("e")
+    gr.execute_to_targets(g, "e")
 
     assert g["e"] == 12
 
@@ -74,5 +74,5 @@ def test_get_subgraph():
 
     h = gr.get_subgraph(g, {"g", "e", "f", "op_g"})
     h.set_internal_context({"e": 1, "f": 2, "op_g": lambda x, y: x + y})
-    h.execute_to_targets("g")
+    gr.execute_to_targets(h, "g")
     assert h["g"] == 3
