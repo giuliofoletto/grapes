@@ -10,6 +10,7 @@ import pytest
 import grapes as gr
 
 
+# Design, context, evaluate
 def test_simple():
     g = gr.Graph()
     g.add_step("a")
@@ -39,6 +40,7 @@ def test_simple():
     assert g["g"] == -9
 
 
+# Design, context, evaluate
 def test_simplified_input():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
@@ -61,6 +63,7 @@ def test_simplified_input():
     assert g["g"] == -9
 
 
+# Design, context, evaluate
 def test_diamond():
     g = gr.Graph()
     g.add_step("a")
@@ -84,6 +87,7 @@ def test_diamond():
     assert g["e"] == 0
 
 
+# Design, context, evaluate
 def test_inverted_input():
     # Typically, we proceed from bottom to top
     # Here we test the opposite
@@ -100,6 +104,7 @@ def test_inverted_input():
     assert g["c"] == 6
 
 
+# Design, context, evaluate
 def test_conditional():
     g = gr.Graph()
     g.add_simple_conditional("d", "c", "a", "b")
@@ -111,6 +116,7 @@ def test_conditional():
     assert g["d"] == g["a"]
 
 
+# Design, merge
 def test_compatibility():
     g = gr.Graph()
     g.add_step("c", "op_c", "a", "b")
@@ -119,6 +125,7 @@ def test_compatibility():
     assert h.is_compatible(g)
 
 
+# Design, merge
 def test_incompatibility():
     g = gr.Graph()
     g.add_step("c", "op_c", "a", "b")
@@ -127,6 +134,7 @@ def test_incompatibility():
     assert not h.is_compatible(g)
 
 
+# Design, merge
 def test_merge():
     exp = gr.Graph()
     exp.add_step("c", "op_c", "a", "b")
@@ -141,6 +149,7 @@ def test_merge():
     assert g == exp
 
 
+# Design, merge, context, evaluate
 def test_merge_and_execute():
     exp = gr.Graph()
     exp.add_step("c", "op_c", "a", "b")
@@ -161,6 +170,7 @@ def test_merge_and_execute():
     assert g["e"] == 12
 
 
+# Design, context, evaluate
 def test_kwargs():
     g = gr.Graph()
     g.add_step("c", "op_c", "a", exponent="b")
@@ -175,6 +185,7 @@ def test_kwargs():
     assert g["c"] == 25
 
 
+# Design, context, simplify, evaluate
 def test_simplify_dependency():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
@@ -197,6 +208,7 @@ def test_simplify_dependency():
     assert g["g"] == -9
 
 
+# Design, context, simplify, evaluate
 def test_simplify_all_dependencies():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
@@ -219,6 +231,7 @@ def test_simplify_all_dependencies():
     assert g["g"] == -9
 
 
+# Design, context, evaluate
 def test_progress_towards_targets():
     g = gr.Graph()
     g.add_step("b", "op_b", "a")
@@ -241,6 +254,7 @@ def test_progress_towards_targets():
     assert g["e"] == 12
 
 
+# Design, context, evaluate
 def test_multiple_conditional():
     g = gr.Graph()
     g.add_multiple_conditional(
@@ -264,6 +278,7 @@ def test_multiple_conditional():
     assert g["result"] == 2
 
 
+# Design, context, evaluate
 def test_multiple_conditional_with_default():
     g = gr.Graph()
     g.add_multiple_conditional(
@@ -288,6 +303,7 @@ def test_multiple_conditional_with_default():
     assert g["result"] == 4
 
 
+# Design, context, evaluate
 def test_edit_step():
     g = gr.Graph()
     g.add_step("b", "op_b", "a")
@@ -312,6 +328,7 @@ def test_edit_step():
     assert g["c"] == 12
 
 
+# Design, context, evaluate
 def test_remove_step():
     g = gr.Graph()
     g.add_step("b", "op_b", "a")
@@ -326,6 +343,7 @@ def test_remove_step():
         g.remove_step("d")
 
 
+# Design, context, evaluate
 def test_add_step_quick():
     def example_function_only_positional(a, b):
         return a**b
@@ -359,6 +377,7 @@ def test_add_step_quick():
         g.add_step_quick("h", "a non-function object")
 
 
+# Design
 def test_topological_generations():
     g = gr.Graph()
     g.add_step("d", "fd", "b", "c")
@@ -373,6 +392,7 @@ def test_topological_generations():
     assert g.get_node_attribute("fd", "topological_generation_index") == 0
 
 
+# Design, context, reachability
 def test_reachability_simple():
     g = gr.Graph()
     g.add_step("b", "fb", "a")
@@ -388,6 +408,7 @@ def test_reachability_simple():
     assert g.get_reachability("b") == "reachable"
 
 
+# Design, context, reachability
 def test_reachability_long_graph():
     g = gr.Graph()
     g.add_step_quick("c", lambda b: b)
@@ -403,6 +424,7 @@ def test_reachability_long_graph():
     assert g.get_reachability("b") == "reachable"
 
 
+# Design, context, reachability
 def test_reachability_conditional_with_true_value():
     g = gr.Graph()
     g.add_simple_conditional("name", "condition", "value_true", "value_false")
@@ -418,6 +440,7 @@ def test_reachability_conditional_with_true_value():
     assert g.get_reachability("name") == "reachable"
 
 
+# Design, context, reachability
 def test_reachability_multiple_conditional_with_true_value():
     g = gr.Graph()
     g.add_multiple_conditional("name", ["ca", "cb"], ["a", "b", "c"])
@@ -433,6 +456,7 @@ def test_reachability_multiple_conditional_with_true_value():
     assert g.get_reachability("name") == "reachable"
 
 
+# Design, context, reachability
 def test_conditional_no_conditions_defined():
     g = gr.Graph()
     g.add_simple_conditional("name", "condition", "value_true", "value_false")
@@ -462,6 +486,7 @@ def test_conditional_no_conditions_defined():
     assert g.get_reachability("name") == "reachable"
 
 
+# Design, context, reachability
 def test_multiple_conditional_no_conditions_defined():
     g = gr.Graph()
     g.add_multiple_conditional("name", ["ca", "cb"], ["va", "vb", "vc"])
@@ -499,6 +524,7 @@ def test_multiple_conditional_no_conditions_defined():
     assert g.get_reachability("name") == "reachable"
 
 
+# Design, features
 def test_sources_and_sinks():
     g = gr.Graph()
     g.add_step("c", "op_c", "a", "b")
@@ -519,6 +545,7 @@ def test_sources_and_sinks():
     assert g.get_all_sinks(exclude_recipes=False) == {"c", "e"}
 
 
+# Design, evaluate
 def test_execute_towards_conditions():
     """
     Execute towards the conditions of conditional by computing c2.
@@ -537,6 +564,7 @@ def test_execute_towards_conditions():
     assert g["c2"] == True
 
 
+# Design, evaluate
 def test_execute_towards_all_conditions_of_conditional():
     """
     Execute towards the conditions of conditional by computing c2 (the conditional is passed instead of the conditions).
@@ -555,6 +583,7 @@ def test_execute_towards_all_conditions_of_conditional():
     assert g["c2"] == True
 
 
+# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step():
     """
     Convert conditional to a trivial step since its condition c2 already has true value.
@@ -572,6 +601,7 @@ def test_convert_conditional_to_trivial_step():
     assert g["conditional"] == g["v2"]
 
 
+# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step_with_evaluation():
     """
     Convert conditional to a trivial step but compute the conditions.
@@ -594,6 +624,7 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
     assert g["conditional"] == g["v2"]
 
 
+# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step_with_default():
     """
     Convert conditional to a trivial step, computing conditions, but use default value since no condition is true.
@@ -616,6 +647,7 @@ def test_convert_conditional_to_trivial_step_with_default():
     assert g["conditional"] == g["default"]
 
 
+# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step_without_true_values():
     """
     Try to convert conditional to trivial step but no conditions can be evaluated to true.
@@ -635,6 +667,7 @@ def test_convert_conditional_to_trivial_step_without_true_values():
         )
 
 
+# Design, features
 def test_get_all_conditionals():
     """
     Get set of all conditionals in the graph.
@@ -647,6 +680,7 @@ def test_get_all_conditionals():
     assert g.get_all_conditionals() == {"conditional1", "conditional2"}
 
 
+# Design, simplify, evaluate
 def test_convert_all_conditionals_to_trivial_steps():
     """
     Convert all conditionals to trivial steps.
@@ -669,6 +703,7 @@ def test_convert_all_conditionals_to_trivial_steps():
     assert g["conditional2"] == g["vf"]
 
 
+# Design, simplify, evaluate
 def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
     """
     Convert all conditionals to trivial steps, computing the conditions.
@@ -694,6 +729,7 @@ def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
     assert g["conditional"] == g["v1"]
 
 
+# Design, context, util, evaluate
 def test_get_subgraph():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
@@ -707,6 +743,7 @@ def test_get_subgraph():
     assert h["g"] == 3
 
 
+# Design, features
 def test_get_all_ancestors():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
@@ -739,6 +776,7 @@ def test_get_all_ancestors():
     }
 
 
+# Design, context, path
 def test_get_path_to_target():
     g = gr.Graph()
     g.add_step("e", "op_e", "a", "b")
@@ -763,6 +801,7 @@ def test_get_path_to_target():
     assert result_l == {"l", "k", "g", "op_g", "e", "f", "h", "op_h"}
 
 
+# Design
 def test_make_recipe_dependencies_also_recipes():
     g = gr.Graph()
     g.add_step("a", "op_a", "b")

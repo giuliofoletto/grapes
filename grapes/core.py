@@ -29,6 +29,7 @@ class Graph:
     Class that represents a graph of nodes.
     """
 
+    # Class
     def __init__(self, nx_digraph=None):
         # Internally, we handle a nx_digraph
         if nx_digraph == None:
@@ -38,18 +39,21 @@ class Graph:
         # Alias for easy access
         self.nodes = self._nxdg.nodes
 
+    # Class
     def __getitem__(self, node):
         """
         Get the value of a node with []
         """
         return self.get_value(node)
 
+    # Class
     def __setitem__(self, node, value):
         """
         Set the value of a node with []
         """
         self.set_value(node, value)
 
+    # Class
     def __eq__(self, other):
         """
         Equality check based on all members.
@@ -58,6 +62,7 @@ class Graph:
             self._nxdg, other._nxdg, dict.__eq__, dict.__eq__
         )
 
+    # Design
     def add_step(self, name, recipe=None, *args, **kwargs):
         """
         Interface to add a node to the graph, with all its dependencies.
@@ -106,6 +111,7 @@ class Graph:
                     self._nxdg.add_node(value, **starting_node_properties)
                 self._nxdg.add_edge(value, name)
 
+    # Design
     def add_step_quick(self, name, recipe):
         """
         Interface to quickly add a step by passing a name and a function.
@@ -139,6 +145,7 @@ class Graph:
         # Directly set the value of recipe_name to recipe
         self.set_value(recipe_name, recipe)
 
+    # Design
     def add_simple_conditional(self, name, condition, value_true, value_false):
         """
         Interface to add a conditional to the graph.
@@ -147,6 +154,7 @@ class Graph:
             name, conditions=[condition], possibilities=[value_true, value_false]
         )
 
+    # Design
     def add_multiple_conditional(self, name, conditions, possibilities):
         """
         Interface to add a multiple conditional to the graph.
@@ -170,6 +178,7 @@ class Graph:
         # Add possibilities to the list of possibilities of the conditional
         self.set_possibilities(name, possibilities)
 
+    # Design
     def edit_step(self, name, recipe=None, *args, **kwargs):
         """
         Interface to edit an existing node, changing its predecessors
@@ -198,6 +207,7 @@ class Graph:
         if had_value:
             self.set_value(name, old_value)
 
+    # Design
     def remove_step(self, name):
         """
         Interface to remove an existing node, without changing anything else
@@ -206,6 +216,7 @@ class Graph:
             raise ValueError("Cannot edit non-existent node " + name)
         self._nxdg.remove_node(name)
 
+    # Get/Set
     def get_node_attribute(self, node, attribute):
         attributes = self.nodes[node]
         if attribute in attributes and attributes[attribute] is not None:
@@ -213,67 +224,85 @@ class Graph:
         else:
             raise ValueError("Node " + node + " has no " + attribute)
 
+    # Get/Set
     def set_node_attribute(self, node, attribute, value):
         self.nodes[node][attribute] = value
 
+    # Get/Set
     def is_recipe(self, node):
         return self.get_node_attribute(node, "is_recipe")
 
+    # Get/Set
     def set_is_recipe(self, node, is_recipe):
         return self.set_node_attribute(node, "is_recipe", is_recipe)
 
+    # Get/Set
     def get_recipe(self, node):
         return self.get_node_attribute(node, "recipe")
 
+    # Get/Set
     def set_recipe(self, node, recipe):
         return self.set_node_attribute(node, "recipe", recipe)
 
+    # Get/Set
     def get_args(self, node):
         return self.get_node_attribute(node, "args")
 
+    # Get/Set
     def set_args(self, node, args):
         return self.set_node_attribute(node, "args", args)
 
+    # Get/Set
     def get_kwargs(self, node):
         return self.get_node_attribute(node, "kwargs")
 
+    # Get/Set
     def set_kwargs(self, node, kwargs):
         return self.set_node_attribute(node, "kwargs", kwargs)
 
+    # Get/Set
     def get_conditions(self, node):
         conditions = self.get_node_attribute(node, "conditions")
         if not isinstance(conditions, list):
             conditions = list(conditions)
         return conditions
 
+    # Get/Set
     def set_conditions(self, node, conditions):
         if not isinstance(conditions, list):
             conditions = list(conditions)
         return self.set_node_attribute(node, "conditions", conditions)
 
+    # Get/Set
     def get_possibilities(self, node):
         possibilities = self.get_node_attribute(node, "possibilities")
         if not isinstance(possibilities, list):
             possibilities = list(possibilities)
         return possibilities
 
+    # Get/Set
     def set_possibilities(self, node, possibilities):
         if not isinstance(possibilities, list):
             possibilities = list(possibilities)
         return self.set_node_attribute(node, "possibilities", possibilities)
 
+    # Get/Set
     def get_type(self, node):
         return self.get_node_attribute(node, "type")
 
+    # Get/Set
     def set_type(self, node, type):
         return self.set_node_attribute(node, "type", type)
 
+    # Get/Set
     def get_topological_generation_index(self, node):
         return self.get_node_attribute(node, "topological_generation_index")
 
+    # Get/Set
     def set_topological_generation_index(self, node, index):
         self.set_node_attribute(node, "topological_generation_index", index)
 
+    # Get/Set
     def get_value(self, node):
         attributes = self.nodes[node]
         if (
@@ -285,15 +314,18 @@ class Graph:
         else:
             raise ValueError("Node " + node + " has no value")
 
+    # Get/Set
     def set_value(self, node, value):
         # Note: This changes reachability
         self.nodes[node]["value"] = value
         self.nodes[node]["has_value"] = True
 
+    # Get/Set
     def unset_value(self, node):
         # Note: This changes reachability
         self.nodes[node]["has_value"] = False
 
+    # Get/Set
     def get_reachability(self, node):
         attributes = self.nodes[node]
         if (
@@ -305,27 +337,34 @@ class Graph:
         else:
             raise ValueError("Node " + node + " has no reachability")
 
+    # Get/Set
     def set_reachability(self, node, reachability):
         if reachability not in ("unreachable", "uncertain", "reachable"):
             raise ValueError(reachability + " is not a valid reachability value.")
         self.nodes[node]["reachability"] = reachability
         self.nodes[node]["has_reachability"] = True
 
+    # Get/Set
     def unset_reachability(self, node):
         self.nodes[node]["has_reachability"] = False
 
+    # Get/Set
     def is_frozen(self, node):
         return self.get_node_attribute(node, "is_frozen")
 
+    # Get/Set
     def set_is_frozen(self, node, is_frozen):
         return self.set_node_attribute(node, "is_frozen", is_frozen)
 
+    # Get/Set
     def has_value(self, node):
         return self.get_node_attribute(node, "has_value")
 
+    # Get/Set
     def set_has_value(self, node, has_value):
         return self.set_node_attribute(node, "has_value", has_value)
 
+    # Design
     def clear_values(self, *args):
         """
         Clear values in the graph nodes.
@@ -340,12 +379,15 @@ class Graph:
                 continue
             self.unset_value(node)
 
+    # Get/Set
     def has_reachability(self, node):
         return self.get_node_attribute(node, "has_reachability")
 
+    # Get/Set
     def set_has_reachability(self, node, has_reachability):
         return self.set_node_attribute(node, "has_reachability", has_reachability)
 
+    # Reachability
     def clear_reachabilities(self, *args):
         """
         Clear reachabilities in the graph nodes.
@@ -360,6 +402,7 @@ class Graph:
                 continue
             self.unset_reachability(node)
 
+    # Context
     def update_internal_context(self, dictionary):
         """
         Update internal context with a dictionary.
@@ -374,6 +417,7 @@ class Graph:
             if key in self.nodes:
                 self.set_value(key, value)
 
+    # Context
     def set_internal_context(self, dictionary):
         """
         Clear all values and then set a new internal context with a dictionary.
@@ -386,6 +430,7 @@ class Graph:
         self.clear_values()
         self.update_internal_context(dictionary)
 
+    # Context
     def get_internal_context(self, exclude_recipes=False):
         """
         Get the internal context.
@@ -406,6 +451,7 @@ class Graph:
                 key: self.get_value(key) for key in self.nodes if self.has_value(key)
             }
 
+    # Context
     def get_list_of_values(self, list_of_keys):
         """
         Get values as list.
@@ -425,6 +471,7 @@ class Graph:
             res.append(self.get_value(key))
         return res
 
+    # Context
     def get_dict_of_values(self, list_of_keys):
         """
         Get values as dictionary.
@@ -441,6 +488,7 @@ class Graph:
         """
         return {key: self.get_value(key) for key in list_of_keys}
 
+    # Context
     def get_kwargs_values(self, dictionary):
         """
         Get values from the graph, using a dictionary that works like function kwargs.
@@ -457,6 +505,7 @@ class Graph:
         """
         return {key: self.get_value(value) for key, value in dictionary.items()}
 
+    # Evaluate
     def evaluate_target(self, target, continue_on_fail=False):
         """
         Generic interface to evaluate a GenericNode.
@@ -472,6 +521,7 @@ class Graph:
                 + " is not supported"
             )
 
+    # Evaluate
     def evaluate_standard(self, node, continue_on_fail=False):
         """
         Evaluate of a node.
@@ -505,6 +555,7 @@ class Graph:
         # Save results
         self.set_value(node, res)
 
+    # Evaluate
     def evaluate_conditional(self, conditional, continue_on_fail=False):
         """
         Evaluate a conditional.
@@ -548,6 +599,7 @@ class Graph:
         # Save results and release
         self.set_value(conditional, res)
 
+    # Evaluate
     def execute_to_targets(self, *targets):
         """
         Evaluate all nodes in the graph that are needed to reach the targets.
@@ -555,6 +607,7 @@ class Graph:
         for target in targets:
             self.evaluate_target(target, False)
 
+    # Evaluate
     def progress_towards_targets(self, *targets):
         """
         Move towards the targets by evaluating nodes, but keep going if evaluation fails.
@@ -562,6 +615,7 @@ class Graph:
         for target in targets:
             self.evaluate_target(target, True)
 
+    # Evaluate
     def execute_towards_conditions(self, *conditions):
         """
         Move towards the conditions, stop if one is found true.
@@ -571,12 +625,14 @@ class Graph:
             if self.has_value(condition) and self[condition]:
                 break
 
+    # Evaluate
     def execute_towards_all_conditions_of_conditional(self, conditional):
         """
         Move towards the conditions of a specific conditional, stop if one is found true.
         """
         self.execute_towards_conditions(*self.get_conditions(conditional))
 
+    # Reachability
     def find_reachability_target(self, target):
         """
         Generic interface to find the reachability of a GenericNode.
@@ -592,6 +648,7 @@ class Graph:
                 + " is not supported"
             )
 
+    # Reachability
     def find_reachability_standard(self, node):
         """
         Find the reachability of a standard node.
@@ -613,6 +670,7 @@ class Graph:
         self.find_reachability_targets(*dependencies)
         self.set_reachability(node, self.get_worst_reachability(*dependencies))
 
+    # Reachability
     def find_reachability_conditional(self, conditional):
         """
         Find the reachability of a conditional.
@@ -680,6 +738,7 @@ class Graph:
                 else:
                     self.set_reachability(conditional, "uncertain")
 
+    # Reachability
     def get_worst_reachability(self, *nodes):
         list_of_reachabilities = []
         for node in nodes:
@@ -691,6 +750,7 @@ class Graph:
         else:
             return "reachable"
 
+    # Reachability
     def get_best_reachability(self, *nodes):
         list_of_reachabilities = []
         for node in nodes:
@@ -702,10 +762,12 @@ class Graph:
         else:
             return "unreachable"
 
+    # Reachability
     def find_reachability_targets(self, *targets):
         for target in targets:
             self.find_reachability_target(target)
 
+    # Merge
     def is_other_node_compatible(self, node, other, other_node):
         # If types differ, return False
         if self.get_type(node) != other.get_type(other_node):
@@ -741,6 +803,7 @@ class Graph:
         # Return True if at least one has no dependencies (or they are the same), at least one has no value (or they are the same)
         return True
 
+    # Merge
     def is_compatible(self, other):
         """
         Check if self and other can be composed. Currently DAG status is not verified.
@@ -753,6 +816,7 @@ class Graph:
                 return False
         return True
 
+    # Reachability
     def merge(self, other):
         """
         Merge other into self.
@@ -764,6 +828,7 @@ class Graph:
         # Refresh alias for easy access
         self.nodes = self._nxdg.nodes
 
+    # Simplify
     def simplify_dependency(self, node_name, dependency_name):
         # Make everything a keyword argument. This is the fate of a simplified node
         self.get_kwargs(node_name).update(
@@ -827,6 +892,7 @@ class Graph:
         }
         self.set_kwargs(node_name, new_kwargs)
 
+    # Simplify
     def simplify_all_dependencies(self, node_name, exclude=set()):
         if not isinstance(exclude, set):
             exclude = set(exclude)
@@ -839,6 +905,7 @@ class Graph:
             if dependency not in exclude:
                 self.simplify_dependency(node_name, dependency)
 
+    # Design
     def freeze(self, *args):
         if len(args) == 0:  # Interpret as "Freeze everything"
             nodes_to_freeze = self.nodes
@@ -849,6 +916,7 @@ class Graph:
             if self.has_value(key):
                 self.set_is_frozen(key, True)
 
+    # Design
     def unfreeze(self, *args):
         if len(args) == 0:  # Interpret as "Unfreeze everything"
             nodes_to_unfreeze = self.nodes.keys()
@@ -858,6 +926,7 @@ class Graph:
         for key in nodes_to_unfreeze:
             self.set_is_frozen(key, False)
 
+    # Design
     def make_recipe_dependencies_also_recipes(self):
         """
         Make dependencies (predecessors) of recipes also recipes, if they have only recipe successors
@@ -875,6 +944,7 @@ class Graph:
                         if all_children_are_recipes:
                             self.set_is_recipe(parent, True)
 
+    # Design
     def finalize_definition(self):
         """
         Perform operations that should typically be done after the definition of a graph is completed
@@ -886,18 +956,21 @@ class Graph:
         self.update_topological_generation_indexes()
         self.freeze()
 
+    # Features
     def get_topological_order(self):
         """
         Return list of nodes in topological order, i.e., from dependencies to targets
         """
         return list(nx.topological_sort(self._nxdg))
 
+    # Features
     def get_topological_generations(self):
         """
         Return list of topological generations of the graph
         """
         return list(nx.topological_generations(self._nxdg))
 
+    # Features
     def update_topological_generation_indexes(self):
         generations = self.get_topological_generations()
         for node in self.nodes:
@@ -906,6 +979,7 @@ class Graph:
                     self.set_topological_generation_index(node, index)
                     break
 
+    # Features
     def get_all_sources(self, exclude_recipes=False):
         sources = set()
         for node in self.nodes:
@@ -915,6 +989,7 @@ class Graph:
                 sources.add(node)
         return sources
 
+    # Get/set
     def get_all_sinks(self, exclude_recipes=False):
         sinks = set()
         for node in self.nodes:
@@ -924,6 +999,7 @@ class Graph:
                 sinks.add(node)
         return sinks
 
+    # Simplify
     def convert_conditional_to_trivial_step(
         self, conditional, execute_towards_conditions=False
     ):
@@ -984,6 +1060,7 @@ class Graph:
         # Add and connect the possibility
         self._nxdg.add_edge(selected_possibility, conditional)
 
+    # Features
     def get_all_conditionals(self):
         """
         Get set of all conditional nodes in the graph.
@@ -994,6 +1071,7 @@ class Graph:
                 conditionals.add(node)
         return conditionals
 
+    # Simplify
     def convert_all_conditionals_to_trivial_steps(
         self, execute_towards_conditions=False
     ):
@@ -1011,17 +1089,20 @@ class Graph:
                 conditional, execute_towards_conditions
             )
 
+    # Util
     def get_subgraph(self, nodes):
         h = copy.deepcopy(self)
         h._nxdg.remove_nodes_from([n for n in self._nxdg if n not in nodes])
         return h
 
+    # Features
     def get_all_ancestors_target(self, target):
         """
         Get all the ancestors of a node.
         """
         return nx.ancestors(self._nxdg, target)
 
+    # Path
     def get_path_to_target(self, target):
         """
         Generic interface to get the path from the last valued nodes to a target.
@@ -1037,6 +1118,7 @@ class Graph:
                 + " is not supported"
             )
 
+    # Path
     def get_path_to_standard(self, node):
         """
         Get the path from the last valued nodes to a standard node.
@@ -1049,6 +1131,7 @@ class Graph:
             result = result | self.get_path_to_target(dependency)
         return result
 
+    # Path
     def get_path_to_conditional(self, conditional):
         """
         Get the path from the last valued nodes to a conditional node.
