@@ -1,4 +1,5 @@
 from .core import Graph
+from .merge import check_compatibility, check_compatibility_nodes, get_subgraph, merge
 from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
 from .simplify import (
     convert_all_conditionals_to_trivial_steps,

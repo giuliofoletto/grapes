@@ -765,67 +765,6 @@ class Graph:
         for target in targets:
             self.find_reachability_target(target)
 
-    # Merge
-    def is_other_node_compatible(self, node, other, other_node):
-        # If types differ, return False
-        if self.get_type(node) != other.get_type(other_node):
-            return False
-        # If nodes are equal, return True
-        if self.nodes[node] == other._nxdg.nodes[other_node]:
-            return True
-        # If they both have values but they differ, return False. If only one has a value, proceed
-        if (
-            self.has_value(node)
-            and other.has_value(other_node)
-            and self.get_value(node) != other.get_value(other_node)
-        ):
-            # Plot twist! Both are functions and have the same code: proceed
-            if (
-                inspect.isfunction(self.get_value(node))
-                and inspect.isfunction(other.get_value(other_node))
-                and self.get_value(node).__code__.co_code
-                == other.get_value(other_node).__code__.co_code
-            ):
-                pass
-            else:
-                return False
-        # If they both have dependencies but they differ, return False. If only one has dependencies, proceed
-        predecessors = list(self._nxdg.predecessors(node))
-        other_predecessors = list(other._nxdg.predecessors(other_node))
-        if (
-            len(predecessors) != 0
-            and len(other_predecessors) != 0
-            and predecessors != other_predecessors
-        ):
-            return False
-        # Return True if at least one has no dependencies (or they are the same), at least one has no value (or they are the same)
-        return True
-
-    # Merge
-    def is_compatible(self, other):
-        """
-        Check if self and other can be composed. Currently DAG status is not verified.
-        """
-        if not isinstance(other, Graph):
-            return False
-        common_nodes = self.nodes & other._nxdg.nodes  # Intersection
-        for key in common_nodes:
-            if not self.is_other_node_compatible(key, other, key):
-                return False
-        return True
-
-    # Reachability
-    def merge(self, other):
-        """
-        Merge other into self.
-        """
-        if not self.is_compatible(other):
-            raise ValueError("Cannot merge incompatible graphs")
-        res = nx.compose(self._nxdg, other._nxdg)
-        self._nxdg = res
-        # Refresh alias for easy access
-        self.nodes = self._nxdg.nodes
-
     # Design
     def freeze(self, *args):
         if len(args) == 0:  # Interpret as "Freeze everything"
@@ -930,12 +869,6 @@ class Graph:
             if self.get_type(node) == "conditional":
                 conditionals.add(node)
         return conditionals
-
-    # Util
-    def get_subgraph(self, nodes):
-        h = copy.deepcopy(self)
-        h._nxdg.remove_nodes_from([n for n in self._nxdg if n not in nodes])
-        return h
 
     # Features
     def get_all_ancestors_target(self, target):

@@ -16,6 +16,7 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
+from .merge import get_subgraph
 from .path import get_path_to_target
 from .simplify import (
     convert_all_conditionals_to_trivial_steps,
@@ -315,4 +316,4 @@ def get_execution_subgraph(graph, context, *targets):
     path = set()
     for target in targets:
         path = path | get_path_to_target(graph, target)
-    return graph.get_subgraph(path)
+    return get_subgraph(graph, path)
