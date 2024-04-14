@@ -338,8 +338,8 @@ def test_execute_towards_conditions():
 
     gr.execute_towards_conditions(g, "c1", "c2", "c3")
 
-    assert not g.has_value("c1")
-    assert not g.has_value("c3")
+    assert not g.get_has_value("c1")
+    assert not g.get_has_value("c3")
     assert g["c2"] == True
 
 
@@ -359,8 +359,8 @@ def test_execute_towards_all_conditions_of_conditional():
 
     gr.execute_towards_all_conditions_of_conditional(g, "conditional")
 
-    assert not g.has_value("c1")
-    assert not g.has_value("c3")
+    assert not g.get_has_value("c1")
+    assert not g.get_has_value("c3")
     assert g["c2"] == True
 
 
@@ -420,5 +420,5 @@ def test_make_recipe_dependencies_also_recipes():
     gr.add_step(g, "b", "op_b", "c")  # c will no longer be converted to recipe
     gr.finalize_definition(g)  # calls make_recipe_dependencies_also_recipes
 
-    assert g.is_recipe("d")
-    assert not g.is_recipe("c")
+    assert g.get_is_recipe("d")
+    assert not g.get_is_recipe("c")

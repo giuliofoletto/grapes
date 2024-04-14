@@ -27,7 +27,7 @@ def get_path_to_standard(graph, node):
     Get the path from the last valued nodes to a standard node.
     """
     result = set((node,))
-    if graph.has_value(node):
+    if graph.get_has_value(node):
         return result
     dependencies = graph._nxdg.predecessors(node)
     for dependency in dependencies:
@@ -40,11 +40,11 @@ def get_path_to_conditional(graph, conditional):
     Get the path from the last valued nodes to a conditional node.
     """
     result = set((conditional,))
-    if graph.has_value(conditional):
+    if graph.get_has_value(conditional):
         return result
     # If not, evaluate the conditions until one is found true
     for index, condition in enumerate(graph.get_conditions(conditional)):
-        if graph.has_value(condition) and graph.get_value(condition):
+        if graph.get_has_value(condition) and graph.get_value(condition):
             # A condition is true
             possibility = graph.get_possibilities(conditional)[index]
             result = result | get_path_to_standard(graph, condition)

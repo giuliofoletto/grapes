@@ -107,7 +107,7 @@ def convert_conditional_to_trivial_step(
         execute_towards_all_conditions_of_conditional(graph, conditional)
 
     for index, condition in enumerate(graph.get_conditions(conditional)):
-        if graph.has_value(condition) and graph.get_value(condition):
+        if graph.get_has_value(condition) and graph.get_value(condition):
             break
     else:  # Happens if loop is never broken, i.e. when no conditions are true
         if (

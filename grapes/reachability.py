@@ -16,7 +16,7 @@ def clear_reachabilities(graph, *args):
         nodes_to_clear = args & graph.nodes  # Intersection
 
     for node in nodes_to_clear:
-        if graph.is_frozen(node):
+        if graph.get_is_frozen(node):
             continue
         graph.unset_reachability(node)
 
@@ -42,10 +42,10 @@ def find_reachability_standard(graph, node):
     Find the reachability of a standard node.
     """
     # Check if it already has a reachability
-    if graph.has_reachability(node):
+    if graph.get_has_reachability(node):
         return
     # Check if it already has a value
-    if graph.has_value(node):
+    if graph.get_has_value(node):
         graph.set_reachability(node, "reachable")
         return
     # If not, check the missing dependencies of all arguments
@@ -65,16 +65,16 @@ def find_reachability_conditional(graph, conditional):
     Find the reachability of a conditional.
     """
     # Check if it already has a reachability
-    if graph.has_reachability(conditional):
+    if graph.get_has_reachability(conditional):
         return
     # Check if it already has a value
-    if graph.has_value(conditional):
+    if graph.get_has_value(conditional):
         graph.get_value(conditional)
         graph.set_reachability(conditional, "reachable")
         return
     # If not, evaluate the conditions until one is found true
     for index, condition in enumerate(graph.get_conditions(conditional)):
-        if graph.has_value(condition) and graph.get_value(condition):
+        if graph.get_has_value(condition) and graph.get_value(condition):
             # A condition is true
             possibility = graph.get_possibilities(conditional)[index]
             find_reachability_target(graph, possibility)

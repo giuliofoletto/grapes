@@ -318,7 +318,7 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
         for node in graph.nodes:
             if (
                 graph.get_topological_generation_index(node) == 0
-                and graph.has_reachability(node)
+                and graph.get_has_reachability(node)
                 and graph.get_reachability(node) != "reachable"
             ):
                 missing_dependencies.add(node)

@@ -22,8 +22,8 @@ def check_compatibility_nodes(first_graph, first_node, second_graph, second_node
         return True
     # If they both have values but they differ, return False. If only one has a value, proceed
     if (
-        first_graph.has_value(first_node)
-        and second_graph.has_value(second_node)
+        first_graph.get_has_value(first_node)
+        and second_graph.get_has_value(second_node)
         and first_graph.get_value(first_node) != second_graph.get_value(second_node)
     ):
         # Plot twist! Both are functions and have the same code: proceed

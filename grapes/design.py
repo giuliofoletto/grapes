@@ -136,9 +136,9 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
         raise ValueError("Cannot edit non-existent node " + name)
 
     # Store old attributes
-    was_recipe = graph.is_recipe(name)
-    was_frozen = graph.is_frozen(name)
-    had_value = graph.has_value(name)
+    was_recipe = graph.get_is_recipe(name)
+    was_frozen = graph.get_is_frozen(name)
+    had_value = graph.get_has_value(name)
     if had_value:
         old_value = graph.get_value(name)
 
@@ -176,7 +176,7 @@ def clear_values(graph, *args):
         nodes_to_clear = args & graph.nodes  # Intersection
 
     for node in nodes_to_clear:
-        if graph.is_frozen(node):
+        if graph.get_is_frozen(node):
             continue
         graph.unset_value(node)
 
@@ -222,11 +222,11 @@ def get_internal_context(graph, exclude_recipes=False):
         return {
             key: graph.get_value(key)
             for key in graph.nodes
-            if (graph.has_value(key) and not graph.is_recipe(key))
+            if (graph.get_has_value(key) and not graph.get_is_recipe(key))
         }
     else:
         return {
-            key: graph.get_value(key) for key in graph.nodes if graph.has_value(key)
+            key: graph.get_value(key) for key in graph.nodes if graph.get_has_value(key)
         }
 
 
@@ -291,7 +291,7 @@ def freeze(graph, *args):
         nodes_to_freeze = args & graph.nodes  # Intersection
 
     for key in nodes_to_freeze:
-        if graph.has_value(key):
+        if graph.get_has_value(key):
             graph.set_is_frozen(key, True)
 
 
@@ -311,12 +311,12 @@ def make_recipe_dependencies_also_recipes(graph):
     """
     # Work in reverse topological order, to get successors before predecessors
     for node in reversed(get_topological_order(graph)):
-        if graph.is_recipe(node):
+        if graph.get_is_recipe(node):
             for parent in graph._nxdg.predecessors(node):
-                if not graph.is_recipe(parent):
+                if not graph.get_is_recipe(parent):
                     all_children_are_recipes = True
                     for child in graph._nxdg.successors(parent):
-                        if not graph.is_recipe(child):
+                        if not graph.get_is_recipe(child):
                             all_children_are_recipes = False
                             break
                     if all_children_are_recipes:
@@ -361,7 +361,7 @@ def update_topological_generation_indexes(graph):
 def get_all_sources(graph, exclude_recipes=False):
     sources = set()
     for node in graph.nodes:
-        if exclude_recipes and graph.is_recipe(node):
+        if exclude_recipes and graph.get_is_recipe(node):
             continue
         if graph._nxdg.in_degree(node) == 0:
             sources.add(node)
@@ -371,7 +371,7 @@ def get_all_sources(graph, exclude_recipes=False):
 def get_all_sinks(graph, exclude_recipes=False):
     sinks = set()
     for node in graph.nodes:
-        if exclude_recipes and graph.is_recipe(node):
+        if exclude_recipes and graph.get_is_recipe(node):
             continue
         if graph._nxdg.out_degree(node) == 0:
             sinks.add(node)

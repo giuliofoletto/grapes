@@ -73,7 +73,7 @@ class Graph:
         self.nodes[node][attribute] = value
 
     # Get/Set
-    def is_recipe(self, node):
+    def get_is_recipe(self, node):
         return self.get_node_attribute(node, "is_recipe")
 
     # Get/Set
@@ -193,7 +193,7 @@ class Graph:
         self.nodes[node]["has_reachability"] = False
 
     # Get/Set
-    def is_frozen(self, node):
+    def get_is_frozen(self, node):
         return self.get_node_attribute(node, "is_frozen")
 
     # Get/Set
@@ -201,7 +201,7 @@ class Graph:
         return self.set_node_attribute(node, "is_frozen", is_frozen)
 
     # Get/Set
-    def has_value(self, node):
+    def get_has_value(self, node):
         return self.get_node_attribute(node, "has_value")
 
     # Get/Set
@@ -209,7 +209,7 @@ class Graph:
         return self.set_node_attribute(node, "has_value", has_value)
 
     # Get/Set
-    def has_reachability(self, node):
+    def get_has_reachability(self, node):
         return self.get_node_attribute(node, "has_reachability")
 
     # Get/Set

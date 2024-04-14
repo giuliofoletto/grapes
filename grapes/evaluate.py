@@ -29,7 +29,7 @@ def evaluate_standard(graph, node, continue_on_fail=False):
     Evaluate of a node.
     """
     # Check if it already has a value
-    if graph.has_value(node):
+    if graph.get_has_value(node):
         graph.get_value(node)
         return
     # If not, evaluate all arguments
@@ -63,21 +63,21 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
     Evaluate a conditional.
     """
     # Check if it already has a value
-    if graph.has_value(conditional):
+    if graph.get_has_value(conditional):
         graph.get_value(conditional)
         return
     # If not, check if one of the conditions already has a true value
     for index, condition in enumerate(graph.get_conditions(conditional)):
-        if graph.has_value(condition) and graph.get_value(condition):
+        if graph.get_has_value(condition) and graph.get_value(condition):
             break
     else:
         # Happens only if loop is never broken
         # In this case, evaluate the conditions until one is found true
         for index, condition in enumerate(graph.get_conditions(conditional)):
             evaluate_target(graph, condition, continue_on_fail)
-            if graph.has_value(condition) and graph.get_value(condition):
+            if graph.get_has_value(condition) and graph.get_value(condition):
                 break
-            elif not graph.has_value(condition):
+            elif not graph.get_has_value(condition):
                 # Computing failed
                 if continue_on_fail:
                     # Do nothing, we want to keep going
@@ -124,7 +124,7 @@ def execute_towards_conditions(graph, *conditions):
     """
     for condition in conditions:
         evaluate_target(graph, condition, True)
-        if graph.has_value(condition) and graph[condition]:
+        if graph.get_has_value(condition) and graph[condition]:
             break
 
 
