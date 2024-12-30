@@ -5,7 +5,8 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
-from .core import (
+from .context import get_kwargs_values, get_list_of_values
+from .features import (
     get_args,
     get_conditions,
     get_has_value,
@@ -16,7 +17,6 @@ from .core import (
     get_value,
     set_value,
 )
-from .design import get_kwargs_values, get_list_of_values
 
 
 def evaluate_target(graph, target, continue_on_fail=False):

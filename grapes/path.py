@@ -5,7 +5,13 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
-from .core import get_conditions, get_has_value, get_possibilities, get_type, get_value
+from .features import (
+    get_conditions,
+    get_has_value,
+    get_possibilities,
+    get_type,
+    get_value,
+)
 
 
 def get_path_to_target(graph, target):

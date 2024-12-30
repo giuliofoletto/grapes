@@ -16,19 +16,23 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
-from .core import get_args, get_kwargs, get_recipe
-from .design import (
+from .context import (
     clear_values,
-    freeze,
-    get_all_sinks,
     get_internal_context,
     get_list_of_values,
-    get_topological_generation_index,
     set_internal_context,
-    unfreeze,
     update_internal_context,
 )
 from .evaluate import execute_to_targets, progress_towards_targets
+from .features import (
+    freeze,
+    get_all_sinks,
+    get_args,
+    get_kwargs,
+    get_recipe,
+    get_topological_generation_index,
+    unfreeze,
+)
 from .merge import get_subgraph
 from .path import get_path_to_target
 from .reachability import (

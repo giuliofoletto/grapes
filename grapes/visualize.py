@@ -8,7 +8,7 @@ License: See project-level license file.
 import matplotlib
 import networkx as nx
 
-from .design import (
+from .features import (
     get_all_sinks,
     get_all_sources,
     get_topological_generation_index,

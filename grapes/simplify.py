@@ -8,7 +8,11 @@ License: See project-level license file.
 import networkx as nx
 
 from . import function_composer
-from .core import (
+from .design import starting_node_properties
+from .evaluate import execute_towards_all_conditions_of_conditional
+from .features import (
+    get_all_conditionals,
+    get_all_sources,
     get_args,
     get_conditions,
     get_has_value,
@@ -22,10 +26,7 @@ from .core import (
     set_kwargs,
     set_recipe,
     set_value,
-    starting_node_properties,
 )
-from .design import get_all_conditionals, get_all_sources
-from .evaluate import execute_towards_all_conditions_of_conditional
 
 
 def simplify_dependency(graph, node_name, dependency_name):

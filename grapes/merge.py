@@ -10,7 +10,8 @@ import inspect
 
 import networkx as nx
 
-from .core import Graph, get_has_value, get_type, get_value
+from .core import Graph
+from .features import get_has_value, get_type, get_value
 
 
 def check_compatibility_nodes(first_graph, first_node, second_graph, second_node):

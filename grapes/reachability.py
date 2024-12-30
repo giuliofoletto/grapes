@@ -5,16 +5,16 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
-from .core import (
+from .features import (
     get_conditions,
     get_has_value,
+    get_is_frozen,
     get_node_attribute,
     get_possibilities,
     get_type,
     get_value,
     set_node_attribute,
 )
-from .design import get_is_frozen
 
 
 def get_has_reachability(graph, node):
