@@ -46,8 +46,8 @@ def test_execute_to_targets_with_conditional():
 
     assert g["c1"] == False
     assert g["c2"] == True
-    assert not g.get_has_value(
-        "c3"
+    assert not gr.get_has_value(
+        g, "c3"
     )  # c3 is not computed because c2 is found to be True
     assert g["conditional"] == g["v2"]
 
@@ -106,8 +106,8 @@ def test_execute_towards_conditions():
 
     gr.execute_towards_conditions(g, "c1", "c2", "c3")
 
-    assert not g.get_has_value("c1")
-    assert not g.get_has_value("c3")
+    assert not gr.get_has_value(g, "c1")
+    assert not gr.get_has_value(g, "c3")
     assert g["c2"] == True
 
 
@@ -127,6 +127,6 @@ def test_execute_towards_all_conditions_of_conditional():
 
     gr.execute_towards_all_conditions_of_conditional(g, "conditional")
 
-    assert not g.get_has_value("c1")
-    assert not g.get_has_value("c3")
+    assert not gr.get_has_value(g, "c1")
+    assert not gr.get_has_value(g, "c3")
     assert g["c2"] == True

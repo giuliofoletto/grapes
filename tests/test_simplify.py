@@ -70,7 +70,7 @@ def test_convert_conditional_to_trivial_step():
     gr.finalize_definition(g)
 
     gr.convert_conditional_to_trivial_step(g, "conditional")
-    assert g.get_type("conditional") == "standard"
+    assert gr.get_type(g, "conditional") == "standard"
 
     gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["v2"]
@@ -95,7 +95,7 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
     gr.convert_conditional_to_trivial_step(
         g, "conditional", execute_towards_conditions=True
     )
-    assert g.get_type("conditional") == "standard"
+    assert gr.get_type(g, "conditional") == "standard"
 
     gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["v2"]
@@ -118,7 +118,7 @@ def test_convert_conditional_to_trivial_step_with_default():
     gr.convert_conditional_to_trivial_step(
         g, "conditional", execute_towards_conditions=True
     )
-    assert g.get_type("conditional") == "standard"
+    assert gr.get_type(g, "conditional") == "standard"
 
     gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["default"]
@@ -161,8 +161,8 @@ def test_convert_all_conditionals_to_trivial_steps():
     gr.finalize_definition(g)
 
     gr.convert_all_conditionals_to_trivial_steps(g)
-    assert g.get_type("conditional1") == "standard"
-    assert g.get_type("conditional2") == "standard"
+    assert gr.get_type(g, "conditional1") == "standard"
+    assert gr.get_type(g, "conditional2") == "standard"
 
     gr.execute_to_targets(g, "conditional1", "conditional2")
     assert g["conditional1"] == g["vt"]
@@ -191,7 +191,7 @@ def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
     gr.finalize_definition(g)
 
     gr.convert_all_conditionals_to_trivial_steps(g, execute_towards_conditions=True)
-    assert g.get_type("conditional") == "standard"
+    assert gr.get_type(g, "conditional") == "standard"
 
     gr.execute_to_targets(g, "conditional")
     assert g["conditional"] == g["v1"]

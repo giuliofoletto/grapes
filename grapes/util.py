@@ -16,6 +16,14 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
+from .core import (
+    get_args,
+    get_has_reachability,
+    get_kwargs,
+    get_reachability,
+    get_recipe,
+    get_topological_generation_index,
+)
 from .design import (
     clear_values,
     freeze,
@@ -282,12 +290,12 @@ def lambdify_graph(graph, input_keys, target, constants={}):
     initial_keys = set(input_keys) | set(constants.keys())
     # Simplify until the graph is a single function
     while not set(
-        operational_graph.get_args(target)
-        + tuple(operational_graph.get_kwargs(target).values())
+        get_args(operational_graph, target)
+        + tuple(get_kwargs(operational_graph, target).values())
     ).issubset(initial_keys):
         simplify_all_dependencies(operational_graph, target, exclude=initial_keys)
     # Get the function representing the graph
-    function = operational_graph[operational_graph.get_recipe(target)]
+    function = operational_graph[get_recipe(operational_graph, target)]
     # If needed, get a function only of the input keys
     if len(constants) > 0:
 
@@ -317,9 +325,9 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
     if feasibility in {"unreachable", "uncertain"}:
         for node in graph.nodes:
             if (
-                graph.get_topological_generation_index(node) == 0
-                and graph.get_has_reachability(node)
-                and graph.get_reachability(node) != "reachable"
+                get_topological_generation_index(graph, node) == 0
+                and get_has_reachability(graph, node)
+                and get_reachability(graph, node) != "reachable"
             ):
                 missing_dependencies.add(node)
     return feasibility, missing_dependencies

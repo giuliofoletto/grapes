@@ -5,19 +5,21 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+from .core import get_conditions, get_has_value, get_possibilities, get_type, get_value
+
 
 def get_path_to_target(graph, target):
     """
     Generic interface to get the path from the last valued nodes to a target.
     """
-    if graph.get_type(target) == "standard":
+    if get_type(graph, target) == "standard":
         return get_path_to_standard(graph, target)
-    elif graph.get_type(target) == "conditional":
+    elif get_type(graph, target) == "conditional":
         return get_path_to_conditional(graph, target)
     else:
         raise ValueError(
             "Getting the ancestors of nodes of type "
-            + graph.get_type(target)
+            + get_type(graph, target)
             + " is not supported"
         )
 
@@ -27,7 +29,7 @@ def get_path_to_standard(graph, node):
     Get the path from the last valued nodes to a standard node.
     """
     result = set((node,))
-    if graph.get_has_value(node):
+    if get_has_value(graph, node):
         return result
     dependencies = graph._nxdg.predecessors(node)
     for dependency in dependencies:
@@ -40,13 +42,13 @@ def get_path_to_conditional(graph, conditional):
     Get the path from the last valued nodes to a conditional node.
     """
     result = set((conditional,))
-    if graph.get_has_value(conditional):
+    if get_has_value(graph, conditional):
         return result
     # If not, evaluate the conditions until one is found true
-    for index, condition in enumerate(graph.get_conditions(conditional)):
-        if graph.get_has_value(condition) and graph.get_value(condition):
+    for index, condition in enumerate(get_conditions(graph, conditional)):
+        if get_has_value(graph, condition) and get_value(graph, condition):
             # A condition is true
-            possibility = graph.get_possibilities(conditional)[index]
+            possibility = get_possibilities(graph, conditional)[index]
             result = result | get_path_to_standard(graph, condition)
             result = result | get_path_to_standard(graph, possibility)
             return result

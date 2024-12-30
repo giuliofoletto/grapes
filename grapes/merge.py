@@ -10,28 +10,28 @@ import inspect
 
 import networkx as nx
 
-from .core import Graph
+from .core import Graph, get_has_value, get_type, get_value
 
 
 def check_compatibility_nodes(first_graph, first_node, second_graph, second_node):
     # If types differ, return False
-    if first_graph.get_type(first_node) != second_graph.get_type(second_node):
+    if get_type(first_graph, first_node) != get_type(second_graph, second_node):
         return False
     # If nodes are equal, return True
     if first_graph.nodes[first_node] == second_graph._nxdg.nodes[second_node]:
         return True
     # If they both have values but they differ, return False. If only one has a value, proceed
     if (
-        first_graph.get_has_value(first_node)
-        and second_graph.get_has_value(second_node)
-        and first_graph.get_value(first_node) != second_graph.get_value(second_node)
+        get_has_value(first_graph, first_node)
+        and get_has_value(second_graph, second_node)
+        and get_value(first_graph, first_node) != get_value(second_graph, second_node)
     ):
         # Plot twist! Both are functions and have the same code: proceed
         if (
-            inspect.isfunction(first_graph.get_value(first_node))
-            and inspect.isfunction(second_graph.get_value(second_node))
-            and first_graph.get_value(first_node).__code__.co_code
-            == second_graph.get_value(second_node).__code__.co_code
+            inspect.isfunction(get_value(first_graph, first_node))
+            and inspect.isfunction(get_value(second_graph, second_node))
+            and get_value(first_graph, first_node).__code__.co_code
+            == get_value(second_graph, second_node).__code__.co_code
         ):
             pass
         else:

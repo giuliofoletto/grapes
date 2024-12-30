@@ -1,4 +1,25 @@
-from .core import Graph
+from .core import (
+    Graph,
+    get_args,
+    get_conditions,
+    get_has_reachability,
+    get_has_value,
+    get_is_frozen,
+    get_is_recipe,
+    get_kwargs,
+    get_node_attribute,
+    get_possibilities,
+    get_reachability,
+    get_recipe,
+    get_topological_generation_index,
+    get_type,
+    get_value,
+    set_has_reachability,
+    set_is_frozen,
+    set_reachability,
+    set_topological_generation_index,
+    unset_reachability,
+)
 from .design import (
     add_multiple_conditional,
     add_simple_conditional,

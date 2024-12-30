@@ -18,12 +18,12 @@ def test_reachability_simple():
     gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "b")
-    assert g.get_reachability("b") == "unreachable"
+    assert gr.get_reachability(g, "b") == "unreachable"
     gr.clear_reachabilities(g)
 
     gr.update_internal_context(g, {"a": 1})
     gr.find_reachability_targets(g, "b")
-    assert g.get_reachability("b") == "reachable"
+    assert gr.get_reachability(g, "b") == "reachable"
 
 
 # Design, context, reachability
@@ -34,12 +34,12 @@ def test_reachability_long_graph():
     gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "b")
-    assert g.get_reachability("b") == "unreachable"
+    assert gr.get_reachability(g, "b") == "unreachable"
     gr.clear_reachabilities(g)
 
     gr.update_internal_context(g, {"a": 1})
     gr.find_reachability_targets(g, "b")
-    assert g.get_reachability("b") == "reachable"
+    assert gr.get_reachability(g, "b") == "reachable"
 
 
 # Design, context, reachability
@@ -50,12 +50,12 @@ def test_reachability_conditional_with_true_value():
     gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "unreachable"
+    assert gr.get_reachability(g, "name") == "unreachable"
     gr.clear_reachabilities(g)
 
     gr.update_internal_context(g, {"value_true": 1})
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "reachable"
+    assert gr.get_reachability(g, "name") == "reachable"
 
 
 # Design, context, reachability
@@ -66,12 +66,12 @@ def test_reachability_multiple_conditional_with_true_value():
     gr.finalize_definition(g)
 
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "unreachable"
+    assert gr.get_reachability(g, "name") == "unreachable"
     gr.clear_reachabilities(g)
 
     gr.update_internal_context(g, {"a": 1})
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "reachable"
+    assert gr.get_reachability(g, "name") == "reachable"
 
 
 # Design, context, reachability
@@ -83,25 +83,25 @@ def test_conditional_no_conditions_defined():
 
     # Here, condition and possibilities are unreachable
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "unreachable"
+    assert gr.get_reachability(g, "name") == "unreachable"
     gr.clear_reachabilities(g)
 
     # Here, condition is undefined but reachable, but all values are unreachable
     g["pre_req"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "unreachable"
+    assert gr.get_reachability(g, "name") == "unreachable"
     gr.clear_reachabilities(g)
 
     # Now one of the possibilities is already available, therefore the conditional might be, depending on condition
     g["value_true"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "uncertain"
+    assert gr.get_reachability(g, "name") == "uncertain"
     gr.clear_reachabilities(g)
 
     # Now all of the possibilities are already available, therefore the conditional is certainly reachable
     g["value_false"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "reachable"
+    assert gr.get_reachability(g, "name") == "reachable"
 
 
 # Design, context, reachability
@@ -114,29 +114,29 @@ def test_multiple_conditional_no_conditions_defined():
 
     # Here, condition and possibilities are unreachable
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "unreachable"
+    assert gr.get_reachability(g, "name") == "unreachable"
     gr.clear_reachabilities(g)
 
     # Here, ca is undefined but reachable, but all values are unreachable
     g["pa"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "unreachable"
+    assert gr.get_reachability(g, "name") == "unreachable"
     gr.clear_reachabilities(g)
 
     # Now one of the possibilities is already available, therefore the conditional might be, depending on condition
     g["va"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "uncertain"
+    assert gr.get_reachability(g, "name") == "uncertain"
     gr.clear_reachabilities(g)
 
     # Now all of the possibilities are reachable, but the conditional is still uncertain because we do not know which condition is True
     g["pb"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "uncertain"
+    assert gr.get_reachability(g, "name") == "uncertain"
     gr.clear_reachabilities(g)
 
     # Now all of the possibilities are already available, therefore the conditional is certainly reachable
     g["vb"] = 1
     g["vc"] = 1
     gr.find_reachability_targets(g, "name")
-    assert g.get_reachability("name") == "reachable"
+    assert gr.get_reachability(g, "name") == "reachable"

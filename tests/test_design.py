@@ -28,13 +28,13 @@ def test_add_step():
     for n in {"a", "b", "c", "d", "e", "f", "g", "op_e", "op_f", "op_g"}:
         assert n in g.nodes
     for n in {"op_e", "op_f", "op_g"}:
-        assert g.get_is_recipe(n)
-    assert g.get_args("e") == ("a", "b")
-    assert g.get_args("f") == ("c", "d")
-    assert g.get_args("g") == ("e", "f")
-    assert g.get_recipe("e") == "op_e"
-    assert g.get_recipe("f") == "op_f"
-    assert g.get_recipe("g") == "op_g"
+        assert gr.get_is_recipe(g, n)
+    assert gr.get_args(g, "e") == ("a", "b")
+    assert gr.get_args(g, "f") == ("c", "d")
+    assert gr.get_args(g, "g") == ("e", "f")
+    assert gr.get_recipe(g, "e") == "op_e"
+    assert gr.get_recipe(g, "f") == "op_f"
+    assert gr.get_recipe(g, "g") == "op_g"
 
 
 # Design
@@ -48,13 +48,13 @@ def test_add_step_disordered():
     for n in {"a", "b", "c", "d", "e", "f", "g", "op_e", "op_f", "op_g"}:
         assert n in g.nodes
     for n in {"op_e", "op_f", "op_g"}:
-        assert g.get_is_recipe(n)
-    assert g.get_args("e") == ("a", "b")
-    assert g.get_args("f") == ("c", "d")
-    assert g.get_args("g") == ("e", "f")
-    assert g.get_recipe("e") == "op_e"
-    assert g.get_recipe("f") == "op_f"
-    assert g.get_recipe("g") == "op_g"
+        assert gr.get_is_recipe(g, n)
+    assert gr.get_args(g, "e") == ("a", "b")
+    assert gr.get_args(g, "f") == ("c", "d")
+    assert gr.get_args(g, "g") == ("e", "f")
+    assert gr.get_recipe(g, "e") == "op_e"
+    assert gr.get_recipe(g, "f") == "op_f"
+    assert gr.get_recipe(g, "g") == "op_g"
 
 
 # Design
@@ -69,11 +69,11 @@ def test_add_step_inverted():
     for n in {"a", "b", "c", "op_b", "op_c"}:
         assert n in g.nodes
     for n in {"op_b", "op_c"}:
-        assert g.get_is_recipe(n)
-    assert g.get_args("c") == ("b",)
-    assert g.get_args("b") == ("a",)
-    assert g.get_recipe("c") == "op_c"
-    assert g.get_recipe("b") == "op_b"
+        assert gr.get_is_recipe(g, n)
+    assert gr.get_args(g, "c") == ("b",)
+    assert gr.get_args(g, "b") == ("a",)
+    assert gr.get_recipe(g, "c") == "op_c"
+    assert gr.get_recipe(g, "b") == "op_b"
 
 
 # Design
@@ -96,14 +96,14 @@ def test_add_step_quick():
 
     for n in {"c", "d", "e", "f"}:
         assert n in g.nodes
-    assert g.get_args("c") == ("a", "b")
-    assert g.get_recipe("c") == "example_function_only_positional"
-    assert g.get_args("d") == (
+    assert gr.get_args(g, "c") == ("a", "b")
+    assert gr.get_recipe(g, "c") == "example_function_only_positional"
+    assert gr.get_args(g, "d") == (
         "a",
         "b",
     )
-    assert g.get_kwargs("d") == {"c": "c"}
-    assert g.get_args("e") == ()
+    assert gr.get_kwargs(g, "d") == {"c": "c"}
+    assert gr.get_args(g, "e") == ()
 
     def example_function_with_varargs(*args):
         return 1
@@ -122,9 +122,9 @@ def test_add_simple_conditional():
 
     for n in {"a", "b", "c", "d"}:
         assert n in g.nodes
-    assert g.get_type("d") == "conditional"
-    assert g.get_conditions("d") == ["c"]
-    assert g.get_possibilities("d") == ["a", "b"]
+    assert gr.get_type(g, "d") == "conditional"
+    assert gr.get_conditions(g, "d") == ["c"]
+    assert gr.get_possibilities(g, "d") == ["a", "b"]
 
 
 # Design
@@ -148,9 +148,13 @@ def test_add_multiple_conditional():
         "node_3",
     }:
         assert n in g.nodes
-    assert g.get_type("result") == "conditional"
-    assert g.get_conditions("result") == ["condition_1", "condition_2", "condition_3"]
-    assert g.get_possibilities("result") == ["node_1", "node_2", "node_3"]
+    assert gr.get_type(g, "result") == "conditional"
+    assert gr.get_conditions(g, "result") == [
+        "condition_1",
+        "condition_2",
+        "condition_3",
+    ]
+    assert gr.get_possibilities(g, "result") == ["node_1", "node_2", "node_3"]
 
 
 # Design
@@ -162,15 +166,15 @@ def test_edit_step():
 
     for n in {"a", "b", "c", "op_b", "op_c"}:
         assert n in g.nodes
-    assert g.get_args("c") == ("b",)
-    assert g.get_recipe("c") == "op_c"
-    assert g.get_args("b") == ("a",)
-    assert g.get_recipe("b") == "op_b"
+    assert gr.get_args(g, "c") == ("b",)
+    assert gr.get_recipe(g, "c") == "op_c"
+    assert gr.get_args(g, "b") == ("a",)
+    assert gr.get_recipe(g, "b") == "op_b"
 
     gr.edit_step(g, "b", "new_op_b", "a", "d")
 
-    assert g.get_args("b") == ("a", "d")
-    assert g.get_recipe("b") == "new_op_b"
+    assert gr.get_args(g, "b") == ("a", "d")
+    assert gr.get_recipe(g, "b") == "new_op_b"
 
 
 # Design
@@ -241,14 +245,14 @@ def test_clear_values():
     gr.finalize_definition(g)
 
     gr.update_internal_context(g, {"a": 5})
-    assert g.get_has_value("a")
+    assert gr.get_has_value(g, "a")
     assert g["a"] == 5
 
     gr.clear_values(g)
 
-    assert not g.get_has_value("a")
-    assert g.get_has_value("op_b")  # Frozen
-    assert g.get_has_value("op_c")
+    assert not gr.get_has_value(g, "a")
+    assert gr.get_has_value(g, "op_b")  # Frozen
+    assert gr.get_has_value(g, "op_c")
 
 
 def test_get_list_of_values():
@@ -292,12 +296,12 @@ def test_freeze():
     gr.set_internal_context(g, operations)
     gr.finalize_definition(g)
 
-    assert g.get_is_frozen("op_b")
-    assert g.get_is_frozen("op_c")
+    assert gr.get_is_frozen(g, "op_b")
+    assert gr.get_is_frozen(g, "op_c")
     gr.update_internal_context(g, {"a": 5})
-    assert not g.get_is_frozen("a")
+    assert not gr.get_is_frozen(g, "a")
     gr.freeze(g, "a")
-    assert g.get_is_frozen("a")
+    assert gr.get_is_frozen(g, "a")
 
 
 def test_unfreeze():
@@ -310,9 +314,9 @@ def test_unfreeze():
 
     gr.update_internal_context(g, {"a": 5})
     gr.freeze(g, "a")
-    assert g.get_is_frozen("a")
+    assert gr.get_is_frozen(g, "a")
     gr.unfreeze(g, "a")
-    assert not g.get_is_frozen("a")
+    assert not gr.get_is_frozen(g, "a")
 
 
 def test_make_recipe_dependencies_also_recipes():
@@ -322,8 +326,8 @@ def test_make_recipe_dependencies_also_recipes():
     gr.add_step(g, "b", "op_b", "c")
     gr.make_recipe_dependencies_also_recipes(g)
 
-    assert g.get_is_recipe("pre_op_a")
-    assert not g.get_is_recipe("c")
+    assert gr.get_is_recipe(g, "pre_op_a")
+    assert not gr.get_is_recipe(g, "c")
 
 
 def test_finalize_definition():
@@ -335,19 +339,19 @@ def test_finalize_definition():
     gr.set_internal_context(g, operations)
     gr.finalize_definition(g)
 
-    assert g.get_is_frozen("op_b") and g.get_is_frozen("op_c")
+    assert gr.get_is_frozen(g, "op_b") and gr.get_is_frozen(g, "op_c")
     assert (
-        g.get_is_recipe("op_b")
-        and g.get_is_recipe("op_c")
-        and g.get_is_recipe("build_op_b")
+        gr.get_is_recipe(g, "op_b")
+        and gr.get_is_recipe(g, "op_c")
+        and gr.get_is_recipe(g, "build_op_b")
     )
-    assert g.get_node_attribute("pre_op_b", "topological_generation_index") == 0
-    assert g.get_node_attribute("build_op_b", "topological_generation_index") == 0
-    assert g.get_node_attribute("op_b", "topological_generation_index") == 1
-    assert g.get_node_attribute("b", "topological_generation_index") == 2
-    assert g.get_node_attribute("c", "topological_generation_index") == 3
-    assert g.get_node_attribute("a", "topological_generation_index") == 0
-    assert g.get_node_attribute("op_c", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "pre_op_b", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "build_op_b", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "op_b", "topological_generation_index") == 1
+    assert gr.get_node_attribute(g, "b", "topological_generation_index") == 2
+    assert gr.get_node_attribute(g, "c", "topological_generation_index") == 3
+    assert gr.get_node_attribute(g, "a", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "op_c", "topological_generation_index") == 0
 
 
 # Design
@@ -357,12 +361,12 @@ def test_topological_generations():
     gr.add_step(g, "b", "fb", "a")
     gr.finalize_definition(g)
 
-    assert g.get_node_attribute("a", "topological_generation_index") == 0
-    assert g.get_node_attribute("b", "topological_generation_index") == 1
-    assert g.get_node_attribute("c", "topological_generation_index") == 0
-    assert g.get_node_attribute("d", "topological_generation_index") == 2
-    assert g.get_node_attribute("fb", "topological_generation_index") == 0
-    assert g.get_node_attribute("fd", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "a", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "b", "topological_generation_index") == 1
+    assert gr.get_node_attribute(g, "c", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "d", "topological_generation_index") == 2
+    assert gr.get_node_attribute(g, "fb", "topological_generation_index") == 0
+    assert gr.get_node_attribute(g, "fd", "topological_generation_index") == 0
 
 
 # Design, features
@@ -442,5 +446,5 @@ def test_make_recipe_dependencies_also_recipes():
     gr.add_step(g, "b", "op_b", "c")  # c will no longer be converted to recipe
     gr.finalize_definition(g)  # calls make_recipe_dependencies_also_recipes
 
-    assert g.get_is_recipe("d")
-    assert not g.get_is_recipe("c")
+    assert gr.get_is_recipe(g, "d")
+    assert not gr.get_is_recipe(g, "c")

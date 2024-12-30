@@ -5,6 +5,17 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+from .core import (
+    get_args,
+    get_conditions,
+    get_has_value,
+    get_kwargs,
+    get_possibilities,
+    get_recipe,
+    get_type,
+    get_value,
+    set_value,
+)
 from .design import get_kwargs_values, get_list_of_values
 
 
@@ -12,14 +23,14 @@ def evaluate_target(graph, target, continue_on_fail=False):
     """
     Generic interface to evaluate a GenericNode.
     """
-    if graph.get_type(target) == "standard":
+    if get_type(graph, target) == "standard":
         return evaluate_standard(graph, target, continue_on_fail)
-    elif graph.get_type(target) == "conditional":
+    elif get_type(graph, target) == "conditional":
         return evaluate_conditional(graph, target, continue_on_fail)
     else:
         raise ValueError(
             "Evaluation of nodes of type "
-            + graph.get_type(target)
+            + get_type(graph, target)
             + " is not supported"
         )
 
@@ -29,8 +40,8 @@ def evaluate_standard(graph, node, continue_on_fail=False):
     Evaluate of a node.
     """
     # Check if it already has a value
-    if graph.get_has_value(node):
-        graph.get_value(node)
+    if get_has_value(graph, node):
+        get_value(graph, node)
         return
     # If not, evaluate all arguments
     for dependency_name in graph._nxdg.predecessors(node):
@@ -38,11 +49,11 @@ def evaluate_standard(graph, node, continue_on_fail=False):
 
     # Actual computation happens here
     try:
-        recipe = graph.get_recipe(node)
-        func = graph.get_value(recipe)
+        recipe = get_recipe(graph, node)
+        func = get_value(graph, recipe)
         res = func(
-            *get_list_of_values(graph, graph.get_args(node)),
-            **get_kwargs_values(graph, graph.get_kwargs(node))
+            *get_list_of_values(graph, get_args(graph, node)),
+            **get_kwargs_values(graph, get_kwargs(graph, node))
         )
     except Exception as e:
         if continue_on_fail:
@@ -55,7 +66,7 @@ def evaluate_standard(graph, node, continue_on_fail=False):
                 ]
             raise
     # Save results
-    graph.set_value(node, res)
+    set_value(graph, node, res)
 
 
 def evaluate_conditional(graph, conditional, continue_on_fail=False):
@@ -63,21 +74,21 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
     Evaluate a conditional.
     """
     # Check if it already has a value
-    if graph.get_has_value(conditional):
-        graph.get_value(conditional)
+    if get_has_value(graph, conditional):
+        get_value(graph, conditional)
         return
     # If not, check if one of the conditions already has a true value
-    for index, condition in enumerate(graph.get_conditions(conditional)):
-        if graph.get_has_value(condition) and graph.get_value(condition):
+    for index, condition in enumerate(get_conditions(graph, conditional)):
+        if get_has_value(graph, condition) and get_value(graph, condition):
             break
     else:
         # Happens only if loop is never broken
         # In this case, evaluate the conditions until one is found true
-        for index, condition in enumerate(graph.get_conditions(conditional)):
+        for index, condition in enumerate(get_conditions(graph, conditional)):
             evaluate_target(graph, condition, continue_on_fail)
-            if graph.get_has_value(condition) and graph.get_value(condition):
+            if get_has_value(graph, condition) and get_value(graph, condition):
                 break
-            elif not graph.get_has_value(condition):
+            elif not get_has_value(graph, condition):
                 # Computing failed
                 if continue_on_fail:
                     # Do nothing, we want to keep going
@@ -89,9 +100,9 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
 
     # Actual computation happens here
     try:
-        possibility = graph.get_possibilities(conditional)[index]
+        possibility = get_possibilities(graph, conditional)[index]
         evaluate_target(graph, possibility, continue_on_fail)
-        res = graph.get_value(possibility)
+        res = get_value(graph, possibility)
     except:
         if continue_on_fail:
             # Do nothing, we want to keep going
@@ -99,7 +110,7 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
         else:
             raise ValueError("Node " + possibility + " could not be computed")
     # Save results and release
-    graph.set_value(conditional, res)
+    set_value(graph, conditional, res)
 
 
 def execute_to_targets(graph, *targets):
@@ -124,7 +135,7 @@ def execute_towards_conditions(graph, *conditions):
     """
     for condition in conditions:
         evaluate_target(graph, condition, True)
-        if graph.get_has_value(condition) and graph[condition]:
+        if get_has_value(graph, condition) and graph[condition]:
             break
 
 
@@ -132,4 +143,4 @@ def execute_towards_all_conditions_of_conditional(graph, conditional):
     """
     Move towards the conditions of a specific conditional, stop if one is found true.
     """
-    execute_towards_conditions(graph, *graph.get_conditions(conditional))
+    execute_towards_conditions(graph, *get_conditions(graph, conditional))

@@ -9,7 +9,26 @@ import inspect
 
 import networkx as nx
 
-from .core import starting_node_properties
+from .core import (
+    get_has_value,
+    get_is_frozen,
+    get_is_recipe,
+    get_type,
+    get_value,
+    set_args,
+    set_conditions,
+    set_has_value,
+    set_is_frozen,
+    set_is_recipe,
+    set_kwargs,
+    set_possibilities,
+    set_recipe,
+    set_topological_generation_index,
+    set_type,
+    set_value,
+    starting_node_properties,
+    unset_value,
+)
 
 
 def add_step(graph, name, recipe=None, *args, **kwargs):
@@ -33,15 +52,15 @@ def add_step(graph, name, recipe=None, *args, **kwargs):
         # Set attributes
         # Note: This could be done in the constructor, but doing it separately adds flexibility
         # Indeed, we might want to change how attributes work, and we can do it by modifying setters
-        graph.set_recipe(name, recipe)
-        graph.set_args(name, args)
-        graph.set_kwargs(name, kwargs)
+        set_recipe(graph, name, recipe)
+        set_args(graph, name, args)
+        set_kwargs(graph, name, kwargs)
 
         # Add and connect the recipe
         # Avoid adding existing recipe so as not to overwrite attributes
         if recipe not in graph.nodes:
             graph._nxdg.add_node(recipe, **starting_node_properties)
-        graph.set_is_recipe(recipe, True)
+        set_is_recipe(graph, recipe, True)
         # Note: adding argument to the edges is elegant but impractical.
         # If relations were defined through edges attributes rather than stored inside nodes,
         # retrieving them would require iterating through all edges and selecting the ones with the right attributes.
@@ -92,7 +111,7 @@ def add_step_quick(graph, name, recipe):
     # Add the step: this will create nodes for name, recipe_name and all elements of args and kwargs_list
     add_step(graph, name, recipe_name, *args, **kwargs)
     # Directly set the value of recipe_name to recipe
-    graph.set_value(recipe_name, recipe)
+    set_value(graph, recipe_name, recipe)
 
 
 def add_simple_conditional(graph, name, condition, value_true, value_false):
@@ -119,13 +138,13 @@ def add_multiple_conditional(graph, name, conditions, possibilities):
         graph._nxdg.add_edge(node, name)
 
     # Specify that this node is a conditional
-    graph.set_type(name, "conditional")
+    set_type(graph, name, "conditional")
 
     # Add conditions name to the list of conditions of the conditional
-    graph.set_conditions(name, conditions)
+    set_conditions(graph, name, conditions)
 
     # Add possibilities to the list of possibilities of the conditional
-    graph.set_possibilities(name, possibilities)
+    set_possibilities(graph, name, possibilities)
 
 
 def edit_step(graph, name, recipe=None, *args, **kwargs):
@@ -136,11 +155,11 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
         raise ValueError("Cannot edit non-existent node " + name)
 
     # Store old attributes
-    was_recipe = graph.get_is_recipe(name)
-    was_frozen = graph.get_is_frozen(name)
-    had_value = graph.get_has_value(name)
+    was_recipe = get_is_recipe(graph, name)
+    was_frozen = get_is_frozen(graph, name)
+    had_value = get_has_value(graph, name)
     if had_value:
-        old_value = graph.get_value(name)
+        old_value = get_value(graph, name)
 
     # Remove in-edges from the node because we need to replace them
     # use of list() is to make a copy because in_edges() returns a view
@@ -150,11 +169,11 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
 
     # Readd attributes
     # Readding out-edges is not needed because we never removed them
-    graph.set_is_recipe(name, was_recipe)
-    graph.set_is_frozen(name, was_frozen)
-    graph.set_has_value(name, had_value)
+    set_is_recipe(graph, name, was_recipe)
+    set_is_frozen(graph, name, was_frozen)
+    set_has_value(graph, name, had_value)
     if had_value:
-        graph.set_value(name, old_value)
+        set_value(graph, name, old_value)
 
 
 def remove_step(graph, name):
@@ -176,9 +195,9 @@ def clear_values(graph, *args):
         nodes_to_clear = args & graph.nodes  # Intersection
 
     for node in nodes_to_clear:
-        if graph.get_is_frozen(node):
+        if get_is_frozen(graph, node):
             continue
-        graph.unset_value(node)
+        unset_value(graph, node)
 
 
 def update_internal_context(graph, dictionary):
@@ -193,7 +212,7 @@ def update_internal_context(graph, dictionary):
     for key, value in dictionary.items():
         # Accept dictionaries with more keys than needed
         if key in graph.nodes:
-            graph.set_value(key, value)
+            set_value(graph, key, value)
 
 
 def set_internal_context(graph, dictionary):
@@ -220,13 +239,15 @@ def get_internal_context(graph, exclude_recipes=False):
     """
     if exclude_recipes:
         return {
-            key: graph.get_value(key)
+            key: get_value(graph, key)
             for key in graph.nodes
-            if (graph.get_has_value(key) and not graph.get_is_recipe(key))
+            if (get_has_value(graph, key) and not get_is_recipe(graph, key))
         }
     else:
         return {
-            key: graph.get_value(key) for key in graph.nodes if graph.get_has_value(key)
+            key: get_value(graph, key)
+            for key in graph.nodes
+            if get_has_value(graph, key)
         }
 
 
@@ -246,7 +267,7 @@ def get_list_of_values(graph, list_of_keys):
     """
     res = []
     for key in list_of_keys:
-        res.append(graph.get_value(key))
+        res.append(get_value(graph, key))
     return res
 
 
@@ -264,7 +285,7 @@ def get_dict_of_values(graph, list_of_keys):
     dict
         Dictionary whose keys are the elements of list_of_keys and whose values are the corresponding node values
     """
-    return {key: graph.get_value(key) for key in list_of_keys}
+    return {key: get_value(graph, key) for key in list_of_keys}
 
 
 def get_kwargs_values(graph, dictionary):
@@ -281,7 +302,7 @@ def get_kwargs_values(graph, dictionary):
     dict
         A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes
     """
-    return {key: graph.get_value(value) for key, value in dictionary.items()}
+    return {key: get_value(graph, value) for key, value in dictionary.items()}
 
 
 def freeze(graph, *args):
@@ -291,8 +312,8 @@ def freeze(graph, *args):
         nodes_to_freeze = args & graph.nodes  # Intersection
 
     for key in nodes_to_freeze:
-        if graph.get_has_value(key):
-            graph.set_is_frozen(key, True)
+        if get_has_value(graph, key):
+            set_is_frozen(graph, key, True)
 
 
 def unfreeze(graph, *args):
@@ -302,7 +323,7 @@ def unfreeze(graph, *args):
         nodes_to_unfreeze = args & graph.nodes  # Intersection
 
     for key in nodes_to_unfreeze:
-        graph.set_is_frozen(key, False)
+        set_is_frozen(graph, key, False)
 
 
 def make_recipe_dependencies_also_recipes(graph):
@@ -311,16 +332,16 @@ def make_recipe_dependencies_also_recipes(graph):
     """
     # Work in reverse topological order, to get successors before predecessors
     for node in reversed(get_topological_order(graph)):
-        if graph.get_is_recipe(node):
+        if get_is_recipe(graph, node):
             for parent in graph._nxdg.predecessors(node):
-                if not graph.get_is_recipe(parent):
+                if not get_is_recipe(graph, parent):
                     all_children_are_recipes = True
                     for child in graph._nxdg.successors(parent):
-                        if not graph.get_is_recipe(child):
+                        if not get_is_recipe(graph, child):
                             all_children_are_recipes = False
                             break
                     if all_children_are_recipes:
-                        graph.set_is_recipe(parent, True)
+                        set_is_recipe(graph, parent, True)
 
 
 def finalize_definition(graph):
@@ -354,14 +375,14 @@ def update_topological_generation_indexes(graph):
     for node in graph.nodes:
         for index, generation in enumerate(generations):
             if node in generation:
-                graph.set_topological_generation_index(node, index)
+                set_topological_generation_index(graph, node, index)
                 break
 
 
 def get_all_sources(graph, exclude_recipes=False):
     sources = set()
     for node in graph.nodes:
-        if exclude_recipes and graph.get_is_recipe(node):
+        if exclude_recipes and get_is_recipe(graph, node):
             continue
         if graph._nxdg.in_degree(node) == 0:
             sources.add(node)
@@ -371,7 +392,7 @@ def get_all_sources(graph, exclude_recipes=False):
 def get_all_sinks(graph, exclude_recipes=False):
     sinks = set()
     for node in graph.nodes:
-        if exclude_recipes and graph.get_is_recipe(node):
+        if exclude_recipes and get_is_recipe(graph, node):
             continue
         if graph._nxdg.out_degree(node) == 0:
             sinks.add(node)
@@ -384,7 +405,7 @@ def get_all_conditionals(graph):
     """
     conditionals = set()
     for node in graph.nodes:
-        if graph.get_type(node) == "conditional":
+        if get_type(graph, node) == "conditional":
             conditionals.add(node)
     return conditionals
 
