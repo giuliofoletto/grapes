@@ -16,20 +16,14 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 11:
 else:
     import tomli as tomllib
 
-from .core import (
-    get_args,
-    get_has_reachability,
-    get_kwargs,
-    get_reachability,
-    get_recipe,
-    get_topological_generation_index,
-)
+from .core import get_args, get_kwargs, get_recipe
 from .design import (
     clear_values,
     freeze,
     get_all_sinks,
     get_internal_context,
     get_list_of_values,
+    get_topological_generation_index,
     set_internal_context,
     unfreeze,
     update_internal_context,
@@ -40,6 +34,8 @@ from .path import get_path_to_target
 from .reachability import (
     clear_reachabilities,
     find_reachability_targets,
+    get_has_reachability,
+    get_reachability,
     get_worst_reachability,
 )
 from .simplify import (

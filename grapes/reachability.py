@@ -7,16 +7,42 @@ License: See project-level license file.
 
 from .core import (
     get_conditions,
-    get_has_reachability,
     get_has_value,
-    get_is_frozen,
+    get_node_attribute,
     get_possibilities,
-    get_reachability,
     get_type,
     get_value,
-    set_reachability,
-    unset_reachability,
+    set_node_attribute,
 )
+from .design import get_is_frozen
+
+
+def get_has_reachability(graph, node):
+    return get_node_attribute(graph, node, "has_reachability")
+
+
+def set_has_reachability(graph, node, has_reachability):
+    return set_node_attribute(graph, node, "has_reachability", has_reachability)
+
+
+def get_reachability(graph, node):
+    if get_node_attribute(
+        graph, node, "reachability"
+    ) is not None and get_node_attribute(graph, node, "has_reachability"):
+        return get_node_attribute(graph, node, "reachability")
+    else:
+        raise ValueError("Node " + node + " has no reachability")
+
+
+def set_reachability(graph, node, reachability):
+    if reachability not in ("unreachable", "uncertain", "reachable"):
+        raise ValueError(reachability + " is not a valid reachability value.")
+    set_node_attribute(graph, node, "reachability", reachability)
+    set_node_attribute(graph, node, "has_reachability", True)
+
+
+def unset_reachability(graph, node):
+    set_node_attribute(graph, node, "has_reachability", False)
 
 
 def clear_reachabilities(graph, *args):

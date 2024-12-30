@@ -8,8 +8,12 @@ License: See project-level license file.
 import matplotlib
 import networkx as nx
 
-from .core import get_node_attribute
-from .design import get_all_sinks, get_all_sources, get_topological_generations
+from .design import (
+    get_all_sinks,
+    get_all_sources,
+    get_topological_generation_index,
+    get_topological_generations,
+)
 
 
 def get_graphviz_digraph(
@@ -68,8 +72,8 @@ def get_graphviz_digraph(
         # Manipulate colors
         must_be_colored = False
         if color_mode.lower() == "by_generation":
-            topological_generation_index = get_node_attribute(
-                graph, node_name, "topological_generation_index"
+            topological_generation_index = get_topological_generation_index(
+                graph, node_name
             )
             # The __call__ method of the colormap returns a tuple of rgba values in [0, 1]
             # We call it passing the ratio between the topological_generation_index of this node and the max of the graph

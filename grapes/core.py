@@ -61,7 +61,7 @@ class Graph:
         )
 
 
-# Get/Set
+# Core
 def get_node_attribute(graph, node, attribute):
     attributes = graph.nodes[node]
     if attribute in attributes and attributes[attribute] is not None:
@@ -70,12 +70,12 @@ def get_node_attribute(graph, node, attribute):
         raise ValueError("Node " + node + " has no " + attribute)
 
 
-# Get/Set
+# Core
 def set_node_attribute(graph, node, attribute, value):
     graph.nodes[node][attribute] = value
 
 
-# Get/Set
+# Features
 def get_value(graph, node):
     if get_node_attribute(graph, node, "value") is not None and get_has_value(
         graph, node
@@ -85,80 +85,80 @@ def get_value(graph, node):
         raise ValueError("Node " + node + " has no value")
 
 
-# Get/Set
+# Features
 def set_value(graph, node, value):
     # Note: This changes reachability
     set_node_attribute(graph, node, "value", value)
     set_has_value(graph, node, True)
 
 
-# Get/Set
+# Features
 def unset_value(graph, node):
     # Note: This changes reachability
     set_has_value(graph, node, False)
 
 
-# Get/Set
+# Features
 def get_has_value(graph, node):
     return get_node_attribute(graph, node, "has_value")
 
 
-# Get/Set
+# Features
 def set_has_value(graph, node, has_value):
     return set_node_attribute(graph, node, "has_value", has_value)
 
 
-# Get/Set
+# Features
 def get_type(graph, node):
     return get_node_attribute(graph, node, "type")
 
 
-# Get/Set
+# Features
 def set_type(graph, node, type):
     return set_node_attribute(graph, node, "type", type)
 
 
-# Get/Set
+# Features
 def get_is_recipe(graph, node):
     return get_node_attribute(graph, node, "is_recipe")
 
 
-# Get/Set
+# Features
 def set_is_recipe(graph, node, is_recipe):
     return set_node_attribute(graph, node, "is_recipe", is_recipe)
 
 
-# Get/Set
+# Features
 def get_recipe(graph, node):
     return get_node_attribute(graph, node, "recipe")
 
 
-# Get/Set
+# Features
 def set_recipe(graph, node, recipe):
     return set_node_attribute(graph, node, "recipe", recipe)
 
 
-# Get/Set
+# Features
 def get_args(graph, node):
     return get_node_attribute(graph, node, "args")
 
 
-# Get/Set
+# Features
 def set_args(graph, node, args):
     return set_node_attribute(graph, node, "args", args)
 
 
-# Get/Set
+# Features
 def get_kwargs(graph, node):
     return get_node_attribute(graph, node, "kwargs")
 
 
-# Get/Set
+# Features
 def set_kwargs(graph, node, kwargs):
     return set_node_attribute(graph, node, "kwargs", kwargs)
 
 
-# Get/Set
+# Features
 def get_conditions(graph, node):
     conditions = get_node_attribute(graph, node, "conditions")
     if not isinstance(conditions, list):
@@ -166,14 +166,14 @@ def get_conditions(graph, node):
     return conditions
 
 
-# Get/Set
+# Features
 def set_conditions(graph, node, conditions):
     if not isinstance(conditions, list):
         conditions = list(conditions)
     return set_node_attribute(graph, node, "conditions", conditions)
 
 
-# Get/Set
+# Features
 def get_possibilities(graph, node):
     possibilities = get_node_attribute(graph, node, "possibilities")
     if not isinstance(possibilities, list):
@@ -181,61 +181,8 @@ def get_possibilities(graph, node):
     return possibilities
 
 
-# Get/Set
+# Features
 def set_possibilities(graph, node, possibilities):
     if not isinstance(possibilities, list):
         possibilities = list(possibilities)
     return set_node_attribute(graph, node, "possibilities", possibilities)
-
-
-# Get/Set
-def get_is_frozen(graph, node):
-    return get_node_attribute(graph, node, "is_frozen")
-
-
-# Get/Set
-def set_is_frozen(graph, node, is_frozen):
-    return set_node_attribute(graph, node, "is_frozen", is_frozen)
-
-
-# Get/Set
-def get_topological_generation_index(graph, node):
-    return get_node_attribute(graph, node, "topological_generation_index")
-
-
-# Get/Set
-def set_topological_generation_index(graph, node, index):
-    set_node_attribute(graph, node, "topological_generation_index", index)
-
-
-# Get/Set
-def get_has_reachability(graph, node):
-    return get_node_attribute(graph, node, "has_reachability")
-
-
-# Get/Set
-def set_has_reachability(graph, node, has_reachability):
-    return set_node_attribute(graph, node, "has_reachability", has_reachability)
-
-
-# Get/Set
-def get_reachability(graph, node):
-    if get_node_attribute(
-        graph, node, "reachability"
-    ) is not None and get_node_attribute(graph, node, "has_reachability"):
-        return get_node_attribute(graph, node, "reachability")
-    else:
-        raise ValueError("Node " + node + " has no reachability")
-
-
-# Get/Set
-def set_reachability(graph, node, reachability):
-    if reachability not in ("unreachable", "uncertain", "reachable"):
-        raise ValueError(reachability + " is not a valid reachability value.")
-    set_node_attribute(graph, node, "reachability", reachability)
-    set_node_attribute(graph, node, "has_reachability", True)
-
-
-# Get/Set
-def unset_reachability(graph, node):
-    set_node_attribute(graph, node, "has_reachability", False)

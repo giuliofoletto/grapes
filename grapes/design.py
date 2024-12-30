@@ -11,19 +11,18 @@ import networkx as nx
 
 from .core import (
     get_has_value,
-    get_is_frozen,
     get_is_recipe,
+    get_node_attribute,
     get_type,
     get_value,
     set_args,
     set_conditions,
     set_has_value,
-    set_is_frozen,
     set_is_recipe,
     set_kwargs,
+    set_node_attribute,
     set_possibilities,
     set_recipe,
-    set_topological_generation_index,
     set_type,
     set_value,
     starting_node_properties,
@@ -31,6 +30,7 @@ from .core import (
 )
 
 
+# Design
 def add_step(graph, name, recipe=None, *args, **kwargs):
     """
     Interface to add a node to the graph, with all its dependencies.
@@ -80,6 +80,7 @@ def add_step(graph, name, recipe=None, *args, **kwargs):
             graph._nxdg.add_edge(value, name)
 
 
+# Design
 def add_step_quick(graph, name, recipe):
     """
     Interface to quickly add a step by passing a name and a function.
@@ -114,6 +115,7 @@ def add_step_quick(graph, name, recipe):
     set_value(graph, recipe_name, recipe)
 
 
+# Design
 def add_simple_conditional(graph, name, condition, value_true, value_false):
     """
     Interface to add a conditional to the graph.
@@ -147,6 +149,7 @@ def add_multiple_conditional(graph, name, conditions, possibilities):
     set_possibilities(graph, name, possibilities)
 
 
+# Design
 def edit_step(graph, name, recipe=None, *args, **kwargs):
     """
     Interface to edit an existing node, changing its predecessors
@@ -176,6 +179,7 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
         set_value(graph, name, old_value)
 
 
+# Design
 def remove_step(graph, name):
     """
     Interface to remove an existing node, without changing anything else
@@ -185,6 +189,7 @@ def remove_step(graph, name):
     graph._nxdg.remove_node(name)
 
 
+# Context
 def clear_values(graph, *args):
     """
     Clear values in the graph nodes.
@@ -200,6 +205,7 @@ def clear_values(graph, *args):
         unset_value(graph, node)
 
 
+# Context
 def update_internal_context(graph, dictionary):
     """
     Update internal context with a dictionary.
@@ -215,6 +221,7 @@ def update_internal_context(graph, dictionary):
             set_value(graph, key, value)
 
 
+# Context
 def set_internal_context(graph, dictionary):
     """
     Clear all values and then set a new internal context with a dictionary.
@@ -228,6 +235,7 @@ def set_internal_context(graph, dictionary):
     update_internal_context(graph, dictionary)
 
 
+# Context
 def get_internal_context(graph, exclude_recipes=False):
     """
     Get the internal context.
@@ -251,6 +259,7 @@ def get_internal_context(graph, exclude_recipes=False):
         }
 
 
+# Context
 def get_list_of_values(graph, list_of_keys):
     """
     Get values as list.
@@ -271,6 +280,7 @@ def get_list_of_values(graph, list_of_keys):
     return res
 
 
+# Context
 def get_dict_of_values(graph, list_of_keys):
     """
     Get values as dictionary.
@@ -288,6 +298,7 @@ def get_dict_of_values(graph, list_of_keys):
     return {key: get_value(graph, key) for key in list_of_keys}
 
 
+# Context
 def get_kwargs_values(graph, dictionary):
     """
     Get values from the graph, using a dictionary that works like function kwargs.
@@ -305,6 +316,17 @@ def get_kwargs_values(graph, dictionary):
     return {key: get_value(graph, value) for key, value in dictionary.items()}
 
 
+# Features
+def get_is_frozen(graph, node):
+    return get_node_attribute(graph, node, "is_frozen")
+
+
+# Features
+def set_is_frozen(graph, node, is_frozen):
+    return set_node_attribute(graph, node, "is_frozen", is_frozen)
+
+
+# Features
 def freeze(graph, *args):
     if len(args) == 0:  # Interpret as "Freeze everything"
         nodes_to_freeze = graph.nodes
@@ -316,6 +338,7 @@ def freeze(graph, *args):
             set_is_frozen(graph, key, True)
 
 
+# Features
 def unfreeze(graph, *args):
     if len(args) == 0:  # Interpret as "Unfreeze everything"
         nodes_to_unfreeze = graph.nodes.keys()
@@ -326,6 +349,7 @@ def unfreeze(graph, *args):
         set_is_frozen(graph, key, False)
 
 
+# Features
 def make_recipe_dependencies_also_recipes(graph):
     """
     Make dependencies (predecessors) of recipes also recipes, if they have only recipe successors
@@ -344,6 +368,7 @@ def make_recipe_dependencies_also_recipes(graph):
                         set_is_recipe(graph, parent, True)
 
 
+# Design
 def finalize_definition(graph):
     """
     Perform operations that should typically be done after the definition of a graph is completed
@@ -356,6 +381,17 @@ def finalize_definition(graph):
     freeze(graph)
 
 
+# Features
+def get_topological_generation_index(graph, node):
+    return get_node_attribute(graph, node, "topological_generation_index")
+
+
+# Features
+def set_topological_generation_index(graph, node, index):
+    set_node_attribute(graph, node, "topological_generation_index", index)
+
+
+# Features
 def get_topological_order(graph):
     """
     Return list of nodes in topological order, i.e., from dependencies to targets
@@ -363,6 +399,7 @@ def get_topological_order(graph):
     return list(nx.topological_sort(graph._nxdg))
 
 
+# Features
 def get_topological_generations(graph):
     """
     Return list of topological generations of the graph
@@ -370,6 +407,7 @@ def get_topological_generations(graph):
     return list(nx.topological_generations(graph._nxdg))
 
 
+# Features
 def update_topological_generation_indexes(graph):
     generations = get_topological_generations(graph)
     for node in graph.nodes:
@@ -379,6 +417,7 @@ def update_topological_generation_indexes(graph):
                 break
 
 
+# Features
 def get_all_sources(graph, exclude_recipes=False):
     sources = set()
     for node in graph.nodes:
@@ -389,6 +428,7 @@ def get_all_sources(graph, exclude_recipes=False):
     return sources
 
 
+# Features
 def get_all_sinks(graph, exclude_recipes=False):
     sinks = set()
     for node in graph.nodes:
@@ -399,6 +439,7 @@ def get_all_sinks(graph, exclude_recipes=False):
     return sinks
 
 
+# Features
 def get_all_conditionals(graph):
     """
     Get set of all conditional nodes in the graph.
@@ -410,6 +451,7 @@ def get_all_conditionals(graph):
     return conditionals
 
 
+# Features
 def get_all_ancestors_target(graph, target):
     """
     Get all the ancestors of a node.
