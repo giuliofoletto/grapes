@@ -19,6 +19,7 @@ else:
 from .context import (
     clear_values,
     get_internal_context,
+    get_dict_of_values,
     get_list_of_values,
     set_internal_context,
     update_internal_context,
@@ -199,7 +200,7 @@ def context_from_file(file_name):
 
 
 def wrap_graph_with_function(
-    graph, input_keys, *targets, constants={}, input_as_kwargs=True
+    graph, input_keys, *targets, constants={}, input_as_kwargs=True, output_as_dict=True
 ):
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
@@ -234,7 +235,22 @@ def wrap_graph_with_function(
             + ", ".join(missing_dependencies)
         )
 
-    if input_as_kwargs:
+    if input_as_kwargs and output_as_dict:
+
+        def specific_function(**kwargs):
+            # Use for loop rather than dict comprehension because it is a more basic operation
+            for key in input_keys:
+                operational_graph[key] = kwargs[key]
+            execute_to_targets(operational_graph, *targets)
+            dict_of_values = get_dict_of_values(operational_graph, targets)
+            # Clear values so that the function can be called again
+            clear_values(operational_graph)
+            if len(dict_of_values.keys()) == 1:
+                return dict_of_values[list(dict_of_values.keys())[0]]
+            else:
+                return dict_of_values
+
+    elif input_as_kwargs and not output_as_dict:
 
         def specific_function(**kwargs):
             # Use for loop rather than dict comprehension because it is a more basic operation
@@ -249,7 +265,23 @@ def wrap_graph_with_function(
             else:
                 return list_of_values
 
-    else:
+    elif not input_as_kwargs and output_as_dict:
+        input_keys = list(input_keys)
+
+        def specific_function(*args):
+            # Use for loop rather than dict comprehension because it is a more basic operation
+            for i in range(len(input_keys)):
+                operational_graph[input_keys[i]] = args[i]
+            execute_to_targets(operational_graph, *targets)
+            dict_of_values = get_dict_of_values(operational_graph, targets)
+            # Clear values so that the function can be called again
+            clear_values(operational_graph)
+            if len(dict_of_values.keys()) == 1:
+                return dict_of_values[list(dict_of_values.keys())[0]]
+            else:
+                return dict_of_values
+
+    else:  # not input_as_kwargs and not output_as_dict
         input_keys = list(input_keys)
 
         def specific_function(*args):

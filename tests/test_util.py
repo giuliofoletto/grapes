@@ -186,7 +186,7 @@ def test_context_from_file():
     assert context == expected_context
 
 
-def test_wrap_with_function():
+def test_wrap_with_function_input_as_kwargs_output_as_dict():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -202,11 +202,113 @@ def test_wrap_with_function():
 
     # Get a function a,b,c,d -> g
     f1 = gr.wrap_graph_with_function(
-        g, ["a", "b", "c", "d"], "g", input_as_kwargs=False
+        g, ["a", "b", "c", "d"], "g", input_as_kwargs=True, output_as_dict=True
     )
     # Get a function a,b,c,d -> [e,f,g]
     f2 = gr.wrap_graph_with_function(
-        g, ["a", "b", "c", "d"], "e", "f", "g", input_as_kwargs=False
+        g,
+        ["a", "b", "c", "d"],
+        "e",
+        "f",
+        "g",
+        input_as_kwargs=True,
+        output_as_dict=True,
+    )
+    assert f1(a=1, b=2, c=3, d=4) == -9
+    assert f2(a=1, b=2, c=3, d=4) == dict(e=3, f=12, g=-9)
+
+
+def test_wrap_with_function_input_as_kwargs_output_as_list():
+    g = gr.Graph()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
+
+    # Get a function a,b,c,d -> g
+    f1 = gr.wrap_graph_with_function(
+        g, ["a", "b", "c", "d"], "g", input_as_kwargs=True, output_as_dict=False
+    )
+    # Get a function a,b,c,d -> [e,f,g]
+    f2 = gr.wrap_graph_with_function(
+        g,
+        ["a", "b", "c", "d"],
+        "e",
+        "f",
+        "g",
+        input_as_kwargs=True,
+        output_as_dict=False,
+    )
+    assert f1(a=1, b=2, c=3, d=4) == -9
+    assert f2(a=1, b=2, c=3, d=4) == [3, 12, -9]
+
+
+def test_wrap_with_function_input_as_args_output_as_dict():
+    g = gr.Graph()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
+
+    # Get a function a,b,c,d -> g
+    f1 = gr.wrap_graph_with_function(
+        g, ["a", "b", "c", "d"], "g", input_as_kwargs=False, output_as_dict=True
+    )
+    # Get a function a,b,c,d -> [e,f,g]
+    f2 = gr.wrap_graph_with_function(
+        g,
+        ["a", "b", "c", "d"],
+        "e",
+        "f",
+        "g",
+        input_as_kwargs=False,
+        output_as_dict=True,
+    )
+    assert f1(1, 2, 3, 4) == -9
+    assert f2(1, 2, 3, 4) == dict(e=3, f=12, g=-9)
+
+
+def test_wrap_with_function_input_as_args_output_as_list():
+    g = gr.Graph()
+    gr.add_step(g, "e", "op_e", "a", "b")
+    gr.add_step(g, "f", "op_f", "c", "d")
+    gr.add_step(g, "g", "op_g", "e", "f")
+
+    operations = {
+        "op_e": lambda x, y: x + y,
+        "op_f": lambda x, y: x * y,
+        "op_g": lambda x, y: x - y,
+    }
+    gr.set_internal_context(g, operations)
+    gr.finalize_definition(g)
+
+    # Get a function a,b,c,d -> g
+    f1 = gr.wrap_graph_with_function(
+        g, ["a", "b", "c", "d"], "g", input_as_kwargs=False, output_as_dict=False
+    )
+    # Get a function a,b,c,d -> [e,f,g]
+    f2 = gr.wrap_graph_with_function(
+        g,
+        ["a", "b", "c", "d"],
+        "e",
+        "f",
+        "g",
+        input_as_kwargs=False,
+        output_as_dict=False,
     )
     assert f1(1, 2, 3, 4) == -9
     assert f2(1, 2, 3, 4) == [3, 12, -9]
