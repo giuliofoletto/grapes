@@ -10,7 +10,6 @@ import pytest
 import grapes as gr
 
 
-# Features
 def test_freeze():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -27,7 +26,6 @@ def test_freeze():
     assert gr.get_is_frozen(g, "a")
 
 
-# Features
 def test_unfreeze():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -43,8 +41,7 @@ def test_unfreeze():
     assert not gr.get_is_frozen(g, "a")
 
 
-# Features
-def test_topological_generations():
+def test_get_topological_generation_index():
     g = gr.Graph()
     gr.add_step(g, "d", "fd", "b", "c")
     gr.add_step(g, "b", "fb", "a")
@@ -58,8 +55,7 @@ def test_topological_generations():
     assert gr.get_topological_generation_index(g, "fd") == 0
 
 
-# Features
-def test_sources_and_sinks():
+def test_get_all_sources():
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "e", "op_e", "d")
@@ -75,11 +71,19 @@ def test_sources_and_sinks():
         "d_op_c",
         "op_e",
     }
+
+
+def test_get_all_sinks():
+    g = gr.Graph()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.add_step(g, "e", "op_e", "d")
+    gr.add_step(g, "op_c", "b_op_c", "d_op_c")
+    gr.finalize_definition(g)
+
     assert gr.get_all_sinks(g, exclude_recipes=True) == {"c", "e"}
     assert gr.get_all_sinks(g, exclude_recipes=False) == {"c", "e"}
 
 
-# Features
 def test_get_all_conditionals():
     """
     Get set of all conditionals in the graph.
@@ -92,8 +96,7 @@ def test_get_all_conditionals():
     assert gr.get_all_conditionals(g) == {"conditional1", "conditional2"}
 
 
-# Features
-def test_get_all_ancestors():
+def test_get_all_ancestors_target():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -125,7 +128,6 @@ def test_get_all_ancestors():
     }
 
 
-# Features
 def test_make_recipe_dependencies_also_recipes():
     g = gr.Graph()
     gr.add_step(g, "a", "op_a", "b")
@@ -133,7 +135,10 @@ def test_make_recipe_dependencies_also_recipes():
         g, "op_a", "build_op_a", "c", "d"
     )  # c and d will be converted to recipes
     gr.add_step(g, "b", "op_b", "c")  # c will no longer be converted to recipe
-    gr.finalize_definition(g)  # calls make_recipe_dependencies_also_recipes
+    gr.make_recipe_dependencies_also_recipes(g)
+    gr.finalize_definition(
+        g
+    )  # make_recipe_dependencies_also_recipes is also called here
 
     assert gr.get_is_recipe(g, "d")
     assert not gr.get_is_recipe(g, "c")

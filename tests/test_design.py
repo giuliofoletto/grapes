@@ -10,7 +10,6 @@ import pytest
 import grapes as gr
 
 
-# Design
 def test_add_step():
     g = gr.Graph()
     gr.add_step(g, "a")
@@ -37,7 +36,6 @@ def test_add_step():
     assert gr.get_recipe(g, "g") == "op_g"
 
 
-# Design
 def test_add_step_disordered():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
@@ -57,7 +55,6 @@ def test_add_step_disordered():
     assert gr.get_recipe(g, "g") == "op_g"
 
 
-# Design
 def test_add_step_inverted():
     # Typically, we proceed from bottom to top
     # Here we test the opposite
@@ -76,7 +73,6 @@ def test_add_step_inverted():
     assert gr.get_recipe(g, "b") == "op_b"
 
 
-# Design
 def test_add_step_quick():
     def example_function_only_positional(a, b):
         return a**b
@@ -114,7 +110,6 @@ def test_add_step_quick():
         gr.add_step_quick(g, "h", "a non-function object")
 
 
-# Design
 def test_add_simple_conditional():
     g = gr.Graph()
     gr.add_simple_conditional(g, "d", "c", "a", "b")
@@ -127,7 +122,6 @@ def test_add_simple_conditional():
     assert gr.get_possibilities(g, "d") == ["a", "b"]
 
 
-# Design
 def test_add_multiple_conditional():
     g = gr.Graph()
     gr.add_multiple_conditional(
@@ -157,7 +151,6 @@ def test_add_multiple_conditional():
     assert gr.get_possibilities(g, "result") == ["node_1", "node_2", "node_3"]
 
 
-# Design
 def test_edit_step():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -177,7 +170,6 @@ def test_edit_step():
     assert gr.get_recipe(g, "b") == "new_op_b"
 
 
-# Design
 def test_remove_step():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -191,7 +183,6 @@ def test_remove_step():
         gr.remove_step(g, "d")
 
 
-# Design
 def test_finalize_definition():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -207,10 +198,10 @@ def test_finalize_definition():
         and gr.get_is_recipe(g, "op_c")
         and gr.get_is_recipe(g, "build_op_b")
     )
-    assert gr.get_node_attribute(g, "pre_op_b", "topological_generation_index") == 0
-    assert gr.get_node_attribute(g, "build_op_b", "topological_generation_index") == 0
-    assert gr.get_node_attribute(g, "op_b", "topological_generation_index") == 1
-    assert gr.get_node_attribute(g, "b", "topological_generation_index") == 2
-    assert gr.get_node_attribute(g, "c", "topological_generation_index") == 3
-    assert gr.get_node_attribute(g, "a", "topological_generation_index") == 0
-    assert gr.get_node_attribute(g, "op_c", "topological_generation_index") == 0
+    assert gr.get_topological_generation_index(g, "pre_op_b") == 0
+    assert gr.get_topological_generation_index(g, "build_op_b") == 0
+    assert gr.get_topological_generation_index(g, "op_b") == 1
+    assert gr.get_topological_generation_index(g, "b") == 2
+    assert gr.get_topological_generation_index(g, "c") == 3
+    assert gr.get_topological_generation_index(g, "a") == 0
+    assert gr.get_topological_generation_index(g, "op_c") == 0

@@ -1,5 +1,5 @@
 """
-Core of the grapes package. Includes the classes for nodes and graphs.
+Core of the grapes package. Includes the Graph class.
 
 Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.

@@ -10,7 +10,6 @@ import pytest
 import grapes as gr
 
 
-# Design, context, path
 def test_get_path_to_target():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")

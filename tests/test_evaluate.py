@@ -52,8 +52,7 @@ def test_execute_to_targets_with_conditional():
     assert g["conditional"] == g["v2"]
 
 
-# Design, context, evaluate
-def test_kwargs():
+def test_execute_to_targets_with_kwargs():
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", exponent="b")
     gr.finalize_definition(g)
@@ -67,7 +66,6 @@ def test_kwargs():
     assert g["c"] == 25
 
 
-# Design, context, evaluate
 def test_progress_towards_targets():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -90,7 +88,6 @@ def test_progress_towards_targets():
     assert g["e"] == 12
 
 
-# Design, evaluate
 def test_execute_towards_conditions():
     """
     Execute towards the conditions of conditional by computing c2.
@@ -111,7 +108,6 @@ def test_execute_towards_conditions():
     assert g["c2"] == True
 
 
-# Design, evaluate
 def test_execute_towards_all_conditions_of_conditional():
     """
     Execute towards the conditions of conditional by computing c2 (the conditional is passed instead of the conditions).

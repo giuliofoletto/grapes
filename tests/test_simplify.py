@@ -10,7 +10,6 @@ import pytest
 import grapes as gr
 
 
-# Design, context, simplify, evaluate
 def test_simplify_dependency():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
@@ -33,7 +32,6 @@ def test_simplify_dependency():
     assert g["g"] == -9
 
 
-# Design, context, simplify, evaluate
 def test_simplify_all_dependencies():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
@@ -56,7 +54,6 @@ def test_simplify_all_dependencies():
     assert g["g"] == -9
 
 
-# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step():
     """
     Convert conditional to a trivial step since its condition c2 already has true value.
@@ -76,7 +73,6 @@ def test_convert_conditional_to_trivial_step():
     assert g["conditional"] == g["v2"]
 
 
-# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step_with_evaluation():
     """
     Convert conditional to a trivial step but compute the conditions.
@@ -101,7 +97,6 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
     assert g["conditional"] == g["v2"]
 
 
-# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step_with_default():
     """
     Convert conditional to a trivial step, computing conditions, but use default value since no condition is true.
@@ -124,7 +119,6 @@ def test_convert_conditional_to_trivial_step_with_default():
     assert g["conditional"] == g["default"]
 
 
-# Design, simplify, evaluate
 def test_convert_conditional_to_trivial_step_without_true_values():
     """
     Try to convert conditional to trivial step but no conditions can be evaluated to true.
@@ -146,7 +140,6 @@ def test_convert_conditional_to_trivial_step_without_true_values():
         )
 
 
-# Design, simplify, evaluate
 def test_convert_all_conditionals_to_trivial_steps():
     """
     Convert all conditionals to trivial steps.
@@ -169,7 +162,6 @@ def test_convert_all_conditionals_to_trivial_steps():
     assert g["conditional2"] == g["vf"]
 
 
-# Design, simplify, evaluate
 def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
     """
     Convert all conditionals to trivial steps, computing the conditions.

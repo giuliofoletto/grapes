@@ -15,7 +15,6 @@ from .features import (
 )
 
 
-# Context
 def clear_values(graph, *args):
     """
     Clear values in the graph nodes.
@@ -31,7 +30,6 @@ def clear_values(graph, *args):
         unset_value(graph, node)
 
 
-# Context
 def update_internal_context(graph, dictionary):
     """
     Update internal context with a dictionary.
@@ -47,7 +45,6 @@ def update_internal_context(graph, dictionary):
             set_value(graph, key, value)
 
 
-# Context
 def set_internal_context(graph, dictionary):
     """
     Clear all values and then set a new internal context with a dictionary.
@@ -61,7 +58,6 @@ def set_internal_context(graph, dictionary):
     update_internal_context(graph, dictionary)
 
 
-# Context
 def get_internal_context(graph, exclude_recipes=False):
     """
     Get the internal context.
@@ -85,7 +81,6 @@ def get_internal_context(graph, exclude_recipes=False):
         }
 
 
-# Context
 def get_list_of_values(graph, list_of_keys):
     """
     Get values as list.
@@ -106,7 +101,6 @@ def get_list_of_values(graph, list_of_keys):
     return res
 
 
-# Context
 def get_dict_of_values(graph, list_of_keys):
     """
     Get values as dictionary.
@@ -124,7 +118,6 @@ def get_dict_of_values(graph, list_of_keys):
     return {key: get_value(graph, key) for key in list_of_keys}
 
 
-# Context
 def get_kwargs_values(graph, dictionary):
     """
     Get values from the graph, using a dictionary that works like function kwargs.

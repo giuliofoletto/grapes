@@ -10,7 +10,6 @@ import pytest
 import grapes as gr
 
 
-# Context
 def test_set_internal_context():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -25,7 +24,6 @@ def test_set_internal_context():
     assert g["a"] == operations["a"]
 
 
-# Context
 def test_get_internal_context():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -38,7 +36,6 @@ def test_get_internal_context():
     assert gr.get_internal_context(g) == operations
 
 
-# Context
 def test_update_internal_context():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -56,7 +53,6 @@ def test_update_internal_context():
     assert g["op_b"] == new_operations["op_b"]  # Updated
 
 
-# Context
 def test_clear_values():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -76,7 +72,6 @@ def test_clear_values():
     assert gr.get_has_value(g, "op_c")
 
 
-# Context
 def test_get_list_of_values():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -89,7 +84,6 @@ def test_get_list_of_values():
     assert gr.get_list_of_values(g, ["a", "b"]) == [5, 10]
 
 
-# Context
 def test_get_dict_of_values():
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
@@ -102,7 +96,6 @@ def test_get_dict_of_values():
     assert gr.get_dict_of_values(g, ["a", "b"]) == {"a": 5, "b": 10}
 
 
-# Context
 def test_get_kwargs_values():
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", exponent="b")

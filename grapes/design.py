@@ -39,7 +39,6 @@ starting_node_properties = {
 }
 
 
-# Design
 def add_step(graph, name, recipe=None, *args, **kwargs):
     """
     Interface to add a node to the graph, with all its dependencies.
@@ -89,7 +88,6 @@ def add_step(graph, name, recipe=None, *args, **kwargs):
             graph._nxdg.add_edge(value, name)
 
 
-# Design
 def add_step_quick(graph, name, recipe):
     """
     Interface to quickly add a step by passing a name and a function.
@@ -100,7 +98,7 @@ def add_step_quick(graph, name, recipe):
     # Check that the passed recipe is a valid function
     if not inspect.isfunction(recipe):
         raise TypeError(
-            "The passed recipe should be a function, but it is a " + type(recipe)
+            "The passed recipe should be a function, but it is a " + str(type(recipe))
         )
     argspec = inspect.getfullargspec(recipe)
     # varargs and varkw are not supported because add_step_quick needs parameter names to build nodes
@@ -124,7 +122,6 @@ def add_step_quick(graph, name, recipe):
     set_value(graph, recipe_name, recipe)
 
 
-# Design
 def add_simple_conditional(graph, name, condition, value_true, value_false):
     """
     Interface to add a conditional to the graph.
@@ -158,7 +155,6 @@ def add_multiple_conditional(graph, name, conditions, possibilities):
     set_possibilities(graph, name, possibilities)
 
 
-# Design
 def edit_step(graph, name, recipe=None, *args, **kwargs):
     """
     Interface to edit an existing node, changing its predecessors
@@ -170,6 +166,7 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
     was_recipe = get_is_recipe(graph, name)
     was_frozen = get_is_frozen(graph, name)
     had_value = get_has_value(graph, name)
+    old_value = None
     if had_value:
         old_value = get_value(graph, name)
 
@@ -188,7 +185,6 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
         set_value(graph, name, old_value)
 
 
-# Design
 def remove_step(graph, name):
     """
     Interface to remove an existing node, without changing anything else
@@ -198,7 +194,6 @@ def remove_step(graph, name):
     graph._nxdg.remove_node(name)
 
 
-# Design
 def finalize_definition(graph):
     """
     Perform operations that should typically be done after the definition of a graph is completed

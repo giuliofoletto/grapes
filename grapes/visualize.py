@@ -71,6 +71,7 @@ def get_graphviz_digraph(
 
         # Manipulate colors
         must_be_colored = False
+        color_rgba = (1, 1, 1, 1)  # Default to white
         if color_mode.lower() == "by_generation":
             topological_generation_index = get_topological_generation_index(
                 graph, node_name
@@ -149,7 +150,7 @@ def hex_string_from_rgba(r, g, b, a):
     return "#" + r_hex + g_hex + b_hex + a_hex
 
 
-def best_text_from_background_color(r, g, b, a=1):
+def best_text_from_background_color(r, g, b, a=1.0):
     """
     Get the best text color from background.
 

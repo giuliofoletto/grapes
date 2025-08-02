@@ -10,8 +10,7 @@ import pytest
 import grapes as gr
 
 
-# Design, merge
-def test_compatibility():
+def test_check_compatibility():
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     h = gr.Graph()
@@ -19,8 +18,7 @@ def test_compatibility():
     assert gr.check_compatibility(g, h)
 
 
-# Design, merge
-def test_incompatibility():
+def test_check_compatibility_incompatible():
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     h = gr.Graph()
@@ -28,7 +26,6 @@ def test_incompatibility():
     assert not gr.check_compatibility(g, h)
 
 
-# Design, merge
 def test_merge():
     exp = gr.Graph()
     gr.add_step(exp, "c", "op_c", "a", "b")
@@ -43,7 +40,6 @@ def test_merge():
     assert res == exp
 
 
-# Design, merge, context, evaluate
 def test_merge_and_execute():
     exp = gr.Graph()
     gr.add_step(exp, "c", "op_c", "a", "b")
@@ -71,7 +67,6 @@ def test_merge_and_execute():
     assert g["e"] == 12
 
 
-# Design, context, util, evaluate
 def test_get_subgraph():
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")

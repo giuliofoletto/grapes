@@ -10,7 +10,6 @@ import pytest
 import grapes as gr
 
 
-# Design, context, reachability
 def test_reachability_simple():
     g = gr.Graph()
     gr.add_step(g, "b", "fb", "a")
@@ -26,7 +25,6 @@ def test_reachability_simple():
     assert gr.get_reachability(g, "b") == "reachable"
 
 
-# Design, context, reachability
 def test_reachability_long_graph():
     g = gr.Graph()
     gr.add_step_quick(g, "c", lambda b: b)
@@ -42,7 +40,6 @@ def test_reachability_long_graph():
     assert gr.get_reachability(g, "b") == "reachable"
 
 
-# Design, context, reachability
 def test_reachability_conditional_with_true_value():
     g = gr.Graph()
     gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
@@ -58,7 +55,6 @@ def test_reachability_conditional_with_true_value():
     assert gr.get_reachability(g, "name") == "reachable"
 
 
-# Design, context, reachability
 def test_reachability_multiple_conditional_with_true_value():
     g = gr.Graph()
     gr.add_multiple_conditional(g, "name", ["ca", "cb"], ["a", "b", "c"])
@@ -74,7 +70,6 @@ def test_reachability_multiple_conditional_with_true_value():
     assert gr.get_reachability(g, "name") == "reachable"
 
 
-# Design, context, reachability
 def test_conditional_no_conditions_defined():
     g = gr.Graph()
     gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
@@ -104,7 +99,6 @@ def test_conditional_no_conditions_defined():
     assert gr.get_reachability(g, "name") == "reachable"
 
 
-# Design, context, reachability
 def test_multiple_conditional_no_conditions_defined():
     g = gr.Graph()
     gr.add_multiple_conditional(g, "name", ["ca", "cb"], ["va", "vb", "vc"])

@@ -98,7 +98,6 @@ def find_reachability_standard(graph, node):
     set_reachability(graph, node, get_worst_reachability(graph, *dependencies))
 
 
-# Reachability
 def find_reachability_conditional(graph, conditional):
     """
     Find the reachability of a conditional.

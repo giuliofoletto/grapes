@@ -99,8 +99,8 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
             index = -1
 
     # Actual computation happens here
+    possibility = get_possibilities(graph, conditional)[index]
     try:
-        possibility = get_possibilities(graph, conditional)[index]
         evaluate_target(graph, possibility, continue_on_fail)
         res = get_value(graph, possibility)
     except:
