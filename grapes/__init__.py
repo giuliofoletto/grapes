@@ -27,6 +27,7 @@ from .features import (
     freeze,
     get_all_ancestors_target,
     get_all_conditionals,
+    get_all_nodes,
     get_all_sinks,
     get_all_sources,
     get_args,

@@ -55,6 +55,27 @@ def test_get_topological_generation_index():
     assert gr.get_topological_generation_index(g, "fd") == 0
 
 
+def test_get_all_nodes():
+    g = gr.Graph()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.add_step(g, "e", "op_e", "d")
+    gr.add_step(g, "op_c", "b_op_c", "d_op_c")
+    gr.finalize_definition(g)
+
+    assert gr.get_all_nodes(g, exclude_recipes=True) == {"a", "b", "c", "d", "e"}
+    assert gr.get_all_nodes(g, exclude_recipes=False) == {
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "op_c",
+        "op_e",
+        "b_op_c",
+        "d_op_c",
+    }
+
+
 def test_get_all_sources():
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")

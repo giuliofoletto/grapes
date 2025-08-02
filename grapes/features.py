@@ -192,6 +192,15 @@ def update_topological_generation_indexes(graph):
                 break
 
 
+def get_all_nodes(graph, exclude_recipes=False):
+    nodes = set()
+    for node in graph.nodes:
+        if exclude_recipes and get_is_recipe(graph, node):
+            continue
+        nodes.add(node)
+    return nodes
+
+
 def get_all_sources(graph, exclude_recipes=False):
     sources = set()
     for node in graph.nodes:
