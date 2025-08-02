@@ -41,10 +41,6 @@ def test_merge():
 
 
 def test_merge_and_execute():
-    exp = gr.Graph()
-    gr.add_step(exp, "c", "op_c", "a", "b")
-    gr.add_step(exp, "e", "op_e", "c", "d")
-
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     h = gr.Graph()
@@ -59,6 +55,32 @@ def test_merge_and_execute():
             "b": 2,
             "d": 4,
             "op_c": lambda x, y: x + y,
+            "op_e": lambda x, y: x * y,
+        },
+    )
+    gr.execute_to_targets(g, "e")
+
+    assert g["e"] == 12
+
+
+def test_merge_and_execute_with_value():
+    g = gr.Graph()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.update_internal_context(
+        g,
+        {
+            "c": 3,
+        },
+    )
+    h = gr.Graph()
+    gr.add_step(h, "e", "op_e", "c", "d")
+    g = gr.merge(g, h)
+    gr.finalize_definition(g)
+
+    gr.update_internal_context(
+        g,
+        {
+            "d": 4,
             "op_e": lambda x, y: x * y,
         },
     )

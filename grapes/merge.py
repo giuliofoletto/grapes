@@ -70,6 +70,14 @@ def merge(first, second):
     if not check_compatibility(first, second):
         raise ValueError("Cannot merge incompatible graphs")
     res = nx.compose(first._nxdg, second._nxdg)
+    # If a node in first has value, but its counterpart in second has not, the value must be recovered
+    for key in nx.intersection(first._nxdg, second._nxdg):
+        if (
+            not second._nxdg.nodes[key]["has_value"]
+            and first._nxdg.nodes[key]["has_value"]
+        ):
+            res.nodes[key]["has_value"] = True
+            res.nodes[key]["value"] = first._nxdg.nodes[key]["value"]
     return Graph(nx_digraph=res)
 
 
