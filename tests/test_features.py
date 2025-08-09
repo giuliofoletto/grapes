@@ -163,3 +163,13 @@ def test_make_recipe_dependencies_also_recipes():
 
     assert gr.get_is_recipe(g, "d")
     assert not gr.get_is_recipe(g, "c")
+
+
+def test_get_all_recipes():
+    g = gr.Graph()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.add_step(g, "e", "op_e", "d")
+    gr.add_step(g, "op_c", "b_op_c", "d_op_c")
+    assert gr.get_all_recipes(g) == set(["op_c", "op_e", "b_op_c"])
+    gr.finalize_definition(g)  # Calls make_recipe_dependencies_also_recipes
+    assert gr.get_all_recipes(g) == set(["op_c", "op_e", "b_op_c", "d_op_c"])

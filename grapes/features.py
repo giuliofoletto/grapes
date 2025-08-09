@@ -237,3 +237,14 @@ def get_all_ancestors_target(graph, target):
     Get all the ancestors of a node.
     """
     return nx.ancestors(graph._nxdg, target)
+
+
+def get_all_recipes(graph):
+    """
+    Get all the recipe nodes in the graph.
+    """
+    recipes = set()
+    for node in graph.nodes:
+        if get_is_recipe(graph, node):
+            recipes.add(node)
+    return recipes
