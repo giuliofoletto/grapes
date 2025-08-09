@@ -103,3 +103,23 @@ def test_get_kwargs_values():
 
     gr.update_internal_context(g, {"a": 5, "b": 2})
     assert gr.get_kwargs_values(g, {"exponent": "b"}) == {"exponent": 2}
+
+
+def test_update_recipes_from_module():
+    g = gr.Graph()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    gr.add_step(g, "d", "op_d", "c")
+    gr.finalize_definition(g)
+
+    # Example module with functions
+    import data.example_module as functions
+
+    gr.update_recipes_from_module(g, functions)
+
+    assert g["op_c"] == functions.op_c
+    assert g["op_d"] == functions.op_d
+
+    gr.update_internal_context(g, {"a": 5, "b": 2})
+    gr.execute_to_targets(g, "d")
+    assert g["c"] == 7
+    assert g["d"] == 14

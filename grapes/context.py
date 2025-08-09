@@ -5,6 +5,8 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+import inspect
+
 from .features import (
     get_has_value,
     get_is_frozen,
@@ -133,3 +135,21 @@ def get_kwargs_values(graph, dictionary):
         A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes
     """
     return {key: get_value(graph, value) for key, value in dictionary.items()}
+
+
+def update_recipes_from_module(graph, module):
+    """
+    Update the internal context to assign to recipes the functions with the same name taken from a module.
+
+    Parameters
+    ----------
+    graph: Graph
+        The graph to update
+    module: module
+        Module from which to load the functions
+    """
+    context = {
+        name: func
+        for name, func in inspect.getmembers(module, predicate=inspect.isfunction)
+    }
+    update_internal_context(graph, context)

@@ -6,6 +6,7 @@ from .context import (
     get_list_of_values,
     set_internal_context,
     update_internal_context,
+    update_recipes_from_module,
 )
 from .core import Graph
 from .design import (
