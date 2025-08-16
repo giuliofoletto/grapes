@@ -63,7 +63,7 @@ def check_compatibility(first, second):
     return True
 
 
-def merge(first, second):
+def merge_two(first, second):
     """
     Merge two graphs.
     """
@@ -79,6 +79,18 @@ def merge(first, second):
             res.nodes[key]["has_value"] = True
             res.nodes[key]["value"] = first._nxdg.nodes[key]["value"]
     return Graph(nx_digraph=res)
+
+
+def merge(*graphs):
+    """
+    Merge any number (>=2) of graphs.
+    """
+    if len(graphs) < 2:
+        raise ValueError("At least two graphs are required to merge")
+    elif len(graphs) == 2:
+        return merge_two(graphs[0], graphs[1])
+    else:
+        return merge(merge_two(graphs[0], graphs[1]), *graphs[2:])
 
 
 def get_subgraph(graph, nodes):

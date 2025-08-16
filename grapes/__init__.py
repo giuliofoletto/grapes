@@ -29,9 +29,9 @@ from .features import (
     get_all_ancestors_target,
     get_all_conditionals,
     get_all_nodes,
+    get_all_recipes,
     get_all_sinks,
     get_all_sources,
-    get_all_recipes,
     get_args,
     get_conditions,
     get_has_value,
@@ -52,7 +52,13 @@ from .features import (
     unfreeze,
     update_topological_generation_indexes,
 )
-from .merge import check_compatibility, check_compatibility_nodes, get_subgraph, merge
+from .merge import (
+    check_compatibility,
+    check_compatibility_nodes,
+    get_subgraph,
+    merge,
+    merge_two,
+)
 from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
 from .reachability import (
     clear_reachabilities,

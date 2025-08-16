@@ -26,7 +26,7 @@ def test_check_compatibility_incompatible():
     assert not gr.check_compatibility(g, h)
 
 
-def test_merge():
+def test_merge_two():
     exp = gr.Graph()
     gr.add_step(exp, "c", "op_c", "a", "b")
     gr.add_step(exp, "e", "op_e", "c", "d")
@@ -36,8 +36,29 @@ def test_merge():
     h = gr.Graph()
     gr.add_step(h, "e", "op_e", "c", "d")
 
-    res = gr.merge(g, h)
+    res = gr.merge_two(g, h)
+    res_inv = gr.merge_two(h, g)
     assert res == exp
+    assert res_inv == exp
+
+
+def test_merge_multi():
+    exp = gr.Graph()
+    gr.add_step(exp, "c", "op_c", "a", "b")
+    gr.add_step(exp, "e", "op_e", "c", "d")
+    gr.add_step(exp, "g", "op_g", "e", "f")
+
+    g = gr.Graph()
+    gr.add_step(g, "c", "op_c", "a", "b")
+    h = gr.Graph()
+    gr.add_step(h, "e", "op_e", "c", "d")
+    i = gr.Graph()
+    gr.add_step(i, "g", "op_g", "e", "f")
+
+    res = gr.merge(g, h, i)
+    res_inv = gr.merge(i, h, g)
+    assert res == exp
+    assert res_inv == exp
 
 
 def test_merge_and_execute():
