@@ -5,8 +5,11 @@ Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
 """
 
+import io
 import matplotlib
+import matplotlib.pyplot as plt
 import networkx as nx
+from PIL import Image
 
 from .features import (
     get_all_sinks,
@@ -144,6 +147,29 @@ def write_dotfile(graphviz_graph, filename):
         The name of the file where to save the dot file.
     """
     graphviz_graph.write(filename)
+
+
+def draw_to_screen(graphviz_graph, format="png", prog="dot"):
+    """
+    Draw a graphviz AGraph to an image and return it as a PIL Image.
+
+    Parameters
+    ----------
+    graphviz_graph: pygraphviz.AGraph
+        The graph to be drawn.
+    format: str
+        The format of the output image (default: png). See graphviz documentation for supported formats.
+    prog: str
+        The layout program to use (default: dot). See graphviz documentation for supported programs.
+    """
+    graphviz_graph.layout(prog=prog)
+    buffer = io.BytesIO()
+    graphviz_graph.draw(buffer, format=format)
+    buffer.seek(0)
+    img = Image.open(buffer)
+    plt.imshow(img)
+    plt.axis("off")  # Hide axes
+    plt.show()
 
 
 def draw_to_file(graphviz_graph, filename, format="pdf", prog="dot"):

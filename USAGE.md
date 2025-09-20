@@ -135,6 +135,12 @@ gv = gr.get_graphviz_digraph(
     rankdir="TB",
     splines="ortho",
 )
+gr.draw_to_screen(gv, format="png", prog="dot")
+```
+
+You can also write to a dotfile or save the rendered graph to a file.
+
+```python
 gr.write_dotfile(gv, "ideal_gas.gv")
 gr.draw_to_file(gv, "ideal_gas.pdf", format="pdf", prog="dot")
 print("Graph saved to ideal_gas.pdf")

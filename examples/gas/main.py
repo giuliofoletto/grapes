@@ -85,17 +85,19 @@ result = gr.execute_graph_from_context(g, context, target)
 print(result["T"], "K")  # 1218.73 K
 
 # Visualize the graph
-# Utility code to get folder name
-import os
-
-visualizations_folder_name = (
-    os.path.dirname(os.path.realpath(__file__)) + "/visualizations/"
-)
 gv = gr.get_graphviz_digraph(
     g,
     hide_recipes=True,
     rankdir="TB",
     splines="ortho",
+)
+gr.draw_to_screen(gv, format="png", prog="dot")
+
+# Utility code to get folder name
+import os
+
+visualizations_folder_name = (
+    os.path.dirname(os.path.realpath(__file__)) + "/visualizations/"
 )
 gr.write_dotfile(gv, visualizations_folder_name + "ideal_gas.gv")
 gr.draw_to_file(
