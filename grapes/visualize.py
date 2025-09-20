@@ -115,6 +115,60 @@ def get_graphviz_digraph(
     return g
 
 
+def write_string(graphviz_graph):
+    """
+    Get the string representation of a graphviz AGraph.
+
+    Parameters
+    ----------
+    graphviz_graph: pygraphviz.AGraph
+        The graph to be converted to string.
+
+    Returns
+    -------
+    str
+        The string representation of the graph in dot format.
+    """
+    return graphviz_graph.string()
+
+
+def write_dotfile(graphviz_graph, filename):
+    """
+    Write a graphviz AGraph to a dot file.
+
+    Parameters
+    ----------
+    graphviz_graph: pygraphviz.AGraph
+        The graph to be written.
+    filename: str
+        The name of the file where to save the dot file.
+    """
+    graphviz_graph.write(filename)
+
+
+def draw_to_file(graphviz_graph, filename, format="pdf", prog="dot"):
+    """
+    Draw a graphviz AGraph to file.
+
+    Parameters
+    ----------
+    graphviz_graph: pygraphviz.AGraph
+        The graph to be drawn.
+    filename: str
+        The name of the file where to save the drawing.
+    format: str
+        The format of the output file (default: pdf). See graphviz documentation for supported formats.
+    prog: str
+        The layout program to use (default: dot). See graphviz documentation for supported programs.
+    """
+    # Process filename
+    if ("." + format) not in filename:
+        filename += "." + format
+    graphviz_graph.layout(prog=prog)
+    graphviz_graph.draw(filename, format=format)
+
+
+# Utility functions
 def prettify_label(name):
     return "".join(
         c.upper() if ((i > 0 and name[i - 1] == "_") or i == 0) else c

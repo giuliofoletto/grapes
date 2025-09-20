@@ -91,6 +91,6 @@ from .util import (
     lambdify_graph,
     wrap_graph_with_function,
 )
-from .visualize import get_graphviz_digraph
+from .visualize import get_graphviz_digraph, write_string, write_dotfile, draw_to_file
 
 __version__ = "0.9.0"

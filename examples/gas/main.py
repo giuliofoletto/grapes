@@ -97,6 +97,8 @@ gv = gr.get_graphviz_digraph(
     rankdir="TB",
     splines="ortho",
 )
-gv.write(visualizations_folder_name + "ideal_gas.gv")
-gv.draw(visualizations_folder_name + "ideal_gas.pdf", format="pdf", prog="dot")
+gr.write_dotfile(gv, visualizations_folder_name + "ideal_gas.gv")
+gr.draw_to_file(
+    gv, visualizations_folder_name + "ideal_gas.pdf", format="pdf", prog="dot"
+)
 print("Graph saved to", visualizations_folder_name + "ideal_gas.pdf")

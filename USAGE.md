@@ -135,7 +135,7 @@ gv = gr.get_graphviz_digraph(
     rankdir="TB",
     splines="ortho",
 )
-gv.write("ideal_gas.gv")
-gv.draw("ideal_gas.pdf", format="pdf", prog="dot")
+gr.write_dotfile(gv, "ideal_gas.gv")
+gr.draw_to_file(gv, "ideal_gas.pdf", format="pdf", prog="dot")
 print("Graph saved to ideal_gas.pdf")
 ```
