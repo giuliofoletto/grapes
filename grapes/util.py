@@ -1,5 +1,6 @@
 """
-Some utilities. Also, a more functional API to the execution of graphs.
+Utility functions for grapes.
+These are the main functions that an user (not designer) would use to interact with a grapes graph.
 
 Author: Giulio Foletto <giulio.foletto@outlook.com>.
 License: See project-level license file.
@@ -38,7 +39,7 @@ from .merge import get_subgraph
 from .path import get_path_to_target
 from .reachability import (
     clear_reachabilities,
-    find_reachability_targets,
+    compute_reachability_targets,
     get_has_reachability,
     get_reachability,
     get_worst_reachability,
@@ -52,7 +53,8 @@ from .simplify import (
 def execute_graph_from_context(
     graph, context, *targets, inplace=False, check_feasibility=True
 ):
-    """Execute a graph up to a target given a context.
+    """
+    Execute a graph up to the desired targets given a context.
 
     Parameters
     ----------
@@ -60,7 +62,7 @@ def execute_graph_from_context(
         Graph of the computation.
     context : dict
         Dictionary of the initial context of the computation (input).
-    targets : strings (or keys in the graph)
+    targets : strings (or names of nodes in the graph)
         Indicator of what to compute (desired output).
     inplace : bool
         Whether to modify graph and context inplace (default: False).
@@ -102,7 +104,8 @@ def execute_graph_from_context(
 
 
 def json_from_graph(graph):
-    """Get a JSON string representing the context of a graph.
+    """
+    Get a JSON string representing the context of a graph.
 
     Parameters
     ----------
@@ -138,7 +141,7 @@ def context_from_json_file(file_name):
 
     Parameters
     ----------
-    file_name: str
+    file_name : str
         Path to the json file.
 
     Returns
@@ -156,7 +159,7 @@ def context_from_toml_file(file_name):
 
     Parameters
     ----------
-    file_name: str
+    file_name : str
         Path to the toml file.
 
     Returns
@@ -174,7 +177,7 @@ def context_from_file(file_name):
 
     Parameters
     ----------
-    file_name: str
+    file_name : str
         Path to the file.
 
     Returns
@@ -202,6 +205,29 @@ def context_from_file(file_name):
 def wrap_graph_with_function(
     graph, input_keys, *targets, constants={}, input_as_kwargs=True, output_as_dict=True
 ):
+    """
+    Wrap a graph into a function that can be called with the desired inputs and returns the desired outputs.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        Graph of the computation.
+    input_keys : list or set of strings
+        Keys in the graph that will be treated as inputs of the function.
+    targets : strings (or names of nodes in the graph)
+        Keys in the graph that will be treated as outputs of the function.
+    constants : dict
+        Keys and values that are assigned to the graph before the function creation and are present when the function is called, default: {}. If a key is both in constants and input_keys, it is treated as input (i.e., the value in constants is ignored).
+    input_as_kwargs : bool
+        Whether the input of the function is a set of keyword arguments (True) or a list (False), default: True.
+    output_as_dict : bool
+        Whether the output of the function is a dictionary (True) or a list (False), default: True.
+
+    Returns
+    -------
+    function
+        A function that can be called with the desired inputs and returns the desired outputs.
+    """
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
     # Pass all constants to the graph
@@ -301,6 +327,25 @@ def wrap_graph_with_function(
 
 
 def lambdify_graph(graph, input_keys, target, constants={}):
+    """
+    Convert a graph into a function that can be called with the desired inputs and returns the desired output.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        Graph of the computation.
+    input_keys : list or set of strings
+        Keys in the graph that will be treated as inputs of the function.
+    target : string (or name of a node in the graph)
+        Key in the graph that will be treated as output of the function.
+    constants : dict
+        Keys and values that are assigned to the graph before the function creation and are present when the function is called, default: {}. If a key is both in constants and input_keys, it is treated as input (i.e., the value in constants is ignored).
+
+    Returns
+    -------
+    function
+        A function that can be called with the desired inputs and returns the desired output.
+    """
     # Copy graph so as not to pollute the original
     operational_graph = copy.deepcopy(graph)
     # Pass all constants to the graph
@@ -341,6 +386,27 @@ def lambdify_graph(graph, input_keys, target, constants={}):
 
 
 def check_feasibility_of_execution(graph, context, *targets, inplace=False):
+    """
+    Check the feasibility of executing a graph up to the desired targets given a context.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        Graph of the computation.
+    context : dict
+        Dictionary of the initial context of the computation (input).
+    targets : strings (or names of nodes in the graph)
+        Indicator of what to compute (desired output).
+    inplace : bool
+        Whether to modify graph and context inplace (default: False).
+
+    Returns
+    -------
+    feasibility : str
+        One of "reachable", "unreachable", "uncertain".
+    missing_dependencies : set
+        Set of nodes that are missing in the context and prevent the computation from being feasible.
+    """
     # No target is interpreted as compute everything
     if len(targets) == 0:
         targets = graph.get_all_sinks(exclude_recipes=True)
@@ -351,7 +417,7 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
 
     clear_reachabilities(graph)
     set_internal_context(graph, context)
-    find_reachability_targets(graph, *targets)
+    compute_reachability_targets(graph, *targets)
     feasibility = get_worst_reachability(graph, *targets)
     missing_dependencies = set()
     if feasibility in {"unreachable", "uncertain"}:
@@ -366,6 +432,23 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
 
 
 def get_execution_subgraph(graph, context, *targets):
+    """
+    Get the subgraph that would be executed to compute the desired targets given a context.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        Graph of the computation.
+    context : dict
+        Dictionary of the initial context of the computation (input).
+    targets : strings (or names of nodes in the graph)
+        Indicator of what to compute (desired output).
+
+    Returns
+    -------
+    grapes Graph
+        Subgraph that would be executed to compute the desired targets given the context.
+    """
     graph = copy.deepcopy(graph)
     context = copy.deepcopy(context)
     update_internal_context(graph, context)

@@ -179,7 +179,7 @@ def test_remove_step():
     gr.remove_step(g, "b")
     with pytest.raises(KeyError):
         g["b"]
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         gr.remove_step(g, "d")
 
 

@@ -20,6 +20,17 @@ from .features import (
 def clear_values(graph, *args):
     """
     Clear values in the graph nodes.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph whose values are to be cleared
+    *args : hashables (typically strings)
+        Names of nodes whose values are to be cleared. If no names are given, all values are cleared.
+
+    Notes
+    -----
+    Frozen nodes are not cleared.
     """
     if len(args) == 0:  # Interpret as "Clear everything"
         nodes_to_clear = graph.nodes
@@ -38,7 +49,9 @@ def update_internal_context(graph, dictionary):
 
     Parameters
     ----------
-    dictionary: dict
+    graph : Graph
+        The graph to update
+    dictionary : dict
         Dictionary with the new values
     """
     for key, value in dictionary.items():
@@ -53,7 +66,9 @@ def set_internal_context(graph, dictionary):
 
     Parameters
     ----------
-    dictionary: dict
+    graph : Graph
+        The graph to update
+    dictionary : dict
         Dictionary with the new values
     """
     clear_values(graph)
@@ -66,8 +81,10 @@ def get_internal_context(graph, exclude_recipes=False):
 
     Parameters
     ----------
-    exclude_recipes: bool
-        Whether to exclude recipes from the returned dictionary or keep them.
+    graph : Graph
+        The graph whose context is to be retrieved
+    exclude_recipes : bool
+        Whether to exclude recipes from the returned dictionary or keep them, default: False.
     """
     if exclude_recipes:
         return {
@@ -85,11 +102,13 @@ def get_internal_context(graph, exclude_recipes=False):
 
 def get_list_of_values(graph, list_of_keys):
     """
-    Get values as list.
+    Get list of values corresponding to list of keys.
 
     Parameters
     ----------
-    list_of_keys: list of hashables (typically strings)
+    graph : Graph
+        The graph from which to get the values
+    list_of_keys : list of hashables (typically strings)
         List of names of nodes whose values are required
 
     Returns
@@ -105,11 +124,13 @@ def get_list_of_values(graph, list_of_keys):
 
 def get_dict_of_values(graph, list_of_keys):
     """
-    Get values as dictionary.
+    Get dictionary of key:value pairs corresponding to list of keys.
 
     Parameters
     ----------
-    list_of_keys: list of hashables (typically strings)
+    graph : Graph
+        The graph from which to get the values
+    list_of_keys : list of hashables (typically strings)
         List of names of nodes whose values are required
 
     Returns
@@ -126,7 +147,9 @@ def get_kwargs_values(graph, dictionary):
 
     Parameters
     ----------
-    dictionary: dict
+    graph : Graph
+        The graph from which to get the values
+    dictionary : dict
         Keys in dictionary are to be interpreted as keys for function kwargs, while values in dictionary are node names
 
     Returns
@@ -143,10 +166,14 @@ def update_recipes_from_module(graph, module):
 
     Parameters
     ----------
-    graph: Graph
+    graph : Graph
         The graph to update
-    module: module
+    module : module
         Module from which to load the functions
+
+    Notes
+    -----
+    Only functions whose name matches a recipe in the graph are loaded.
     """
     context = {
         name: func

@@ -18,14 +18,62 @@ from .features import (
 
 
 def get_has_reachability(graph, node):
+    """
+    Check if a node has a reachability value.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    node : str
+        The name of the node.
+
+    Returns
+    -------
+    bool
+        True if the node has a reachability value, False otherwise.
+    """
     return get_node_attribute(graph, node, "has_reachability")
 
 
 def set_has_reachability(graph, node, has_reachability):
+    """
+    Set whether a node has a reachability value.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    node : str
+        The name of the node.
+    has_reachability : bool
+        Whether the node has a reachability value.
+    """
     return set_node_attribute(graph, node, "has_reachability", has_reachability)
 
 
 def get_reachability(graph, node):
+    """
+    Get the reachability value of a node.
+    It does not compute it, just retrieves it.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    node : str
+        The name of the node.
+
+    Returns
+    -------
+    str
+        The reachability value ("unreachable", "uncertain", or "reachable").
+
+    Raises
+    ------
+    ValueError
+        If the node does not have a reachability value.
+    """
     if get_node_attribute(
         graph, node, "reachability"
     ) is not None and get_node_attribute(graph, node, "has_reachability"):
@@ -35,6 +83,23 @@ def get_reachability(graph, node):
 
 
 def set_reachability(graph, node, reachability):
+    """
+    Set the reachability value of a node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    node : str
+        The name of the node.
+    reachability : str
+        The reachability value ("unreachable", "uncertain", or "reachable").
+
+    Raises
+    ------
+    ValueError
+        If the reachability value is not valid.
+    """
     if reachability not in ("unreachable", "uncertain", "reachable"):
         raise ValueError(reachability + " is not a valid reachability value.")
     set_node_attribute(graph, node, "reachability", reachability)
@@ -42,12 +107,29 @@ def set_reachability(graph, node, reachability):
 
 
 def unset_reachability(graph, node):
+    """
+    Unset the reachability value of a node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    node : str
+        The name of the node.
+    """
     set_node_attribute(graph, node, "has_reachability", False)
 
 
 def clear_reachabilities(graph, *args):
     """
     Clear reachabilities in the graph nodes.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    *args : str
+        Node names to clear. If empty, all nodes are cleared.
     """
     if len(args) == 0:  # Interpret as "Clear everything"
         nodes_to_clear = graph.nodes
@@ -60,25 +142,44 @@ def clear_reachabilities(graph, *args):
         unset_reachability(graph, node)
 
 
-def find_reachability_target(graph, target):
+def compute_reachability_target(graph, target):
     """
-    Generic interface to find the reachability of a GenericNode.
+    Compute the reachability of a target node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    target : str
+        The name of the target node.
+
+    Raises
+    ------
+    ValueError
+        If the node type is not supported.
     """
     if get_type(graph, target) == "standard":
-        return find_reachability_standard(graph, target)
+        return compute_reachability_standard(graph, target)
     elif get_type(graph, target) == "conditional":
-        return find_reachability_conditional(graph, target)
+        return compute_reachability_conditional(graph, target)
     else:
         raise ValueError(
-            "Finding the reachability of nodes of type "
+            "Computing the reachability of nodes of type "
             + get_type(graph, target)
             + " is not supported"
         )
 
 
-def find_reachability_standard(graph, node):
+def compute_reachability_standard(graph, node):
     """
-    Find the reachability of a standard node.
+    Compute the reachability of a standard node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    node : str
+        The name of the standard node.
     """
     # Check if it already has a reachability
     if get_has_reachability(graph, node):
@@ -94,13 +195,20 @@ def find_reachability_standard(graph, node):
         set_reachability(graph, node, "unreachable")
         return
     # Otherwise, dependencies must be checked
-    find_reachability_targets(graph, *dependencies)
+    compute_reachability_targets(graph, *dependencies)
     set_reachability(graph, node, get_worst_reachability(graph, *dependencies))
 
 
-def find_reachability_conditional(graph, conditional):
+def compute_reachability_conditional(graph, conditional):
     """
-    Find the reachability of a conditional.
+    Compute the reachability of a conditional node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node.
+    conditional : str
+        The name of the conditional node.
     """
     # Check if it already has a reachability
     if get_has_reachability(graph, conditional):
@@ -115,7 +223,7 @@ def find_reachability_conditional(graph, conditional):
         if get_has_value(graph, condition) and get_value(graph, condition):
             # A condition is true
             possibility = get_possibilities(graph, conditional)[index]
-            find_reachability_target(graph, possibility)
+            compute_reachability_target(graph, possibility)
             set_reachability(graph, conditional, get_reachability(graph, possibility))
             return
     else:
@@ -124,8 +232,8 @@ def find_reachability_conditional(graph, conditional):
         # If all conditions and possibilities are unreachable -> unreachable
         # If some conditions are reachable or uncertain but the corresponding possibilities are all unreachable -> unreachable
         # In all other cases -> uncertain
-        find_reachability_targets(graph, *get_conditions(graph, conditional))
-        find_reachability_targets(graph, *get_possibilities(graph, conditional))
+        compute_reachability_targets(graph, *get_conditions(graph, conditional))
+        compute_reachability_targets(graph, *get_possibilities(graph, conditional))
 
         if (
             get_worst_reachability(
@@ -168,12 +276,37 @@ def find_reachability_conditional(graph, conditional):
                 set_reachability(graph, conditional, "uncertain")
 
 
-def find_reachability_targets(graph, *targets):
+def compute_reachability_targets(graph, *targets):
+    """
+    Compute the reachability of multiple target nodes.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    *targets : str
+        Node names to check reachability for.
+    """
     for target in targets:
-        find_reachability_target(graph, target)
+        compute_reachability_target(graph, target)
 
 
 def get_worst_reachability(graph, *nodes):
+    """
+    Get the worst (least reachable) reachability value among a set of nodes.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    *nodes : str
+        Node names to check.
+
+    Returns
+    -------
+    str
+        The worst reachability value ("unreachable", "uncertain", or "reachable").
+    """
     list_of_reachabilities = []
     for node in nodes:
         list_of_reachabilities.append(get_reachability(graph, node))
@@ -186,6 +319,21 @@ def get_worst_reachability(graph, *nodes):
 
 
 def get_best_reachability(graph, *nodes):
+    """
+    Get the best (most reachable) reachability value among a set of nodes.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    *nodes : str
+        Node names to check.
+
+    Returns
+    -------
+    str
+        The best reachability value ("reachable", "uncertain", or "unreachable").
+    """
     list_of_reachabilities = []
     for node in nodes:
         list_of_reachabilities.append(get_reachability(graph, node))

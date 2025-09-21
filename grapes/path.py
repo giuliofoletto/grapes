@@ -16,7 +16,24 @@ from .features import (
 
 def get_path_to_target(graph, target):
     """
-    Generic interface to get the path from the last valued nodes to a target.
+    Get the path from the last valued nodes to a target node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    target : str
+        The name of the target node.
+
+    Returns
+    -------
+    set
+        Set of node names representing the path from valued nodes to the target.
+
+    Raises
+    ------
+    ValueError
+        If the node type is not supported.
     """
     if get_type(graph, target) == "standard":
         return get_path_to_standard(graph, target)
@@ -33,6 +50,18 @@ def get_path_to_target(graph, target):
 def get_path_to_standard(graph, node):
     """
     Get the path from the last valued nodes to a standard node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    node : str
+        The name of the standard node.
+
+    Returns
+    -------
+    set
+        Set of node names representing the path from valued nodes to the standard node.
     """
     result = set((node,))
     if get_has_value(graph, node):
@@ -46,6 +75,18 @@ def get_path_to_standard(graph, node):
 def get_path_to_conditional(graph, conditional):
     """
     Get the path from the last valued nodes to a conditional node.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    conditional : str
+        The name of the conditional node.
+
+    Returns
+    -------
+    set
+        Set of node names representing the path from valued nodes to the conditional node.
     """
     result = set((conditional,))
     if get_has_value(graph, conditional):

@@ -50,7 +50,7 @@ from .features import (
     set_is_frozen,
     set_topological_generation_index,
     unfreeze,
-    update_topological_generation_indexes,
+    compute_topological_generation_indexes,
 )
 from .merge import (
     check_compatibility,
@@ -62,10 +62,10 @@ from .merge import (
 from .path import get_path_to_conditional, get_path_to_standard, get_path_to_target
 from .reachability import (
     clear_reachabilities,
-    find_reachability_conditional,
-    find_reachability_standard,
-    find_reachability_target,
-    find_reachability_targets,
+    compute_reachability_conditional,
+    compute_reachability_standard,
+    compute_reachability_target,
+    compute_reachability_targets,
     get_best_reachability,
     get_has_reachability,
     get_reachability,

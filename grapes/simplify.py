@@ -30,6 +30,24 @@ from .features import (
 
 
 def simplify_dependency(graph, node_name, dependency_name):
+    """
+    Simplify a dependency of a node by merging its computation into that of the node.
+    For example if the graph is a->b->c and we simplify b as a dependency of c, the graph becomes a->c, with c now computing what b used to compute as well.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    node_name : str
+        The name of the node that will include in its computation that of the dependency.
+    dependency_name : str
+        The name of the dependency to eliminate and merge into the node.
+
+    Raises
+    ------
+    TypeError
+        If the dependency or its recipe is not a standard node.
+    """
     # Make everything a keyword argument. This is the fate of a simplified node
     get_kwargs(graph, node_name).update(
         {argument: argument for argument in get_args(graph, node_name)}
@@ -94,6 +112,18 @@ def simplify_dependency(graph, node_name, dependency_name):
 
 
 def simplify_all_dependencies(graph, node_name, exclude=set()):
+    """
+    Simplify all dependencies of a node except those in the exclude set.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes.
+    node_name : str
+        The name of the node to simplify.
+    exclude : set or iterable, optional
+        Dependencies to exclude from simplification (default: empty set).
+    """
     if not isinstance(exclude, set):
         exclude = set(exclude)
     # If a dependency is a source, it cannot be simplified
@@ -110,14 +140,21 @@ def convert_conditional_to_trivial_step(
     graph, conditional, execute_towards_conditions=False
 ):
     """
-    Convert a conditional to a trivial step that returns the dependency corresponding to the true condition.
+    Convert a conditional node to a trivial step that returns the dependency corresponding to the true condition.
 
     Parameters
     ----------
-    conditional: hashable (typically string)
-        The name of the conditional node to be converted
-    execute_towards_conditions: bool
-        Whether to execute the graph towards the conditions until one is found true (default: False)
+    graph : grapes Graph
+        The graph containing the nodes.
+    conditional : str
+        The name of the conditional node to be converted.
+    execute_towards_conditions : bool, optional
+        Whether to execute the graph towards the conditions until one is found true (default: False).
+
+    Raises
+    ------
+    ValueError
+        If no condition is true and there is no default possibility.
     """
     if execute_towards_conditions:
         execute_towards_all_conditions_of_conditional(graph, conditional)
@@ -167,12 +204,14 @@ def convert_conditional_to_trivial_step(
 
 def convert_all_conditionals_to_trivial_steps(graph, execute_towards_conditions=False):
     """
-    Convert all conditionals in the graph to trivial steps that return the dependency corresponding to the true condition.
+    Convert all conditional nodes in the graph to trivial steps.
 
     Parameters
     ----------
-    execute_towards_conditions: bool
-        Whether to execute the graph towards the conditions until one is found true (default: False)
+    graph : grapes Graph
+        The graph containing the nodes.
+    execute_towards_conditions : bool, optional
+        Whether to execute the graph towards the conditions until one is found true (default: False).
     """
     conditionals = get_all_conditionals(graph)
     for conditional in conditionals:

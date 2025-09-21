@@ -24,7 +24,7 @@ from .features import (
     set_recipe,
     set_type,
     set_value,
-    update_topological_generation_indexes,
+    compute_topological_generation_indexes,
 )
 
 starting_node_properties = {
@@ -42,6 +42,19 @@ starting_node_properties = {
 def add_step(graph, name, recipe=None, *args, **kwargs):
     """
     Interface to add a node to the graph, with all its dependencies.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph to which to add the step
+    name : hashable (typically string)
+        Name of the node to add
+    recipe : hashable (typically string), optional
+        Name of the recipe node to add, if any. Default is None.
+    *args : hashables (typically strings)
+        Names of nodes to add as positional dependencies
+    **kwargs : hashables (typically strings)
+        Names of nodes to add as keyword dependencies. Keys in the dicts are the keywords to be used when calling the recipe.
     """
     # Check that if a node has dependencies, it also has a recipe
     if recipe is None and (len(args) > 0 or len(kwargs.keys()) > 0):
@@ -94,6 +107,15 @@ def add_step_quick(graph, name, recipe):
 
     The recipe node takes the name of the passed function.
     Dependency nodes are built from the args and kwonlyargs of the passed function.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph to which to add the step
+    name : hashable (typically string)
+        Name of the node to add
+    recipe : function
+        Function to be used as recipe
     """
     # Check that the passed recipe is a valid function
     if not inspect.isfunction(recipe):
@@ -125,6 +147,20 @@ def add_step_quick(graph, name, recipe):
 def add_simple_conditional(graph, name, condition, value_true, value_false):
     """
     Interface to add a conditional to the graph.
+    A conditional is a node that takes the value of another node (one of the possibilities) depending on the boolean value of a condition node.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph to which to add the conditional
+    name : hashable (typically string)
+        Name of the conditional node to add
+    condition : hashable (typically string)
+        Name of the condition node to add
+    value_true : hashable (typically string)
+        Name of the node to add as possibility if the condition is true
+    value_false : hashable (typically string)
+        Name of the node to add as possibility if the condition is false
     """
     add_multiple_conditional(
         graph, name, conditions=[condition], possibilities=[value_true, value_false]
@@ -134,6 +170,18 @@ def add_simple_conditional(graph, name, condition, value_true, value_false):
 def add_multiple_conditional(graph, name, conditions, possibilities):
     """
     Interface to add a multiple conditional to the graph.
+    A multiple conditional is a node that takes the value of one of its possibilities depending on which of its condition nodes evaluates to True.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph to which to add the conditional
+    name : hashable (typically string)
+        Name of the conditional node to add
+    conditions : list of hashables (typically strings)
+        Names of the condition nodes to add
+    possibilities : list of hashables (typically strings)
+        Names of the nodes to add as possibilities
     """
     # Add all nodes and connect all edges
     # Avoid adding existing node so as not to overwrite attributes
@@ -157,7 +205,20 @@ def add_multiple_conditional(graph, name, conditions, possibilities):
 
 def edit_step(graph, name, recipe=None, *args, **kwargs):
     """
-    Interface to edit an existing node, changing its predecessors
+    Interface to edit an existing node, changing its predecessors.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph to which to add the step
+    name : hashable (typically string)
+        Name of the node to edit
+    recipe : hashable (typically string), optional
+        Name of the recipe node to add, if any. Default is None.
+    *args : hashables (typically strings)
+        Names of nodes to add as positional dependencies
+    **kwargs : hashables (typically strings)
+        Names of nodes to add as keyword dependencies. Keys in the dicts are the keywords to be used when calling the recipe.
     """
     if name not in graph.nodes:
         raise ValueError("Cannot edit non-existent node " + name)
@@ -188,19 +249,36 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
 def remove_step(graph, name):
     """
     Interface to remove an existing node, without changing anything else
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph from which to remove the step
+    name : hashable (typically string)
+        Name of the node to remove
+
+    Raises
+    ------
+    KeyError
+        If the node does not exist
     """
     if name not in graph.nodes:
-        raise ValueError("Cannot edit non-existent node " + name)
+        raise KeyError("Cannot edit non-existent node " + name)
     graph._nxdg.remove_node(name)
 
 
 def finalize_definition(graph):
     """
-    Perform operations that should typically be done after the definition of a graph is completed
+    Perform operations that should typically be done after the definition of a graph is completed.
 
     Currently, this freezes all values, because it is assumed that values given during definition are to be frozen.
     It also marks dependencies of recipes as recipes themselves.
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph to finalize
     """
     make_recipe_dependencies_also_recipes(graph)
-    update_topological_generation_indexes(graph)
+    compute_topological_generation_indexes(graph)
     freeze(graph)

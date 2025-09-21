@@ -21,7 +21,21 @@ from .features import (
 
 def evaluate_target(graph, target, continue_on_fail=False):
     """
-    Generic interface to evaluate a GenericNode.
+    Evaluate a target node in the graph (any type of node).
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node to evaluate.
+    target : str
+        The name of the node to evaluate.
+    continue_on_fail : bool, optional
+        If True, continue evaluation even if an error occurs (default is False).
+
+    Raises
+    ------
+    ValueError
+        If the node type is not supported or evaluation fails and continue_on_fail is False.
     """
     if get_type(graph, target) == "standard":
         return evaluate_standard(graph, target, continue_on_fail)
@@ -37,7 +51,21 @@ def evaluate_target(graph, target, continue_on_fail=False):
 
 def evaluate_standard(graph, node, continue_on_fail=False):
     """
-    Evaluate of a node.
+    Evaluate a standard node in the graph.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the node to evaluate.
+    node : str
+        The name of the standard node to evaluate.
+    continue_on_fail : bool, optional
+        If True, continue evaluation even if an error occurs (default is False).
+
+    Raises
+    ------
+    Exception
+        If evaluation fails and continue_on_fail is False.
     """
     # Check if it already has a value
     if get_has_value(graph, node):
@@ -71,7 +99,21 @@ def evaluate_standard(graph, node, continue_on_fail=False):
 
 def evaluate_conditional(graph, conditional, continue_on_fail=False):
     """
-    Evaluate a conditional.
+    Evaluate a conditional node in the graph.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the conditional node.
+    conditional : str
+        The name of the conditional node to evaluate.
+    continue_on_fail : bool, optional
+        If True, continue evaluation even if an error occurs (default is False).
+
+    Raises
+    ------
+    ValueError
+        If no condition is true or evaluation fails and continue_on_fail is False.
     """
     # Check if it already has a value
     if get_has_value(graph, conditional):
@@ -115,7 +157,14 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
 
 def execute_to_targets(graph, *targets):
     """
-    Evaluate all nodes in the graph that are needed to reach the targets.
+    Evaluate all nodes in the graph required to reach the specified targets.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes to evaluate.
+    *targets : str
+        One or more target node names to evaluate.
     """
     for target in targets:
         evaluate_target(graph, target, False)
@@ -123,7 +172,14 @@ def execute_to_targets(graph, *targets):
 
 def progress_towards_targets(graph, *targets):
     """
-    Move towards the targets by evaluating nodes, but keep going if evaluation fails.
+    Progress towards the specified targets by evaluating nodes, continuing on failure.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the nodes to evaluate.
+    *targets : str
+        One or more target node names to evaluate.
     """
     for target in targets:
         evaluate_target(graph, target, True)
@@ -131,7 +187,14 @@ def progress_towards_targets(graph, *targets):
 
 def execute_towards_conditions(graph, *conditions):
     """
-    Move towards the conditions, stop if one is found true.
+    Progress towards the specified conditions, stopping if one is found true.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the conditions.
+    *conditions : str
+        One or more condition node names to evaluate.
     """
     for condition in conditions:
         evaluate_target(graph, condition, True)
@@ -141,6 +204,13 @@ def execute_towards_conditions(graph, *conditions):
 
 def execute_towards_all_conditions_of_conditional(graph, conditional):
     """
-    Move towards the conditions of a specific conditional, stop if one is found true.
+    Progress towards all conditions of a specific conditional node, stopping if one is found true.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph containing the conditional node.
+    conditional : str
+        The name of the conditional node whose conditions are to be evaluated.
     """
     execute_towards_conditions(graph, *get_conditions(graph, conditional))

@@ -28,6 +28,31 @@ def get_graphviz_digraph(
     colormap="viridis",
     **attrs,
 ):
+    """
+    Create a Graphviz AGraph from a grapes graph.
+
+    Parameters
+    ----------
+    graph : grapes Graph
+        The graph to visualize.
+    hide_recipes : bool, optional
+        If True, recipe nodes are hidden (default: False).
+    pretty_names : bool, optional
+        If True, node labels are prettified (default: False).
+    include_values : bool, optional
+        If True, node values are included in labels (default: False).
+    color_mode : str, optional
+        Coloring mode for nodes ("none", "by_generation", "sources_and_sinks").
+    colormap : str, optional
+        Name of matplotlib colormap to use (default: "viridis").
+    **attrs
+        Additional attributes for the AGraph.
+
+    Returns
+    -------
+    pygraphviz.AGraph
+        The constructed Graphviz AGraph.
+    """
     # Get a graphviz AGraph
     g = nx.drawing.nx_agraph.to_agraph(graph._nxdg)
     # Add attributes to the AGraph
@@ -124,7 +149,7 @@ def write_string(graphviz_graph):
 
     Parameters
     ----------
-    graphviz_graph: pygraphviz.AGraph
+    graphviz_graph : pygraphviz.AGraph
         The graph to be converted to string.
 
     Returns
@@ -141,9 +166,9 @@ def write_dotfile(graphviz_graph, filename):
 
     Parameters
     ----------
-    graphviz_graph: pygraphviz.AGraph
+    graphviz_graph : pygraphviz.AGraph
         The graph to be written.
-    filename: str
+    filename : str
         The name of the file where to save the dot file.
     """
     graphviz_graph.write(filename)
@@ -151,16 +176,16 @@ def write_dotfile(graphviz_graph, filename):
 
 def draw_to_screen(graphviz_graph, format="png", prog="dot"):
     """
-    Draw a graphviz AGraph to an image and return it as a PIL Image.
+    Draw a graphviz AGraph to an image and display it using matplotlib.
 
     Parameters
     ----------
-    graphviz_graph: pygraphviz.AGraph
+    graphviz_graph : pygraphviz.AGraph
         The graph to be drawn.
-    format: str
-        The format of the output image (default: png). See graphviz documentation for supported formats.
-    prog: str
-        The layout program to use (default: dot). See graphviz documentation for supported programs.
+    format : str, optional
+        The format of the output image (default: "png"). See graphviz documentation for supported formats.
+    prog : str, optional
+        The layout program to use (default: "dot"). See graphviz documentation for supported programs.
     """
     graphviz_graph.layout(prog=prog)
     buffer = io.BytesIO()
@@ -174,18 +199,18 @@ def draw_to_screen(graphviz_graph, format="png", prog="dot"):
 
 def draw_to_file(graphviz_graph, filename, format="pdf", prog="dot"):
     """
-    Draw a graphviz AGraph to file.
+    Draw a graphviz AGraph to a file.
 
     Parameters
     ----------
-    graphviz_graph: pygraphviz.AGraph
+    graphviz_graph : pygraphviz.AGraph
         The graph to be drawn.
-    filename: str
+    filename : str
         The name of the file where to save the drawing.
-    format: str
-        The format of the output file (default: pdf). See graphviz documentation for supported formats.
-    prog: str
-        The layout program to use (default: dot). See graphviz documentation for supported programs.
+    format : str, optional
+        The format of the output file (default: "pdf"). See graphviz documentation for supported formats.
+    prog : str, optional
+        The layout program to use (default: "dot"). See graphviz documentation for supported programs.
     """
     # Process filename
     if ("." + format) not in filename:
@@ -196,6 +221,19 @@ def draw_to_file(graphviz_graph, filename, format="pdf", prog="dot"):
 
 # Utility functions
 def prettify_label(name):
+    """
+    Prettify a node label by capitalizing and replacing underscores with spaces.
+
+    Parameters
+    ----------
+    name : str
+        The original node name.
+
+    Returns
+    -------
+    str
+        The prettified label.
+    """
     return "".join(
         c.upper() if ((i > 0 and name[i - 1] == "_") or i == 0) else c
         for i, c in enumerate(name)
@@ -208,13 +246,13 @@ def hex_string_from_rgba(r, g, b, a):
 
     Parameters
     ----------
-    r: float
+    r : float
         Red color channel in [0, 1].
-    g: float
+    g : float
         Green color channel in [0, 1].
-    b: float
+    b : float
         Blue color channel in [0, 1].
-    a: float
+    a : float
         Alpha color channel in [0, 1].
 
     Returns
@@ -232,18 +270,18 @@ def hex_string_from_rgba(r, g, b, a):
 
 def best_text_from_background_color(r, g, b, a=1.0):
     """
-    Get the best text color from background.
+    Get the best text color (white or black) for a given background color.
 
     Parameters
     ----------
-    r: float
+    r : float
         Red color channel in [0, 1].
-    g: float
+    g : float
         Green color channel in [0, 1].
-    b: float
+    b : float
         Blue color channel in [0, 1].
-    a: float
-        Alpha color channel in [0, 1] (default: 1). This value is ignored.
+    a : float, optional
+        Alpha color channel in [0, 1] (default: 1.0). This value is ignored.
 
     Returns
     -------

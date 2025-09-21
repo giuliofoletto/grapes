@@ -27,6 +27,11 @@ See [`USAGE.md`](USAGE.md) for a detailed explanation of how to use `grapes`, wi
 
 It relies internally on [`networkx`](https://networkx.org/) for graph management and on [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) for graph visualization.
 
+## Use of AI tools
+
+Most of the development of `grapes` was done before AI coding tools were available.
+However, recent edits (September 2025) were assisted by GitHub Copilot, especially for writing docstrings.
+
 ## Authorship and License
 
 The bulk of `grapes` development was done by Giulio Foletto in his spare time.
