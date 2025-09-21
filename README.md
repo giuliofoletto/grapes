@@ -3,36 +3,50 @@
 A simple library for dataflow programming in python.
 It allows you to organize your computation as a directed acyclic graph.
 
-## Installation
+## Quickstart
 
-`grapes` is available on [PyPI](https://pypi.org/project/grapes/).
-Install it from there with
+For more complete documentation, please refer to the files in the `docs/` folder.
+Here's what you need to know to get started quickly.
+
+Install `grapes` from PyPI with
 
 ```console
 pip install grapes
 ```
 
-This takes care of installing the dependencies as well (listed in [pyproject.toml](pyproject.toml)).
+Define a graph by adding steps and binding functions to them:
 
-Caveat: when pip tries to install the dependency [`pygraphviz`](https://github.com/pygraphviz/pygraphviz), it might fail if you don't have its binary dependencies installed.
-A simple way tho solve this is to first install `pygraphviz` from [conda-forge](https://conda-forge.org/) and then proceed with the installation of `grapes`.
+```python
+import grapes as gr
+g = gr.Graph()
+gr.add_step(g, "b", "compute_b", "a")
+gr.add_step(g, "c", "compute_c", "b")
+gr.update_internal_context(g,
+    {
+        "compute_b": lambda a: 2*a,
+        "compute_c": lambda b: b+1
+    }
+)
+gr.finalize_definition(g)
+```
 
-## Usage
+Execute the graph to find your target, starting from your input context.
 
-See [`USAGE.md`](USAGE.md) for a detailed explanation of how to use `grapes`, with examples.
+```python
+context = {"a": 3}
+target = "c"
+result = gr.execute_graph_from_context(g, context, target)
+print(result["c"])  # 7
+```
 
-## Acknowledgements
+## Additional remarks
+
+The bulk of `grapes` development was done by Giulio Foletto in his spare time.
+See `LICENSE.txt` and `NOTICE.txt` for details on how `grapes` is distributed.
 
 `grapes` is inspired by [`pythonflow`](https://github.com/spotify/pythonflow) but with substantial modifications.
 
 It relies internally on [`networkx`](https://networkx.org/) for graph management and on [`pygraphviz`](https://github.com/pygraphviz/pygraphviz) for graph visualization.
 
-## Use of AI tools
-
 Most of the development of `grapes` was done before AI coding tools were available.
 However, recent edits (September 2025) were assisted by GitHub Copilot, especially for writing docstrings.
-
-## Authorship and License
-
-The bulk of `grapes` development was done by Giulio Foletto in his spare time.
-See `LICENSE.txt` and `NOTICE.txt` for details on how `grapes` is distributed.

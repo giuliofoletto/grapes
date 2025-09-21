@@ -11,9 +11,16 @@ It also allows you to easily visualize the calculation as a graph.
 Here is a simple example of how to use `grapes` to compute the internal energy $U$ of an ideal gas given its pressure $P$, volume $V$, its number of moles $n$, and the universal constant of ideal gases $R$.
 
 You can first think about how you would solve the problem on paper, and realize that
-$$ T = \frac{PV}{nR} $$
+
+$$
+T = \frac{PV}{nR}
+$$
+
 and that
-$$ U = \frac32 nRT $$
+
+$$
+U = \frac32 nRT
+$$
 
 Then you can translate this to pure python functions:
 
@@ -69,7 +76,10 @@ print(result["U"], "J")  # 15198.75 J
 
 Now imagine that you are not given `n`, but rather the mass `m` of the gas (in kg) and its molar mass `M` (in g/mol).
 You can add another step to the graph to compute `n` from `m` and `M` using the equation
-$$ n = 10^3\cdot\frac{m}{M} $$
+
+$$
+n = 10^3\cdot\frac{m}{M}
+$$
 
 ```python
 # Change the graph to compute n from m and M
@@ -120,7 +130,7 @@ result = gr.execute_graph_from_context(g, context, target)
 print(result["T"], "K")  # 1218.73 K
 ```
 
-The full code of this example is available in the [`examples/gas/main.py`](examples/gas/main.py) file.
+The full code of this example is available in the `examples/gas/main.py` file.
 
 ## Visualization
 
