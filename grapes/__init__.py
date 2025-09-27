@@ -52,6 +52,7 @@ from .features import (
     unfreeze,
     compute_topological_generation_indexes,
 )
+from .function_composer import function_compose_simple, identity_token
 from .merge import (
     check_compatibility,
     check_compatibility_nodes,

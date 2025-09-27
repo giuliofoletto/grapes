@@ -17,7 +17,7 @@ def test_one_argument():
     def internal(argument_of_internal):
         return 2 * argument_of_internal
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
         subfuncs=[internal],
         func_dependencies=["argument"],
@@ -38,7 +38,7 @@ def test_change_names():
     def internal(argument_of_internal):
         return 2 * argument_of_internal
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
         subfuncs=[internal],
         func_dependencies=["new_argument"],
@@ -64,7 +64,7 @@ def test_two_arguments():
     def second_function(argument_of_second_function):
         return 3 * argument_of_second_function
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
         subfuncs=[first_function, second_function],
         func_dependencies=["first_argument", "second_argument"],
@@ -88,9 +88,9 @@ def test_two_arguments_compose_first():
     def first_function(argument_of_first_function):
         return 2 * argument_of_first_function
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
-        subfuncs=[first_function, gr.function_composer.identity_token],
+        subfuncs=[first_function, gr.identity_token],
         func_dependencies=["first_argument", "second_argument"],
         subfuncs_dependencies=[["argument_of_first_function"]],
     )
@@ -109,9 +109,9 @@ def test_two_arguments_compose_second():
     def second_function(argument_of_second_function):
         return 2 * argument_of_second_function
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
-        subfuncs=[gr.function_composer.identity_token, second_function],
+        subfuncs=[gr.identity_token, second_function],
         func_dependencies=["first_argument", "second_argument"],
         subfuncs_dependencies=[[], ["argument_of_second_function"]],
     )  # Need to pass something to keep indexes aligned
@@ -133,7 +133,7 @@ def test_keyword_argument():
     def keyword_function(argument_of_keyword_function):
         return 3 * argument_of_keyword_function
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
         subfuncs=[first_function, keyword_function],
         func_dependencies=["first_argument", "one_keyword_argument"],
@@ -161,7 +161,7 @@ def test_kwargs():
     def second_function(argument_of_second_function):
         return 3 * argument_of_second_function
 
-    composed = gr.function_composer.function_compose_simple(
+    composed = gr.function_compose_simple(
         func=external,
         subfuncs=[first_function, second_function],
         func_dependencies=["first_argument", "second_argument"],
