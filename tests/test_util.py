@@ -95,9 +95,9 @@ def test_execution_not_inplace_does_not_change_context():
     assert current_context == new_context
 
 
-def test_execution_of_all_graph():
+def test_execution_to_sinks():
     """
-    Test the execution of all nodes in a graph. TODO correct.
+    Test the execution of a graph towards all its sinks.
     """
     g = gr.Graph()
     gr.add_step(g, "c", "f_c", "a", "b")
@@ -106,7 +106,7 @@ def test_execution_of_all_graph():
     g["f_f"] = lambda d, e: d * e
     gr.finalize_definition(g)
 
-    # No target means that everything is a target
+    # No target means that all sinks are targets
     res = gr.execute_graph_from_context(g, {"a": 1, "b": 2, "d": 3, "e": 4})
     assert res["c"] == 3
     assert res["f"] == 12

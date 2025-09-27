@@ -9,7 +9,8 @@ import grapes as gr
 
 def test_add_step():
     """
-    Test adding steps in a graph."""
+    Test adding steps in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "a")
     gr.add_step(g, "b")
