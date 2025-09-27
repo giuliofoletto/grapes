@@ -6,6 +6,7 @@ on:
       - '*'
 
 # Ensure the workflow can create releases
+  workflow_dispatch:
 permissions:
   contents: write
 
@@ -34,7 +35,7 @@ jobs:
 
       - name: Create GitHub release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           release_name: ${{ github.ref_name }}
@@ -102,3 +103,5 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
         run: twine upload dist-files/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
