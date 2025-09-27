@@ -1,8 +1,5 @@
 """
-Tools that allow the visualization of a graph using graphviz. Requires pygraphviz.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tools that allow the visualization of a graph using graphviz and pygraphviz.
 """
 
 import io
@@ -29,29 +26,29 @@ def get_graphviz_digraph(
     **attrs,
 ):
     """
-    Create a Graphviz AGraph from a grapes graph.
+    Create a pygraphviz AGraph from a grapes graph.
 
     Parameters
     ----------
     graph : grapes Graph
         The graph to visualize.
     hide_recipes : bool, optional
-        If True, recipe nodes are hidden (default: False).
+        If True, recipe nodes are hidden. Default is False.
     pretty_names : bool, optional
-        If True, node labels are prettified (default: False).
+        If True, node labels are prettified. Default is False.
     include_values : bool, optional
-        If True, node values are included in labels (default: False).
+        If True, node values are included in labels. Default is False.
     color_mode : str, optional
-        Coloring mode for nodes ("none", "by_generation", "sources_and_sinks").
+        Coloring mode for nodes ("none", "by_generation", "sources_and_sinks", default is "none").
     colormap : str, optional
-        Name of matplotlib colormap to use (default: "viridis").
+        Name of matplotlib colormap to use. Default is "viridis".
     **attrs
         Additional attributes for the AGraph.
 
     Returns
     -------
     pygraphviz.AGraph
-        The constructed Graphviz AGraph.
+        The constructed pygraphviz AGraph.
     """
     # Get a graphviz AGraph
     g = nx.drawing.nx_agraph.to_agraph(graph._nxdg)
@@ -145,7 +142,7 @@ def get_graphviz_digraph(
 
 def write_string(graphviz_graph):
     """
-    Get the string representation of a graphviz AGraph.
+    Get the string representation of a pygraphviz AGraph.
 
     Parameters
     ----------
@@ -162,7 +159,7 @@ def write_string(graphviz_graph):
 
 def write_dotfile(graphviz_graph, filename):
     """
-    Write a graphviz AGraph to a dot file.
+    Write a pygraphviz AGraph to a dot file.
 
     Parameters
     ----------
@@ -176,7 +173,7 @@ def write_dotfile(graphviz_graph, filename):
 
 def draw_to_screen(graphviz_graph, format="png", prog="dot"):
     """
-    Draw a graphviz AGraph to an image and display it using matplotlib.
+    Draw a pygraphviz AGraph to an image and display it using matplotlib.
 
     Parameters
     ----------
@@ -199,7 +196,7 @@ def draw_to_screen(graphviz_graph, format="png", prog="dot"):
 
 def draw_to_file(graphviz_graph, filename, format="pdf", prog="dot"):
     """
-    Draw a graphviz AGraph to a file.
+    Draw a pygraphviz AGraph to a file.
 
     Parameters
     ----------
@@ -281,7 +278,7 @@ def best_text_from_background_color(r, g, b, a=1.0):
     b : float
         Blue color channel in [0, 1].
     a : float, optional
-        Alpha color channel in [0, 1] (default: 1.0). This value is ignored.
+        Alpha color channel in [0, 1]. Default is 1.0. This value is ignored.
 
     Returns
     -------

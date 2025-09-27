@@ -1,8 +1,5 @@
 """
-Functions to operate the reachability of targets from valued nodes.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions to manipulate the reachability status of targets from valued nodes.
 """
 
 from .features import (
@@ -25,7 +22,7 @@ def get_has_reachability(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -44,7 +41,7 @@ def set_has_reachability(graph, node, has_reachability):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     has_reachability : bool
         Whether the node has a reachability value.
@@ -61,7 +58,7 @@ def get_reachability(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -90,7 +87,7 @@ def set_reachability(graph, node, reachability):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     reachability : str
         The reachability value ("unreachable", "uncertain", or "reachable").
@@ -114,7 +111,7 @@ def unset_reachability(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     """
     set_node_attribute(graph, node, "has_reachability", False)
@@ -128,7 +125,7 @@ def clear_reachabilities(graph, *args):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    *args : str
+    *args : hashable (typically string)
         Node names to clear. If empty, all nodes are cleared.
     """
     if len(args) == 0:  # Interpret as "Clear everything"
@@ -150,7 +147,7 @@ def compute_reachability_target(graph, target):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    target : str
+    target : hashable (typically string)
         The name of the target node.
 
     Raises
@@ -178,7 +175,7 @@ def compute_reachability_standard(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the standard node.
     """
     # Check if it already has a reachability
@@ -207,7 +204,7 @@ def compute_reachability_conditional(graph, conditional):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    conditional : str
+    conditional : hashable (typically string)
         The name of the conditional node.
     """
     # Check if it already has a reachability
@@ -284,7 +281,7 @@ def compute_reachability_targets(graph, *targets):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    *targets : str
+    *targets : hashables (typically strings)
         Node names to check reachability for.
     """
     for target in targets:
@@ -299,7 +296,7 @@ def get_worst_reachability(graph, *nodes):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    *nodes : str
+    *nodes : hashables (typically strings)
         Node names to check.
 
     Returns
@@ -326,7 +323,7 @@ def get_best_reachability(graph, *nodes):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    *nodes : str
+    *nodes : hashables (typically strings)
         Node names to check.
 
     Returns

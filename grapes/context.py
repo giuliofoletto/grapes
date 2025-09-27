@@ -1,8 +1,5 @@
 """
-Functions that manipulate the context of the graph.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions that manipulate the context of the graph, i.e., the values assigned to its nodes.
 """
 
 import inspect
@@ -19,12 +16,12 @@ from .features import (
 
 def clear_values(graph, *args):
     """
-    Clear values in the graph nodes.
+    Clear (i.e. erase) values in the graph nodes.
 
     Parameters
     ----------
-    graph : Graph
-        The graph whose values are to be cleared
+    graph : grapes Graph
+        The graph whose values are to be cleared.
     *args : hashables (typically strings)
         Names of nodes whose values are to be cleared. If no names are given, all values are cleared.
 
@@ -45,14 +42,18 @@ def clear_values(graph, *args):
 
 def update_internal_context(graph, dictionary):
     """
-    Update internal context with a dictionary.
+    Update the internal context with a dictionary.
 
     Parameters
     ----------
-    graph : Graph
-        The graph to update
+    graph : grapes Graph
+        The graph to update.
     dictionary : dict
-        Dictionary with the new values
+        Dictionary with the new values. Keys are node names, values are the values to assign to those nodes.
+
+    Notes
+    -----
+    Only keys that are already nodes in the graph are considered.
     """
     for key, value in dictionary.items():
         # Accept dictionaries with more keys than needed
@@ -66,10 +67,15 @@ def set_internal_context(graph, dictionary):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to update
+    graph : grapes Graph
+        The graph to update.
     dictionary : dict
-        Dictionary with the new values
+        Dictionary with the new values.
+
+    Notes
+    -----
+    Only keys that are already nodes in the graph are considered.
+    Frozen nodes are not cleared.
     """
     clear_values(graph)
     update_internal_context(graph, dictionary)
@@ -81,10 +87,15 @@ def get_internal_context(graph, exclude_recipes=False):
 
     Parameters
     ----------
-    graph : Graph
-        The graph whose context is to be retrieved
+    graph : grapes Graph
+        The graph whose context is to be retrieved.
     exclude_recipes : bool
         Whether to exclude recipes from the returned dictionary or keep them, default: False.
+
+    Returns
+    -------
+    dict
+        Dictionary with the current values of the graph nodes.
     """
     if exclude_recipes:
         return {
@@ -106,15 +117,15 @@ def get_list_of_values(graph, list_of_keys):
 
     Parameters
     ----------
-    graph : Graph
-        The graph from which to get the values
+    graph : grapes Graph
+        The graph from which to get the values.
     list_of_keys : list of hashables (typically strings)
-        List of names of nodes whose values are required
+        List of names of nodes whose values are required.
 
     Returns
     -------
     list
-        List like list_of_keys which contains values of nodes
+        List like list_of_keys which contains values of nodes.
     """
     res = []
     for key in list_of_keys:
@@ -128,15 +139,15 @@ def get_dict_of_values(graph, list_of_keys):
 
     Parameters
     ----------
-    graph : Graph
-        The graph from which to get the values
+    graph : grapes Graph
+        The graph from which to get the values.
     list_of_keys : list of hashables (typically strings)
-        List of names of nodes whose values are required
+        List of names of nodes whose values are required.
 
     Returns
     -------
     dict
-        Dictionary whose keys are the elements of list_of_keys and whose values are the corresponding node values
+        Dictionary whose keys are the elements of list_of_keys and whose values are the corresponding node values.
     """
     return {key: get_value(graph, key) for key in list_of_keys}
 
@@ -147,15 +158,15 @@ def get_kwargs_values(graph, dictionary):
 
     Parameters
     ----------
-    graph : Graph
-        The graph from which to get the values
+    graph : grapes Graph
+        The graph from which to get the values.
     dictionary : dict
-        Keys in dictionary are to be interpreted as keys for function kwargs, while values in dictionary are node names
+        Dictionary whose keys are to be interpreted as keys for function kwargs, while values in dictionary are node names.
 
     Returns
     -------
     dict
-        A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes
+        A dict with the same keys of the input dictionary, but with values replaced by the values of the nodes.
     """
     return {key: get_value(graph, value) for key, value in dictionary.items()}
 
@@ -166,10 +177,10 @@ def update_recipes_from_module(graph, module):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to update
+    graph : grapes Graph
+        The graph to update.
     module : module
-        Module from which to load the functions
+        Module from which to load the functions.
 
     Notes
     -----

@@ -1,8 +1,5 @@
 """
-Functions to simplify the graph, reducing the number of nodes or converting conditional to standard nodes.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions to simplify the graph, reducing the number of nodes or converting conditional to standard nodes.
 """
 
 import networkx as nx
@@ -32,15 +29,15 @@ from .features import (
 def simplify_dependency(graph, node_name, dependency_name):
     """
     Simplify a dependency of a node by merging its computation into that of the node.
-    For example if the graph is a->b->c and we simplify b as a dependency of c, the graph becomes a->c, with c now computing what b used to compute as well.
+    For example if the graph g is a->b->c and we simplify b as a dependency of c (calling simplify_dependency(g, c, b)), the graph becomes a->c, with c now computing what b used to compute as well.
 
     Parameters
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    node_name : str
+    node_name : hashable (typically string)
         The name of the node that will include in its computation that of the dependency.
-    dependency_name : str
+    dependency_name : hashable (typically string)
         The name of the dependency to eliminate and merge into the node.
 
     Raises
@@ -119,10 +116,10 @@ def simplify_all_dependencies(graph, node_name, exclude=set()):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    node_name : str
+    node_name : hashable (typically string)
         The name of the node to simplify.
     exclude : set or iterable, optional
-        Dependencies to exclude from simplification (default: empty set).
+        Dependencies to exclude from simplification. Default is empty set.
     """
     if not isinstance(exclude, set):
         exclude = set(exclude)
@@ -146,10 +143,10 @@ def convert_conditional_to_trivial_step(
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    conditional : str
+    conditional : hashable (typically string)
         The name of the conditional node to be converted.
     execute_towards_conditions : bool, optional
-        Whether to execute the graph towards the conditions until one is found true (default: False).
+        Whether to execute the graph towards the conditions until one is found true. Default is False.
 
     Raises
     ------
@@ -211,7 +208,7 @@ def convert_all_conditionals_to_trivial_steps(graph, execute_towards_conditions=
     graph : grapes Graph
         The graph containing the nodes.
     execute_towards_conditions : bool, optional
-        Whether to execute the graph towards the conditions until one is found true (default: False).
+        Whether to execute the graph towards the conditions until one is found true. Default is False.
     """
     conditionals = get_all_conditionals(graph)
     for conditional in conditionals:

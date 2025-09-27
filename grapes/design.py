@@ -1,8 +1,5 @@
 """
-Functions to design the graph and get its features.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions to design the graph.
 """
 
 import inspect
@@ -45,16 +42,21 @@ def add_step(graph, name, recipe=None, *args, **kwargs):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to which to add the step
+    graph : grapes Graph
+        The graph to which the step is to be added.
     name : hashable (typically string)
-        Name of the node to add
+        Name of the node to add.
     recipe : hashable (typically string), optional
         Name of the recipe node to add, if any. Default is None.
     *args : hashables (typically strings)
-        Names of nodes to add as positional dependencies
+        Names of nodes to add as positional dependencies.
     **kwargs : hashables (typically strings)
         Names of nodes to add as keyword dependencies. Keys in the dicts are the keywords to be used when calling the recipe.
+
+    Raises
+    ------
+    ValueError
+        If a node with dependencies is added without a recipe.
     """
     # Check that if a node has dependencies, it also has a recipe
     if recipe is None and (len(args) > 0 or len(kwargs.keys()) > 0):
@@ -110,12 +112,23 @@ def add_step_quick(graph, name, recipe):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to which to add the step
+    graph : grapes Graph
+        The graph to which to add the step.
     name : hashable (typically string)
-        Name of the node to add
+        Name of the node to add.
     recipe : function
-        Function to be used as recipe
+        Function to be used as recipe.
+
+    Raises
+    ------
+    TypeError
+        If the passed recipe is not a function.
+    ValueError
+        If the passed function has varargs or varkwargs, which are not supported.
+
+    Notes
+    -----
+    If the function is unnamed (i.e. a lambda), it is automatically renamed to "recipe_for_" + name.
     """
     # Check that the passed recipe is a valid function
     if not inspect.isfunction(recipe):
@@ -151,16 +164,17 @@ def add_simple_conditional(graph, name, condition, value_true, value_false):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to which to add the conditional
+    graph : grapes Graph
+        The graph to which to add the conditional.
     name : hashable (typically string)
-        Name of the conditional node to add
+        Name of the conditional node to add.
     condition : hashable (typically string)
-        Name of the condition node to add
+        Name of the condition node to add.
+        The condition node controls which of the possibility nodes passes its value to the conditional.
     value_true : hashable (typically string)
-        Name of the node to add as possibility if the condition is true
+        Name of the node to add as possibility if the condition is true.
     value_false : hashable (typically string)
-        Name of the node to add as possibility if the condition is false
+        Name of the node to add as possibility if the condition is false.
     """
     add_multiple_conditional(
         graph, name, conditions=[condition], possibilities=[value_true, value_false]
@@ -174,14 +188,14 @@ def add_multiple_conditional(graph, name, conditions, possibilities):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to which to add the conditional
+    graph : grapes Graph
+        The graph to which to add the conditional.
     name : hashable (typically string)
-        Name of the conditional node to add
+        Name of the conditional node to add.
     conditions : list of hashables (typically strings)
-        Names of the condition nodes to add
+        Names of the condition nodes to add.
     possibilities : list of hashables (typically strings)
-        Names of the nodes to add as possibilities
+        Names of the nodes to add as possibilities.
     """
     # Add all nodes and connect all edges
     # Avoid adding existing node so as not to overwrite attributes
@@ -209,16 +223,21 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to which to add the step
+    graph : grapes Graph
+        The graph to which to add the step.
     name : hashable (typically string)
-        Name of the node to edit
+        Name of the node to edit.
     recipe : hashable (typically string), optional
         Name of the recipe node to add, if any. Default is None.
     *args : hashables (typically strings)
-        Names of nodes to add as positional dependencies
+        Names of nodes to add as positional dependencies.
     **kwargs : hashables (typically strings)
         Names of nodes to add as keyword dependencies. Keys in the dicts are the keywords to be used when calling the recipe.
+
+    Raises
+    ------
+    ValueError
+        If the node does not exist.
     """
     if name not in graph.nodes:
         raise ValueError("Cannot edit non-existent node " + name)
@@ -248,19 +267,19 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
 
 def remove_step(graph, name):
     """
-    Interface to remove an existing node, without changing anything else
+    Interface to remove an existing node, without changing anything else.
 
     Parameters
     ----------
-    graph : Graph
-        The graph from which to remove the step
+    graph : grapes Graph
+        The graph from which to remove the step.
     name : hashable (typically string)
-        Name of the node to remove
+        Name of the node to remove.
 
     Raises
     ------
     KeyError
-        If the node does not exist
+        If the node does not exist.
     """
     if name not in graph.nodes:
         raise KeyError("Cannot edit non-existent node " + name)
@@ -276,8 +295,8 @@ def finalize_definition(graph):
 
     Parameters
     ----------
-    graph : Graph
-        The graph to finalize
+    graph : grapes Graph
+        The graph to finalize.
     """
     make_recipe_dependencies_also_recipes(graph)
     compute_topological_generation_indexes(graph)

@@ -1,8 +1,5 @@
 """
-Functions that manipulate the features of the graph.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions that manipulate the features of the nodes.
 """
 
 import networkx as nx
@@ -16,7 +13,7 @@ def get_node_attribute(graph, node, attribute):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     attribute : str
         The attribute to retrieve.
@@ -46,7 +43,7 @@ def set_node_attribute(graph, node, attribute, value):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     attribute : str
         The attribute to set.
@@ -64,7 +61,7 @@ def get_value(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -93,7 +90,7 @@ def set_value(graph, node, value):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     value : Any
         The value to assign.
@@ -111,7 +108,7 @@ def unset_value(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     """
     # Note: This changes reachability
@@ -126,7 +123,7 @@ def get_has_value(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -145,7 +142,7 @@ def set_has_value(graph, node, has_value):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     has_value : bool
         Whether the node has a value.
@@ -161,7 +158,7 @@ def get_type(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -180,7 +177,7 @@ def set_type(graph, node, type):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     type : str
         The type to assign.
@@ -196,7 +193,7 @@ def get_is_recipe(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -215,7 +212,7 @@ def set_is_recipe(graph, node, is_recipe):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     is_recipe : bool
         Whether the node is a recipe.
@@ -231,12 +228,12 @@ def get_recipe(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
     -------
-    str
+    hashable (typically string)
         The name of the node that acts as recipe for the passed node.
     """
     return get_node_attribute(graph, node, "recipe")
@@ -250,9 +247,9 @@ def set_recipe(graph, node, recipe):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
-    recipe : str
+    recipe : hashable (typically string)
         The name of the node that will act as recipe.
     """
     return set_node_attribute(graph, node, "recipe", recipe)
@@ -266,7 +263,7 @@ def get_args(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -285,7 +282,7 @@ def set_args(graph, node, args):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     args : list
         List of argument names.
@@ -301,7 +298,7 @@ def get_kwargs(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -320,7 +317,7 @@ def set_kwargs(graph, node, kwargs):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     kwargs : dict
         Dictionary of keyword argument names and node names.
@@ -336,7 +333,7 @@ def get_conditions(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -358,7 +355,7 @@ def set_conditions(graph, node, conditions):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     conditions : list
         List of condition node names.
@@ -376,7 +373,7 @@ def get_possibilities(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -398,7 +395,7 @@ def set_possibilities(graph, node, possibilities):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     possibilities : list
         List of possible outcome node names.
@@ -416,7 +413,7 @@ def get_is_frozen(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -435,7 +432,7 @@ def set_is_frozen(graph, node, is_frozen):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     is_frozen : bool
         Whether the node is frozen.
@@ -451,7 +448,7 @@ def freeze(graph, *args):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    *args : str
+    *args : hashables (typically strings)
         Node names to freeze. If empty, all nodes are frozen.
     """
     if len(args) == 0:  # Interpret as "Freeze everything"
@@ -472,7 +469,7 @@ def unfreeze(graph, *args):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    *args : str
+    *args : hashables (typically strings)
         Node names to unfreeze. If empty, all nodes are unfrozen.
     """
     if len(args) == 0:  # Interpret as "Unfreeze everything"
@@ -516,7 +513,7 @@ def get_topological_generation_index(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
 
     Returns
@@ -535,7 +532,7 @@ def set_topological_generation_index(graph, node, index):
     ----------
     graph : grapes Graph
         The graph containing the node.
-    node : str
+    node : hashable (typically string)
         The name of the node.
     index : int
         The generation index to assign.
@@ -603,7 +600,7 @@ def get_all_nodes(graph, exclude_recipes=False):
     graph : grapes Graph
         The graph containing the nodes.
     exclude_recipes : bool, optional
-        If True, exclude recipe nodes (default is False).
+        If True, exclude recipe nodes. Default is False.
 
     Returns
     -------
@@ -627,7 +624,7 @@ def get_all_sources(graph, exclude_recipes=False):
     graph : grapes Graph
         The graph containing the nodes.
     exclude_recipes : bool, optional
-        If True, exclude recipe nodes (default is False).
+        If True, exclude recipe nodes. Default is False.
 
     Returns
     -------
@@ -652,7 +649,7 @@ def get_all_sinks(graph, exclude_recipes=False):
     graph : grapes Graph
         The graph containing the nodes.
     exclude_recipes : bool, optional
-        If True, exclude recipe nodes (default is False).
+        If True, exclude recipe nodes. Default is False.
 
     Returns
     -------

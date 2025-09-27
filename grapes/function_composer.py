@@ -1,8 +1,5 @@
 """
-Some tools to compose functions into one.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains some tools to compose functions into one.
 """
 
 import inspect
@@ -33,13 +30,18 @@ def function_compose(
     subfuncs : list of callables
         List of internal functions to be composed with func. If identity_token is passed here, it is replaced by the value of the argument.
     func_dependencies : list of hashables
-        Names of the arguments of func (usually they should correspond to node names in a graph)
+        Names of the arguments of func (usually they should correspond to node names in a graph).
     subfuncs_dependencies : list of lists of hashables
-        Names of the arguments that are passed to the subfuncs when calling the new function (usually they should correspond to node names in a graph)
+        Names of the arguments that are passed to the subfuncs when calling the new function (usually they should correspond to node names in a graph).
     func_signature : list of hashables
-        Names of the arguments of the old func
+        Names of the arguments of the old func.
     subfuncs_signatures : list of lists of hashables
-        Names of the arguments of the old subfuncs
+        Names of the arguments of the old subfuncs.
+
+    Returns
+    -------
+    callable
+        A new function that represents the composition of func and subfuncs.
     """
     return lambda **kwargs: func(
         **{
@@ -74,17 +76,27 @@ def function_compose_simple(
     Parameters
     ----------
     func : callable
-        External function
+        External function.
     subfuncs : list of callables
-        List of internal functions to be composed with func
+        List of internal functions to be composed with func.
     func_dependencies : list of hashables
-        Names of the arguments of the new function (usually they should correspond to node names in a graph)
+        Names of the arguments of the new function (usually they should correspond to node names in a graph).
     subfuncs_dependencies : list of lists of hashables
-        Names of the arguments that are passed to the subfuncs when calling the new function (usually they should correspond to node names in a graph)
+        Names of the arguments that are passed to the subfuncs when calling the new function (usually they should correspond to node names in a graph).
     func_signature : list of hashables
-        Names of the arguments of the old func
+        Names of the arguments of the old func.
     subfuncs_signatures : list of lists of hashables
-        Names of the arguments of the old subfuncs
+        Names of the arguments of the old subfuncs.
+
+    Returns
+    -------
+    callable
+        A new function that represents the composition of func and subfuncs.
+
+    Raises
+    ------
+    ValueError
+        If func or any of the subfuncs have varargs, as they cannot be handled automatically.
     """
     if func_signature is None:
         if inspect.getfullargspec(func).varargs is not None:

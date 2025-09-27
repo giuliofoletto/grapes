@@ -1,8 +1,6 @@
 """
-Functions to evaluate the content of a graph, calling its recipes.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions to evaluate the graph, i.e. call the recipes or assign conditionals to compute values of nodes.
+Usually, it is unnecessary to call these functions directly, as the more convenient interface is in the `util` module.
 """
 
 from .context import get_kwargs_values, get_list_of_values
@@ -27,15 +25,19 @@ def evaluate_target(graph, target, continue_on_fail=False):
     ----------
     graph : grapes Graph
         The graph containing the node to evaluate.
-    target : str
+    target : hashable (typically string)
         The name of the node to evaluate.
     continue_on_fail : bool, optional
-        If True, continue evaluation even if an error occurs (default is False).
+        If True, continue evaluation even if an error occurs. Default is False.
 
     Raises
     ------
     ValueError
-        If the node type is not supported or evaluation fails and continue_on_fail is False.
+        If the node type is not supported.
+
+    Notes
+    -----
+    If continue_on_fail is False, any error during evaluation will raise an exception.
     """
     if get_type(graph, target) == "standard":
         return evaluate_standard(graph, target, continue_on_fail)
@@ -57,10 +59,10 @@ def evaluate_standard(graph, node, continue_on_fail=False):
     ----------
     graph : grapes Graph
         The graph containing the node to evaluate.
-    node : str
+    node : hashable (typically string)
         The name of the standard node to evaluate.
     continue_on_fail : bool, optional
-        If True, continue evaluation even if an error occurs (default is False).
+        If True, continue evaluation even if an error occurs. Default is False.
 
     Raises
     ------
@@ -105,10 +107,10 @@ def evaluate_conditional(graph, conditional, continue_on_fail=False):
     ----------
     graph : grapes Graph
         The graph containing the conditional node.
-    conditional : str
+    conditional : hashable (typically string)
         The name of the conditional node to evaluate.
     continue_on_fail : bool, optional
-        If True, continue evaluation even if an error occurs (default is False).
+        If True, continue evaluation even if an error occurs. Default is False.
 
     Raises
     ------
@@ -163,8 +165,8 @@ def execute_to_targets(graph, *targets):
     ----------
     graph : grapes Graph
         The graph containing the nodes to evaluate.
-    *targets : str
-        One or more target node names to evaluate.
+    *targets : hashables (typically strings)
+        Names of one or more target nodes to evaluate.
     """
     for target in targets:
         evaluate_target(graph, target, False)
@@ -178,8 +180,8 @@ def progress_towards_targets(graph, *targets):
     ----------
     graph : grapes Graph
         The graph containing the nodes to evaluate.
-    *targets : str
-        One or more target node names to evaluate.
+    *targets : hashables (typically strings)
+        Names of one or more target nodes to evaluate.
     """
     for target in targets:
         evaluate_target(graph, target, True)
@@ -193,8 +195,8 @@ def execute_towards_conditions(graph, *conditions):
     ----------
     graph : grapes Graph
         The graph containing the conditions.
-    *conditions : str
-        One or more condition node names to evaluate.
+    *conditions : hashables (typically strings)
+        Names of one or more (condition) nodes to evaluate.
     """
     for condition in conditions:
         evaluate_target(graph, condition, True)
@@ -210,7 +212,7 @@ def execute_towards_all_conditions_of_conditional(graph, conditional):
     ----------
     graph : grapes Graph
         The graph containing the conditional node.
-    conditional : str
+    conditional : hashable (typically string)
         The name of the conditional node whose conditions are to be evaluated.
     """
     execute_towards_conditions(graph, *get_conditions(graph, conditional))

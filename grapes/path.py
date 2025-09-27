@@ -1,8 +1,5 @@
 """
-Functions to get the path needed to reach a target from valued nodes
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions to get the path needed to reach a target from valued nodes.
 """
 
 from .features import (
@@ -22,7 +19,7 @@ def get_path_to_target(graph, target):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    target : str
+    target : hashable (typically string)
         The name of the target node.
 
     Returns
@@ -55,7 +52,7 @@ def get_path_to_standard(graph, node):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    node : str
+    node : hashable (typically string)
         The name of the standard node.
 
     Returns
@@ -80,7 +77,7 @@ def get_path_to_conditional(graph, conditional):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    conditional : str
+    conditional : hashable (typically string)
         The name of the conditional node.
 
     Returns

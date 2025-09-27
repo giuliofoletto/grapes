@@ -1,9 +1,6 @@
 """
-Utility functions for grapes.
-These are the main functions that an user (not designer) would use to interact with a grapes graph.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains utility functions for grapes.
+These are the main functions that an user (not designer) should use to interact with a grapes graph.
 """
 
 import copy
@@ -62,7 +59,7 @@ def execute_graph_from_context(
         Graph of the computation.
     context : dict
         Dictionary of the initial context of the computation (input).
-    targets : strings (or names of nodes in the graph)
+    targets : hashables (typically strings)
         Indicator of what to compute (desired output).
     inplace : bool
         Whether to modify graph and context inplace (default: False).
@@ -145,6 +142,7 @@ def context_from_json_file(file_name):
         Path to the json file.
 
     Returns
+    -------
     dict
         Content of the file as dictionary.
     """
@@ -163,6 +161,7 @@ def context_from_toml_file(file_name):
         Path to the toml file.
 
     Returns
+    -------
     dict
         Content of the file as dictionary.
     """
@@ -181,6 +180,7 @@ def context_from_file(file_name):
         Path to the file.
 
     Returns
+    -------
     dict
         Content of the file as dictionary.
     """
@@ -206,18 +206,18 @@ def wrap_graph_with_function(
     graph, input_keys, *targets, constants={}, input_as_kwargs=True, output_as_dict=True
 ):
     """
-    Wrap a graph into a function that can be called with the desired inputs and returns the desired outputs.
+    Wrap a the execution of a graph into a function that can be called with the desired inputs and returns the desired outputs.
 
     Parameters
     ----------
     graph : grapes Graph
         Graph of the computation.
-    input_keys : list or set of strings
+    input_keys : hashables (typically strings)
         Keys in the graph that will be treated as inputs of the function.
-    targets : strings (or names of nodes in the graph)
+    targets : hashables (typically strings)
         Keys in the graph that will be treated as outputs of the function.
     constants : dict
-        Keys and values that are assigned to the graph before the function creation and are present when the function is called, default: {}. If a key is both in constants and input_keys, it is treated as input (i.e., the value in constants is ignored).
+        Keys and values that are assigned to the graph before the function creation and are present when the function is called, default is empty set. If a key is both in constants and input_keys, it is treated as input (i.e., the value in constants is ignored).
     input_as_kwargs : bool
         Whether the input of the function is a set of keyword arguments (True) or a list (False), default: True.
     output_as_dict : bool
@@ -329,6 +329,7 @@ def wrap_graph_with_function(
 def lambdify_graph(graph, input_keys, target, constants={}):
     """
     Convert a graph into a function that can be called with the desired inputs and returns the desired output.
+    This function is independent from the rest of grapes, and does not require any other grapes function to work.
 
     Parameters
     ----------
@@ -395,7 +396,7 @@ def check_feasibility_of_execution(graph, context, *targets, inplace=False):
         Graph of the computation.
     context : dict
         Dictionary of the initial context of the computation (input).
-    targets : strings (or names of nodes in the graph)
+    targets : hashables (typically strings)
         Indicator of what to compute (desired output).
     inplace : bool
         Whether to modify graph and context inplace (default: False).
@@ -441,7 +442,7 @@ def get_execution_subgraph(graph, context, *targets):
         Graph of the computation.
     context : dict
         Dictionary of the initial context of the computation (input).
-    targets : strings (or names of nodes in the graph)
+    targets : hashables (typically strings)
         Indicator of what to compute (desired output).
 
     Returns

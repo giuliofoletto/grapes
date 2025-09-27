@@ -1,8 +1,6 @@
 """
-Core of the grapes package. Includes the Graph class.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module is the core of the grapes package.
+It contains the Graph class.
 """
 
 import networkx as nx
@@ -34,58 +32,58 @@ class Graph:
 
     def __getitem__(self, node):
         """
-        Get the value of a node with []
+        Get the value of a node with [].
 
         Parameters
         ----------
         node : hashable (typically string)
-            Name of the node whose value is to be retrieved
+            Name of the node whose value is to be retrieved.
 
         Returns
         -------
         value : any
-            Value of the node
+            Value of the node.
 
         Raises
         ------
         ValueError
-            If the node has no value
+            If the node has no value.
         KeyError
-            If the node does not exist
+            If the node does not exist.
         """
         return get_value(self, node)
 
     def __setitem__(self, node, value):
         """
-        Set the value of a node with []
+        Set the value of a node with [].
 
         Parameters
         ----------
         node : hashable (typically string)
-            Name of the node whose value is to be set
+            Name of the node whose value is to be set.
         value : any
-            Value to set
+            Value to set.
 
         Raises
         ------
         KeyError
-            If the node does not exist
+            If the node does not exist.
         """
         set_value(self, node, value)
 
     def __eq__(self, other):
         """
-        Equality check based on all members.
+        Equality check between graphs based on all members.
 
         Parameters
         ----------
         other : Graph
-            Graph to compare with
+            Graph to compare with.
 
         Returns
         -------
         bool
-            True if the graphs are equal, False otherwise
+            True if the graphs are equal, False otherwise.
 
         Notes
         -----

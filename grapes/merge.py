@@ -1,8 +1,5 @@
 """
-Functions to merge, split and verify the compatibility of graphs.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains functions to merge, split and verify the compatibility of graphs.
 """
 
 import copy
@@ -24,11 +21,11 @@ def check_compatibility_nodes(first_graph, first_node, second_graph, second_node
     ----------
     first_graph : grapes Graph
         The first graph containing the node.
-    first_node : str
+    first_node : hashable (typically string)
         The name of the node in the first graph.
     second_graph : grapes Graph
         The second graph containing the node.
-    second_node : str
+    second_node : hashable (typically string)
         The name of the node in the second graph.
 
     Returns
@@ -148,7 +145,7 @@ def merge(*graphs):
     Raises
     ------
     ValueError
-        If fewer than two graphs are provided.
+        If fewer than two graphs are provided or if any pair of graphs are not compatible.
     """
     if len(graphs) < 2:
         raise ValueError("At least two graphs are required to merge")
@@ -166,7 +163,7 @@ def get_subgraph(graph, nodes):
     ----------
     graph : grapes Graph
         The original graph.
-    nodes : list or set of str
+    nodes : list or set of hashables (typically strings)
         The node names to include in the subgraph.
 
     Returns
