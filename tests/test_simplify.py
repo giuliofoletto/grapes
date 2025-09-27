@@ -1,8 +1,5 @@
 """
-Tests of simplification functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of simplification functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_simplify_dependency():
+    """
+    Test simplifying a dependency of a node in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -33,6 +33,9 @@ def test_simplify_dependency():
 
 
 def test_simplify_all_dependencies():
+    """
+    Test simplifying all dependencies of a node in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -56,7 +59,7 @@ def test_simplify_all_dependencies():
 
 def test_convert_conditional_to_trivial_step():
     """
-    Convert conditional to a trivial step since its condition c2 already has true value.
+    Test converting a conditional to a trivial step since its condition c2 already has true value.
     """
     g = gr.Graph()
     gr.add_multiple_conditional(
@@ -75,7 +78,7 @@ def test_convert_conditional_to_trivial_step():
 
 def test_convert_conditional_to_trivial_step_with_evaluation():
     """
-    Convert conditional to a trivial step but compute the conditions.
+    Test converting a conditional to a trivial step but compute the conditions.
     """
     g = gr.Graph()
     gr.add_step(g, "v2", "identity_recipe", "pre_v2")
@@ -99,7 +102,7 @@ def test_convert_conditional_to_trivial_step_with_evaluation():
 
 def test_convert_conditional_to_trivial_step_with_default():
     """
-    Convert conditional to a trivial step, computing conditions, but use default value since no condition is true.
+    Test converting a conditional to a trivial step, computing conditions, but use default value since no condition is true.
     """
     g = gr.Graph()
     gr.add_step(g, "default", "identity_recipe", "pre_default")
@@ -121,7 +124,7 @@ def test_convert_conditional_to_trivial_step_with_default():
 
 def test_convert_conditional_to_trivial_step_without_true_values():
     """
-    Try to convert conditional to trivial step but no conditions can be evaluated to true.
+    Test converting a conditional to trivial step but no conditions can be evaluated to true.
     """
     g = gr.Graph()
     gr.add_step(g, "v2", "identity_recipe", "pre_v2")
@@ -142,7 +145,7 @@ def test_convert_conditional_to_trivial_step_without_true_values():
 
 def test_convert_all_conditionals_to_trivial_steps():
     """
-    Convert all conditionals to trivial steps.
+    Test converting all conditionals to trivial steps.
     """
     g = gr.Graph()
     gr.add_simple_conditional(g, "conditional1", "c1", "vt", "vf")
@@ -164,7 +167,7 @@ def test_convert_all_conditionals_to_trivial_steps():
 
 def test_convert_all_conditionals_to_trivial_steps_with_evaluation():
     """
-    Convert all conditionals to trivial steps, computing the conditions.
+    Test converting all conditionals to trivial steps, computing the conditions.
     """
     g = gr.Graph()
     gr.add_multiple_conditional(

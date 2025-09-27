@@ -1,8 +1,5 @@
 """
-Tests of merge functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of merge functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_check_compatibility():
+    """
+    Test checking compatibility of two simple graphs.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     h = gr.Graph()
@@ -19,6 +19,9 @@ def test_check_compatibility():
 
 
 def test_check_compatibility_incompatible():
+    """
+    Test checking compatibility of two simple graphs which are incompatible.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     h = gr.Graph()
@@ -27,6 +30,9 @@ def test_check_compatibility_incompatible():
 
 
 def test_merge_two():
+    """
+    Test merging two simple graphs.
+    """
     exp = gr.Graph()
     gr.add_step(exp, "c", "op_c", "a", "b")
     gr.add_step(exp, "e", "op_e", "c", "d")
@@ -43,6 +49,9 @@ def test_merge_two():
 
 
 def test_merge_multi():
+    """
+    Test merging multiple simple graphs.
+    """
     exp = gr.Graph()
     gr.add_step(exp, "c", "op_c", "a", "b")
     gr.add_step(exp, "e", "op_e", "c", "d")
@@ -62,6 +71,9 @@ def test_merge_multi():
 
 
 def test_merge_and_execute():
+    """
+    Test merging two simple graphs and executing to a target.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     h = gr.Graph()
@@ -85,6 +97,9 @@ def test_merge_and_execute():
 
 
 def test_merge_and_execute_with_value():
+    """
+    Test merging two simple graphs where one provides a value for a node in the other, and executing to a target.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.update_internal_context(
@@ -111,6 +126,9 @@ def test_merge_and_execute_with_value():
 
 
 def test_get_subgraph():
+    """
+    Test getting a subgraph from a graph and executing it.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")

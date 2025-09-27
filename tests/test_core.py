@@ -1,8 +1,5 @@
 """
-Tests of core functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of core functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_get_set():
+    """
+    Test getting and setting values in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     g["a"] = 1
@@ -22,6 +22,9 @@ def test_get_set():
 
 
 def test_equality():
+    """
+    Test equality and inequality of simple graphs with various nuances.
+    """
     g1 = gr.Graph()
     gr.add_step(g1, "c", "op_c", "a", "b")
     g2 = gr.Graph()

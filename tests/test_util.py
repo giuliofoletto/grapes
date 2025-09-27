@@ -1,8 +1,5 @@
 """
-Tests of utilities.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of utilities.
 """
 
 import warnings
@@ -15,6 +12,9 @@ data_directory = "tests/data"
 
 
 def test_simple_execution():
+    """
+    Test the simple execution of a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "a")
     gr.add_step(g, "b")
@@ -45,6 +45,9 @@ def test_simple_execution():
 
 
 def test_execution_more_targets():
+    """
+    Test the execution of a graph to multiple targets.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "f", "op_f", "d", "e")
@@ -59,6 +62,9 @@ def test_execution_more_targets():
 
 
 def test_execution_inplace():
+    """
+    Test the inplace execution of a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     g["op_c"] = lambda a, b: a + b
@@ -72,6 +78,9 @@ def test_execution_inplace():
 
 
 def test_execution_not_inplace_does_not_change_context():
+    """
+    Test that executing a graph not inplace does not change its context.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     g["op_c"] = lambda a, b: a + b
@@ -87,6 +96,9 @@ def test_execution_not_inplace_does_not_change_context():
 
 
 def test_execution_of_all_graph():
+    """
+    Test the execution of all nodes in a graph. TODO correct.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "f_c", "a", "b")
     gr.add_step(g, "f", "f_f", "d", "e")
@@ -101,6 +113,9 @@ def test_execution_of_all_graph():
 
 
 def test_execution_with_feasibility_check():
+    """
+    Test the execution of a graph with feasibility check.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "fb", "a")
     g["fb"] = lambda a: a
@@ -123,6 +138,9 @@ def test_execution_with_feasibility_check():
 
 
 def test_execution_with_feasibility_check_uncertain():
+    """
+    Test the execution of a graph with feasibility check, where reachability is uncertain.
+    """
     g = gr.Graph()
     gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
     gr.add_step_quick(g, "condition", lambda pre_req: pre_req)
@@ -145,6 +163,9 @@ def test_execution_with_feasibility_check_uncertain():
 
 
 def test_json_from_graph():
+    """
+    Test generating a JSON string from a graph's context.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     g["a"] = 1
@@ -159,6 +180,9 @@ def test_json_from_graph():
 
 
 def test_context_from_json_file():
+    """
+    Test generating a context from a JSON file.
+    """
     file_name = data_directory + "/example.json"
     context = gr.context_from_json_file(file_name)
     expected_context = {"a": 1, "b": 2, "c": "hello"}
@@ -167,6 +191,9 @@ def test_context_from_json_file():
 
 
 def test_context_from_toml_file():
+    """
+    Test generating a context from a TOML file.
+    """
     file_name = data_directory + "/example.toml"
     context = gr.context_from_toml_file(file_name)
     expected_context = {"a": 1, "b": 2, "c": "hello"}
@@ -175,6 +202,9 @@ def test_context_from_toml_file():
 
 
 def test_context_from_file():
+    """
+    Test generating a context from a file, in any of the supported formats.
+    """
     expected_context = {"a": 1, "b": 2, "c": "hello"}
 
     file_name = data_directory + "/example.json"
@@ -187,6 +217,9 @@ def test_context_from_file():
 
 
 def test_wrap_with_function_input_as_kwargs_output_as_dict():
+    """
+    Test wrapping a graph with a function, using kwargs as input and dict as output.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -219,6 +252,9 @@ def test_wrap_with_function_input_as_kwargs_output_as_dict():
 
 
 def test_wrap_with_function_input_as_kwargs_output_as_list():
+    """
+    Test wrapping a graph with a function, using kwargs as input and list as output.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -251,6 +287,9 @@ def test_wrap_with_function_input_as_kwargs_output_as_list():
 
 
 def test_wrap_with_function_input_as_args_output_as_dict():
+    """
+    Test wrapping a graph with a function, using args as input and dict as output.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -283,6 +322,9 @@ def test_wrap_with_function_input_as_args_output_as_dict():
 
 
 def test_wrap_with_function_input_as_args_output_as_list():
+    """
+    Test wrapping a graph with a function, using args as input and list as output.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -315,6 +357,9 @@ def test_wrap_with_function_input_as_args_output_as_list():
 
 
 def test_lambdify():
+    """
+    Test lambdifying a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -334,6 +379,9 @@ def test_lambdify():
 
 
 def test_lambdify_with_constants():
+    """
+    Test lambdifying a graph with some constants passed at the moment of lambdification.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -353,6 +401,9 @@ def test_lambdify_with_constants():
 
 
 def test_unfeasible_wrap():
+    """
+    Test that wrapping a graph with a function raises an error if the inputs are not sufficient to compute the outputs.
+    """
     g = gr.Graph()
     gr.add_step(g, "d", "op_d", "a", "b", "c")
     g["op_d"] = lambda a, b, c: a + b + c
@@ -371,6 +422,9 @@ def test_unfeasible_wrap():
 
 
 def test_get_execution_subgraph():
+    """
+    Test getting an execution subgraph from a graph with a conditional, and executing it.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")

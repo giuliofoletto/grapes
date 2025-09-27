@@ -1,8 +1,5 @@
 """
-Tests of reachability functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of reachability functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_reachability_simple():
+    """
+    Test computing th reachability of nodes in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "fb", "a")
     g["fb"] = lambda a: a
@@ -26,6 +26,9 @@ def test_reachability_simple():
 
 
 def test_reachability_long_graph():
+    """
+    Test computing the reachability of nodes in a linear graph.
+    """
     g = gr.Graph()
     gr.add_step_quick(g, "c", lambda b: b)
     gr.add_step_quick(g, "b", lambda a: a)
@@ -41,6 +44,9 @@ def test_reachability_long_graph():
 
 
 def test_reachability_conditional_with_true_value():
+    """
+    Test computing the reachability of a simple conditional node where the condition is True and the corresponding value is either unavailable or available.
+    """
     g = gr.Graph()
     gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
     g["condition"] = True
@@ -56,6 +62,9 @@ def test_reachability_conditional_with_true_value():
 
 
 def test_reachability_multiple_conditional_with_true_value():
+    """
+    Test computing the reachability of a simple multiple conditional node where one condition is True and the corresponding value is either unavailable or available.
+    """
     g = gr.Graph()
     gr.add_multiple_conditional(g, "name", ["ca", "cb"], ["a", "b", "c"])
     g["ca"] = True
@@ -71,6 +80,9 @@ def test_reachability_multiple_conditional_with_true_value():
 
 
 def test_conditional_no_conditions_defined():
+    """
+    Test computing the reachability of a simple conditional node where no conditions are defined and the corresponding values are either unavailable or available.
+    """
     g = gr.Graph()
     gr.add_simple_conditional(g, "name", "condition", "value_true", "value_false")
     gr.add_step_quick(g, "condition", lambda pre_req: pre_req)
@@ -100,6 +112,9 @@ def test_conditional_no_conditions_defined():
 
 
 def test_multiple_conditional_no_conditions_defined():
+    """
+    Test computing the reachability of a multiple conditional node where no conditions are defined and the corresponding values are either unavailable or available.
+    """
     g = gr.Graph()
     gr.add_multiple_conditional(g, "name", ["ca", "cb"], ["va", "vb", "vc"])
     gr.add_step_quick(g, "ca", lambda pa: pa)

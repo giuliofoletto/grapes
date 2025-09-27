@@ -1,8 +1,5 @@
 """
-Tests of features functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of features functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_freeze():
+    """
+    Test freezing nodes in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -27,6 +27,9 @@ def test_freeze():
 
 
 def test_unfreeze():
+    """
+    Test unfreezing nodes in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -42,6 +45,9 @@ def test_unfreeze():
 
 
 def test_get_topological_generation_index():
+    """
+    Test getting the topological generation index of nodes in a graph (without computing it).
+    """
     g = gr.Graph()
     gr.add_step(g, "d", "fd", "b", "c")
     gr.add_step(g, "b", "fb", "a")
@@ -56,6 +62,9 @@ def test_get_topological_generation_index():
 
 
 def test_get_all_nodes():
+    """
+    Test getting set of all nodes in the graph, optionally excluding recipes.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "e", "op_e", "d")
@@ -77,6 +86,9 @@ def test_get_all_nodes():
 
 
 def test_get_all_sources():
+    """
+    Test getting set of all source nodes in the graph, optionally excluding recipes.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "e", "op_e", "d")
@@ -95,6 +107,9 @@ def test_get_all_sources():
 
 
 def test_get_all_sinks():
+    """
+    Test getting set of all sink nodes in the graph, optionally excluding recipes.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "e", "op_e", "d")
@@ -107,7 +122,7 @@ def test_get_all_sinks():
 
 def test_get_all_conditionals():
     """
-    Get set of all conditionals in the graph.
+    Test getting set of all conditionals in the graph.
     """
     g = gr.Graph()
     gr.add_simple_conditional(g, "conditional1", "c1", "vt", "vf")
@@ -118,6 +133,9 @@ def test_get_all_conditionals():
 
 
 def test_get_all_ancestors_target():
+    """
+    Test getting all ancestors of a target node in the graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -150,6 +168,9 @@ def test_get_all_ancestors_target():
 
 
 def test_make_recipe_dependencies_also_recipes():
+    """
+    Test making recipe dependencies also recipes in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "a", "op_a", "b")
     gr.add_step(
@@ -166,6 +187,9 @@ def test_make_recipe_dependencies_also_recipes():
 
 
 def test_get_all_recipes():
+    """
+    Test getting set of all recipes in the graph, including those converted when calling finalize_definition.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "e", "op_e", "d")

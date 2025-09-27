@@ -1,8 +1,5 @@
 """
-Tests of context functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of context functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_set_internal_context():
+    """
+    Test setting the internal context of a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -25,6 +25,9 @@ def test_set_internal_context():
 
 
 def test_get_internal_context():
+    """
+    Test getting the internal context of a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -37,6 +40,9 @@ def test_get_internal_context():
 
 
 def test_update_internal_context():
+    """
+    Test setting and then updating the internal context of a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -54,6 +60,9 @@ def test_update_internal_context():
 
 
 def test_clear_values():
+    """
+    Test clearing values in a graph, verifying also behavior with frozen values.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -73,6 +82,9 @@ def test_clear_values():
 
 
 def test_get_list_of_values():
+    """
+    Test getting a list of values from a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -85,6 +97,9 @@ def test_get_list_of_values():
 
 
 def test_get_dict_of_values():
+    """
+    Test getting a dictionary of values from a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -97,6 +112,9 @@ def test_get_dict_of_values():
 
 
 def test_get_kwargs_values():
+    """
+    Test getting kwargs values from a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", exponent="b")
     gr.finalize_definition(g)
@@ -106,6 +124,9 @@ def test_get_kwargs_values():
 
 
 def test_update_recipes_from_module():
+    """
+    Test updating recipes from a module in a graph, verifying also proper execution.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", "b")
     gr.add_step(g, "d", "op_d", "c")

@@ -1,8 +1,5 @@
 """
-Tests of design functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of design functionality.
 """
 
 import pytest
@@ -11,6 +8,8 @@ import grapes as gr
 
 
 def test_add_step():
+    """
+    Test adding steps in a graph."""
     g = gr.Graph()
     gr.add_step(g, "a")
     gr.add_step(g, "b")
@@ -37,6 +36,9 @@ def test_add_step():
 
 
 def test_add_step_disordered():
+    """
+    Test adding steps in a graph, without first adding simple nodes.
+    """
     g = gr.Graph()
     gr.add_step(g, "e", "op_e", "a", "b")
     gr.add_step(g, "f", "op_f", "c", "d")
@@ -56,7 +58,10 @@ def test_add_step_disordered():
 
 
 def test_add_step_inverted():
-    # Typically, we proceed from bottom to top
+    """
+    Test adding steps in a graph, in order opposite to execution.
+    """
+    # Typically, we proceed in the order of execution
     # Here we test the opposite
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "b")
@@ -74,6 +79,10 @@ def test_add_step_inverted():
 
 
 def test_add_step_quick():
+    """
+    Test adding steps with the quick function, which infers arguments from the function signature.
+    """
+
     def example_function_only_positional(a, b):
         return a**b
 
@@ -111,6 +120,9 @@ def test_add_step_quick():
 
 
 def test_add_simple_conditional():
+    """
+    Test adding a simple conditional node in a graph.
+    """
     g = gr.Graph()
     gr.add_simple_conditional(g, "d", "c", "a", "b")
     gr.finalize_definition(g)
@@ -123,6 +135,9 @@ def test_add_simple_conditional():
 
 
 def test_add_multiple_conditional():
+    """
+    Test adding a conditional node with multiple conditions in a graph.
+    """
     g = gr.Graph()
     gr.add_multiple_conditional(
         g,
@@ -152,6 +167,9 @@ def test_add_multiple_conditional():
 
 
 def test_edit_step():
+    """
+    Test editing a step in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -171,6 +189,9 @@ def test_edit_step():
 
 
 def test_remove_step():
+    """
+    Test removing a step in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")
@@ -184,6 +205,9 @@ def test_remove_step():
 
 
 def test_finalize_definition():
+    """
+    Test finalizing the definition of a graph, checking properties like frozen status and topological indices.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "c", "op_c", "b")

@@ -1,6 +1,6 @@
 """
-Easy example of usage of grapes to compute properties of an ideal gas.
-Described in detail in USAGE.md.
+This module shows an easy example of usage of grapes to compute properties of an ideal gas.
+Described in detail in the documentation.
 """
 
 import grapes as gr

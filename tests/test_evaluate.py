@@ -1,8 +1,5 @@
 """
-Tests of evaluation functionality.
-
-Author: Giulio Foletto <giulio.foletto@outlook.com>.
-License: See project-level license file.
+This module contains tests of evaluation functionality.
 """
 
 import pytest
@@ -11,6 +8,9 @@ import grapes as gr
 
 
 def test_execute_to_targets():
+    """
+    Test executing to targets in a graph.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", exponent="b")
 
@@ -26,6 +26,10 @@ def test_execute_to_targets():
 
 
 def test_execute_to_targets_with_conditional():
+    """
+    Test executing to targets in a graph with a conditional node.
+    The conditional node should evaluate only the first true condition.
+    """
     g = gr.Graph()
     gr.add_step(g, "c1", "identity_recipe", "pre_c1")
     gr.add_step(g, "c2", "identity_recipe", "pre_c2")
@@ -53,6 +57,9 @@ def test_execute_to_targets_with_conditional():
 
 
 def test_execute_to_targets_with_kwargs():
+    """
+    Test executing to targets in a graph with keyword arguments.
+    """
     g = gr.Graph()
     gr.add_step(g, "c", "op_c", "a", exponent="b")
     gr.finalize_definition(g)
@@ -67,6 +74,9 @@ def test_execute_to_targets_with_kwargs():
 
 
 def test_progress_towards_targets():
+    """
+    Test progressing towards targets in a graph, continuing on failure.
+    """
     g = gr.Graph()
     gr.add_step(g, "b", "op_b", "a")
     gr.add_step(g, "f", "op_f", "b", "c", "e")
@@ -90,7 +100,7 @@ def test_progress_towards_targets():
 
 def test_execute_towards_conditions():
     """
-    Execute towards the conditions of conditional by computing c2.
+    Test the evaluation towards the conditions of conditional by computing c2.
     """
     g = gr.Graph()
     gr.add_step(g, "c2", "identity_recipe", "pre_c2")
@@ -110,7 +120,7 @@ def test_execute_towards_conditions():
 
 def test_execute_towards_all_conditions_of_conditional():
     """
-    Execute towards the conditions of conditional by computing c2 (the conditional is passed instead of the conditions).
+    Test the evaluation towards the conditions of conditional by computing c2 (the conditional is passed instead of the conditions).
     """
     g = gr.Graph()
     gr.add_step(g, "c2", "identity_recipe", "pre_c2")

@@ -1,4 +1,9 @@
+"""
+This module shows an easy example of usage of grapes which is used in the quick start section of the README.
+"""
+
 import grapes as gr
+
 
 g = gr.Graph()
 gr.add_step(g, "b", "compute_b", "a")
