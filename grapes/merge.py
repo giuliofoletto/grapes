@@ -128,14 +128,18 @@ def merge_two(first, second):
     return Graph(nx_digraph=res)
 
 
-def merge(*graphs):
+def merge(first, second, *others):
     """
     Merge any number (>=2) of graphs into a single graph.
 
     Parameters
     ----------
-    *graphs : grapes Graph
-        Two or more graphs to merge.
+    first : grapes Graph
+        The first graph.
+    second : grapes Graph
+        The second graph.
+    *others : grapes Graph
+        Any other graphs to merge.
 
     Returns
     -------
@@ -145,14 +149,12 @@ def merge(*graphs):
     Raises
     ------
     ValueError
-        If fewer than two graphs are provided or if any pair of graphs are not compatible.
+        If any pair of graphs are not compatible.
     """
-    if len(graphs) < 2:
-        raise ValueError("At least two graphs are required to merge")
-    elif len(graphs) == 2:
-        return merge_two(graphs[0], graphs[1])
+    if len(others) == 0:
+        return merge_two(first, second)
     else:
-        return merge(merge_two(graphs[0], graphs[1]), *graphs[2:])
+        return merge(merge_two(first, second), *others)
 
 
 def get_subgraph(graph, nodes):

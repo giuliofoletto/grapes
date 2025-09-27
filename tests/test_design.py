@@ -167,6 +167,20 @@ def test_add_multiple_conditional():
     assert gr.get_possibilities(g, "result") == ["node_1", "node_2", "node_3"]
 
 
+def test_add_multiple_conditional_mismatched_lengths():
+    """
+    Test adding a conditional node with the wrong number of conditions or possibilities.
+    """
+    g = gr.Graph()
+    with pytest.raises(ValueError):
+        gr.add_multiple_conditional(
+            g,
+            "result",
+            ["condition_1", "condition_2", "condition_3"],
+            ["node_1", "node_2"],
+        )
+
+
 def test_edit_step():
     """
     Test editing a step in a graph.
@@ -187,6 +201,9 @@ def test_edit_step():
 
     assert gr.get_args(g, "b") == ("a", "d")
     assert gr.get_recipe(g, "b") == "new_op_b"
+
+    with pytest.raises(KeyError):
+        gr.edit_step(g, "non_existent_node", "op_x", "y")
 
 
 def test_remove_step():

@@ -68,7 +68,7 @@ def get_reachability(graph, node):
 
     Raises
     ------
-    ValueError
+    KeyError
         If the node does not have a reachability value.
     """
     if get_node_attribute(
@@ -76,7 +76,7 @@ def get_reachability(graph, node):
     ) is not None and get_node_attribute(graph, node, "has_reachability"):
         return get_node_attribute(graph, node, "reachability")
     else:
-        raise ValueError("Node " + node + " has no reachability")
+        raise KeyError("Node " + node + " has no reachability")
 
 
 def set_reachability(graph, node, reachability):

@@ -196,7 +196,19 @@ def add_multiple_conditional(graph, name, conditions, possibilities):
         Names of the condition nodes to add.
     possibilities : list of hashables (typically strings)
         Names of the nodes to add as possibilities.
+
+    Raises
+    ------
+    ValueError
+        If the number of possibilities is not equal to the number of conditions or to the number of conditions plus one (to allow for a default possibility).
     """
+    if (
+        len(possibilities) != len(conditions)
+        and len(possibilities) != len(conditions) + 1
+    ):
+        raise ValueError(
+            "The number of possibilities must be equal to the number of conditions or to the number of conditions plus one (to allow for a default possibility)"
+        )
     # Add all nodes and connect all edges
     # Avoid adding existing node so as not to overwrite attributes
     if name not in graph.nodes:
@@ -236,11 +248,11 @@ def edit_step(graph, name, recipe=None, *args, **kwargs):
 
     Raises
     ------
-    ValueError
+    KeyError
         If the node does not exist.
     """
     if name not in graph.nodes:
-        raise ValueError("Cannot edit non-existent node " + name)
+        raise KeyError("Cannot edit non-existent node " + name)
 
     # Store old attributes
     was_recipe = get_is_recipe(graph, name)
