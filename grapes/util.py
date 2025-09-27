@@ -263,7 +263,7 @@ def wrap_graph_with_function(
 
     if input_as_kwargs and output_as_dict:
 
-        def specific_function(**kwargs):
+        def specific_function_input_as_kwargs_output_as_dict(**kwargs):
             # Use for loop rather than dict comprehension because it is a more basic operation
             for key in input_keys:
                 operational_graph[key] = kwargs[key]
@@ -276,9 +276,11 @@ def wrap_graph_with_function(
             else:
                 return dict_of_values
 
+        return specific_function_input_as_kwargs_output_as_dict
+
     elif input_as_kwargs and not output_as_dict:
 
-        def specific_function(**kwargs):
+        def specific_function_input_as_kwargs_output_as_list(**kwargs):
             # Use for loop rather than dict comprehension because it is a more basic operation
             for key in input_keys:
                 operational_graph[key] = kwargs[key]
@@ -290,11 +292,13 @@ def wrap_graph_with_function(
                 return list_of_values[0]
             else:
                 return list_of_values
+
+        return specific_function_input_as_kwargs_output_as_list
 
     elif not input_as_kwargs and output_as_dict:
         input_keys = list(input_keys)
 
-        def specific_function(*args):
+        def specific_function_input_as_args_output_as_dict(*args):
             # Use for loop rather than dict comprehension because it is a more basic operation
             for i in range(len(input_keys)):
                 operational_graph[input_keys[i]] = args[i]
@@ -307,10 +311,12 @@ def wrap_graph_with_function(
             else:
                 return dict_of_values
 
+        return specific_function_input_as_args_output_as_dict
+
     else:  # not input_as_kwargs and not output_as_dict
         input_keys = list(input_keys)
 
-        def specific_function(*args):
+        def specific_function_input_as_args_output_as_list(*args):
             # Use for loop rather than dict comprehension because it is a more basic operation
             for i in range(len(input_keys)):
                 operational_graph[input_keys[i]] = args[i]
@@ -323,7 +329,7 @@ def wrap_graph_with_function(
             else:
                 return list_of_values
 
-    return specific_function
+        return specific_function_input_as_args_output_as_list
 
 
 def lambdify_graph(graph, input_keys, target, constants={}):

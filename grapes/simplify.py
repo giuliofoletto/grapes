@@ -26,7 +26,7 @@ from .features import (
 )
 
 
-def simplify_dependency(graph, node_name, dependency_name):
+def simplify_dependency(graph, node, dependency):
     """
     Simplify a dependency of a node by merging its computation into that of the node.
     For example if the graph g is a->b->c and we simplify b as a dependency of c (calling simplify_dependency(g, c, b)), the graph becomes a->c, with c now computing what b used to compute as well.
@@ -35,9 +35,9 @@ def simplify_dependency(graph, node_name, dependency_name):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    node_name : hashable (typically string)
+    node : hashable (typically string)
         The name of the node that will include in its computation that of the dependency.
-    dependency_name : hashable (typically string)
+    dependency : hashable (typically string)
         The name of the dependency to eliminate and merge into the node.
 
     Raises
@@ -46,69 +46,67 @@ def simplify_dependency(graph, node_name, dependency_name):
         If the dependency or its recipe is not a standard node.
     """
     # Make everything a keyword argument. This is the fate of a simplified node
-    get_kwargs(graph, node_name).update(
-        {argument: argument for argument in get_args(graph, node_name)}
+    get_kwargs(graph, node).update(
+        {argument: argument for argument in get_args(graph, node)}
     )
     # Build lists of dependencies
-    func_dependencies = list(get_kwargs(graph, node_name).values())
+    func_dependencies = list(get_kwargs(graph, node).values())
     subfuncs = []
     subfuncs_dependencies = []
-    for argument in get_kwargs(graph, node_name):
-        if argument == dependency_name:
-            if get_type(graph, dependency_name) != "standard":
+    for argument in get_kwargs(graph, node):
+        if argument == dependency:
+            if get_type(graph, dependency) != "standard":
                 raise TypeError(
                     "Simplification only supports standard nodes, while the type of "
-                    + dependency_name
+                    + dependency
                     + " is "
-                    + get_type(graph, dependency_name)
+                    + get_type(graph, dependency)
                 )
-            if get_type(graph, get_recipe(graph, dependency_name)) != "standard":
+            if get_type(graph, get_recipe(graph, dependency)) != "standard":
                 raise TypeError(
                     "Simplification only supports standard nodes, while the type of "
-                    + get_recipe(graph, dependency_name)
+                    + get_recipe(graph, dependency)
                     + " is "
-                    + get_type(graph, get_recipe(graph, dependency_name))
+                    + get_type(graph, get_recipe(graph, dependency))
                 )
-            subfuncs.append(
-                graph[get_recipe(graph, dependency_name)]
-            )  # Get python function
+            subfuncs.append(graph[get_recipe(graph, dependency)])  # Get python function
             subfuncs_dependencies.append(
-                list(get_args(graph, dependency_name))
-                + list(get_kwargs(graph, dependency_name).values())
+                list(get_args(graph, dependency))
+                + list(get_kwargs(graph, dependency).values())
             )
         else:
             subfuncs.append(function_composer.identity_token)
             subfuncs_dependencies.append([argument])
     # Compose the functions
-    graph[get_recipe(graph, node_name)] = function_composer.function_compose_simple(
-        graph[get_recipe(graph, node_name)],
+    graph[get_recipe(graph, node)] = function_composer.function_compose_simple(
+        graph[get_recipe(graph, node)],
         subfuncs,
         func_dependencies,
         subfuncs_dependencies,
     )
     # Change edges
-    graph._nxdg.remove_edge(dependency_name, node_name)
-    for argument in get_args(graph, dependency_name) + tuple(
-        get_kwargs(graph, dependency_name).values()
+    graph._nxdg.remove_edge(dependency, node)
+    for argument in get_args(graph, dependency) + tuple(
+        get_kwargs(graph, dependency).values()
     ):
-        graph._nxdg.add_edge(argument, node_name, accessor=argument)
+        graph._nxdg.add_edge(argument, node, accessor=argument)
     # Update node
-    set_args(graph, node_name, ())
-    new_kwargs = get_kwargs(graph, node_name)
+    set_args(graph, node, ())
+    new_kwargs = get_kwargs(graph, node)
     new_kwargs.update(
         {
             argument: argument
-            for argument in get_args(graph, dependency_name)
-            + tuple(get_kwargs(graph, dependency_name).values())
+            for argument in get_args(graph, dependency)
+            + tuple(get_kwargs(graph, dependency).values())
         }
     )
     new_kwargs = {
-        key: value for key, value in new_kwargs.items() if value != dependency_name
+        key: value for key, value in new_kwargs.items() if value != dependency
     }
-    set_kwargs(graph, node_name, new_kwargs)
+    set_kwargs(graph, node, new_kwargs)
 
 
-def simplify_all_dependencies(graph, node_name, exclude=set()):
+def simplify_all_dependencies(graph, node, exclude=set()):
     """
     Simplify all dependencies of a node except those in the exclude set.
 
@@ -116,7 +114,7 @@ def simplify_all_dependencies(graph, node_name, exclude=set()):
     ----------
     graph : grapes Graph
         The graph containing the nodes.
-    node_name : hashable (typically string)
+    node : hashable (typically string)
         The name of the node to simplify.
     exclude : set or iterable, optional
         Dependencies to exclude from simplification. Default is empty set.
@@ -125,12 +123,10 @@ def simplify_all_dependencies(graph, node_name, exclude=set()):
         exclude = set(exclude)
     # If a dependency is a source, it cannot be simplified
     exclude |= get_all_sources(graph)
-    dependencies = get_args(graph, node_name) + tuple(
-        get_kwargs(graph, node_name).values()
-    )
+    dependencies = get_args(graph, node) + tuple(get_kwargs(graph, node).values())
     for dependency in dependencies:
         if dependency not in exclude:
-            simplify_dependency(graph, node_name, dependency)
+            simplify_dependency(graph, node, dependency)
 
 
 def convert_conditional_to_trivial_step(
