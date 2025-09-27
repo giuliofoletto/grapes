@@ -9,6 +9,23 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: custom
+      accent: custom
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      primary: custom
+      accent: custom
+  logo: assets/logo.svg
+  favicon: assets/favicon.ico
+extra_css:
+  - stylesheets/custom.css
 plugins:
   - search
   - mkdocstrings:

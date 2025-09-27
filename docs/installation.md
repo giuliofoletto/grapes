@@ -7,7 +7,7 @@ Install it from there with
 pip install grapes
 ```
 
-This takes care of installing the dependencies as well (listed in [pyproject.toml](pyproject.toml)).
+This takes care of installing the dependencies as well (listed in `pyproject.toml` in the root directory).
 
-Caveat: when pip tries to install the dependency [`pygraphviz`](https://github.com/pygraphviz/pygraphviz), it might fail if you don't have its binary dependencies installed.
-A simple way tho solve this is to first install `pygraphviz` from [conda-forge](https://conda-forge.org/) and then proceed with the installation of `grapes`.
+Caveat: when pip installs the dependency [`pygraphviz`](https://github.com/pygraphviz/pygraphviz), it does not install its binary dependency [`graphviz`](https://graphviz.org).
+You can either install it [manually](https://graphviz.org/download/) or install `pygraphviz` from [conda-forge](https://conda-forge.org/) instead of pip.
