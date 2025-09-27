@@ -1,6 +1,7 @@
 site_name: grapes
 repo_url: https://github.com/giuliofoletto/grapes
 repo_name: giuliofoletto/grapes
+site_url: https://giuliofolettograpes.readthedocs.io
 theme:
   name: material
   features:

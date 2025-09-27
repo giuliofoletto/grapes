@@ -5,7 +5,7 @@ It allows you to organize your computation as a directed acyclic graph.
 
 ## Quickstart
 
-For more complete documentation, please refer to the files in the `docs/` folder.
+For a more detailed explanation, refer to the [documentation](https://giuliofolettograpes.readthedocs.io/).
 Here's what you need to know to get started quickly.
 
 Install `grapes` from PyPI with
