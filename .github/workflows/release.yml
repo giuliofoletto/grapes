@@ -82,8 +82,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           echo "Installing grapes from local distribution files in ./dist"
-          # Install the built wheel/sdist locally; pip will fetch dependencies from PyPI by default
-          python -m pip install dist/*
+          set -e
+          # Prefer wheel if available, otherwise fall back to sdist.
+          wheel=$(ls dist/*.whl 2>/dev/null || true)
+          if [ -n "$wheel" ]; then
+            echo "Found wheel: $wheel"
+            python -m pip install "$wheel"
+          else
+            sdist=$(ls dist/*.tar.gz 2>/dev/null || ls dist/*.zip 2>/dev/null || true)
+            if [ -n "$sdist" ]; then
+              echo "Found sdist: $sdist"
+              python -m pip install "$sdist"
+            else
+              echo "No distribution files found in dist/" >&2
+              exit 1
+            fi
+          fi
 
       - name: Run test suite
         run: pytest -q
