@@ -67,6 +67,10 @@ jobs:
           name: dist-files
           path: dist
 
+      - name: Checkout repository (tests)
+        uses: actions/checkout@v4
+        # Fetch the repository so the tests/ folder is available to the runner
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -100,4 +104,4 @@ jobs:
           fi
 
       - name: Run test suite
-        run: pytest -q
+        run: pytest -q tests/
