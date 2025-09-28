@@ -1,4 +1,4 @@
-name: Create Release on Tag
+name: Test, release, publish to TestPyPI
 
 on:
   push:
@@ -9,7 +9,34 @@ permissions:
   contents: write
 
 jobs:
-  create_release:
+  install-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Install binary dependencies
+        run: sudo apt-get install -y graphviz graphviz-dev
+
+      - name: Install package (local) and use PyPI for deps
+        run: |
+          python -m pip install --upgrade pip
+          echo "Installing grapes from local source code"
+          python -m pip install .
+
+      - name: Run test suite
+        run: pytest -q tests/
+
+  create-release:
+    needs: install-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub release
@@ -24,7 +51,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-testpypi:
-    needs: create_release
+    needs: create-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -56,52 +83,3 @@ jobs:
         run: |
           python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
-  test-installed-package:
-    name: Install from TestPyPI and run tests
-    needs: publish-testpypi
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download dist artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-files
-          path: dist
-
-      - name: Checkout repository (tests)
-        uses: actions/checkout@v4
-        # Fetch the repository so the tests/ folder is available to the runner
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install test runner
-        run: python -m pip install --upgrade pip pytest
-
-      - name: Install binary dependencies
-        run: sudo apt-get install -y graphviz graphviz-dev
-
-      - name: Install package built in previous job (local) and use PyPI for deps
-        run: |
-          python -m pip install --upgrade pip
-          echo "Installing grapes from local distribution files in ./dist"
-          set -e
-          # Prefer wheel if available, otherwise fall back to sdist.
-          wheel=$(ls dist/*.whl 2>/dev/null || true)
-          if [ -n "$wheel" ]; then
-            echo "Found wheel: $wheel"
-            python -m pip install "$wheel"
-          else
-            sdist=$(ls dist/*.tar.gz 2>/dev/null || ls dist/*.zip 2>/dev/null || true)
-            if [ -n "$sdist" ]; then
-              echo "Found sdist: $sdist"
-              python -m pip install "$sdist"
-            else
-              echo "No distribution files found in dist/" >&2
-              exit 1
-            fi
-          fi
-
-      - name: Run test suite
-        run: pytest -q tests/
