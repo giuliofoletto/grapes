@@ -76,7 +76,7 @@ jobs:
         run: python -m pip install --upgrade pip pytest
 
       - name: Install binary dependencies
-        run: sudo apt-get install -y graphviz
+        run: sudo apt-get install -y graphviz graphviz-dev
 
       - name: Install package built in previous job (local) and use PyPI for deps
         run: |
