@@ -49,3 +49,31 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+  test-installed-package:
+    name: Install from TestPyPI and run tests
+    needs: publish-testpypi
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Install binary dependencies
+        run: sudo apt-get install -y graphviz
+
+      - name: Install package from Test PyPI
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # Strip leading 'v' from tag if present to form package version
+          VERSION=${TAG#v}
+          echo "Installing grapes==$VERSION from Test PyPI"
+          python -m pip install --index-url https://test.pypi.org/simple/ --trusted-host test.pypi.org grapes==${VERSION}
+
+      - name: Run test suite
+        run: pytest -q
