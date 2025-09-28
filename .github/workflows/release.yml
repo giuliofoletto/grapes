@@ -24,7 +24,9 @@ jobs:
         run: python -m pip install --upgrade pip pytest
 
       - name: Install binary dependencies
-        run: sudo apt-get install -y graphviz graphviz-dev
+        run: |
+          sudo apt-get remove --purge -y man-db
+          sudo apt-get install -y graphviz graphviz-dev
 
       - name: Install package (local) and use PyPI for deps
         run: |
@@ -69,12 +71,6 @@ jobs:
 
       - name: Build sdist and wheel
         run: python -m build --sdist --wheel
-
-      - name: Upload dist as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-files
-          path: dist
 
       - name: Publish to Test PyPI
         env:
