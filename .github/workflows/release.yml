@@ -1,4 +1,4 @@
-name: Test, release, publish to TestPyPI
+name: Test, release, publish to TestPyPI and PyPI
 
 on:
   push:
@@ -31,7 +31,6 @@ jobs:
       - name: Install package (local) and use PyPI for deps
         run: |
           python -m pip install --upgrade pip
-          echo "Installing grapes from local source code"
           python -m pip install .
 
       - name: Run test suite
