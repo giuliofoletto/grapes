@@ -43,6 +43,12 @@ jobs:
       - name: Build sdist and wheel
         run: python -m build --sdist --wheel
 
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+
       - name: Publish to Test PyPI
         env:
           TWINE_USERNAME: __token__
@@ -55,6 +61,12 @@ jobs:
     needs: publish-testpypi
     runs-on: ubuntu-latest
     steps:
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -66,14 +78,12 @@ jobs:
       - name: Install binary dependencies
         run: sudo apt-get install -y graphviz
 
-      - name: Install package from Test PyPI
-        env:
-          TAG: ${{ github.ref_name }}
+      - name: Install package built in previous job (local) and use PyPI for deps
         run: |
-          # Strip leading 'v' from tag if present to form package version
-          VERSION=${TAG#v}
-          echo "Installing grapes==$VERSION from Test PyPI"
-          python -m pip install --index-url https://test.pypi.org/simple/ --trusted-host test.pypi.org grapes==${VERSION}
+          python -m pip install --upgrade pip
+          echo "Installing grapes from local distribution files in ./dist"
+          # Install the built wheel/sdist locally; pip will fetch dependencies from PyPI by default
+          python -m pip install dist/*
 
       - name: Run test suite
         run: pytest -q

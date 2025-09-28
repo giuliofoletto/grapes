@@ -100,4 +100,4 @@ from .visualize import (
     draw_to_screen,
 )
 
-__version__ = "0.10.4a2"
+__version__ = "0.10.4a3"
