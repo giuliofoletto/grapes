@@ -2,8 +2,9 @@
 This module contains tests of execution performance.
 """
 
-import pytest
 import timeit
+
+import pytest
 
 import grapes as gr
 
@@ -106,21 +107,26 @@ def test_inplace_nocheck_execution():
     ), f"The ratio between graph and function execution time {t_graph/t_func} exceeds accepted ratio {accepted_ratio}"
 
 
-def test_bare_execution():
+def test_bare_execution():  # TODO rework because now the execution happens only once
     """
     Test the performance of execute_to_targets with context already set against direct function execution.
     """
     # Expected ratio of execution time (graph / direct function)
-    expected_ratio = 4
+    expected_ratio = 100
     accepted_ratio = int(expected_ratio * acceptance_margin)
     graph = create_graph()
     gr.update_internal_context(graph, context)
+    gr.freeze(graph)  # To restore the graph to this state
+
+    def run_func():
+        gr.execute_to_targets(graph, "j")
+        gr.clear_values(graph)  # Restore state of graph
 
     n = BASE_NUMBER_EXECUTIONS
     t_func = timeit.timeit(lambda: function(a, b, d, e, g, h), number=n) / n
 
     n = BASE_NUMBER_EXECUTIONS // expected_ratio
-    t_graph = timeit.timeit(lambda: gr.execute_to_targets(graph, "j"), number=n) / n
+    t_graph = timeit.timeit(run_func, number=n) / n
 
     assert (
         t_graph < accepted_ratio * t_func
