@@ -8,7 +8,13 @@ It allows you to organize your computation as a directed acyclic graph.
 For a more detailed explanation, refer to the [documentation](https://giuliofolettograpes.readthedocs.io/).
 Here's what you need to know to get started quickly.
 
-Install `grapes` from PyPI with
+Install `grapes` from conda-forge or PyPI with
+
+```console
+conda install conda-forge::grapes
+```
+
+or
 
 ```console
 pip install grapes

@@ -1,7 +1,13 @@
 # Installation
 
-`grapes` is available on [PyPI](https://pypi.org/project/grapes/).
-Install it from there with
+`grapes` is available on [conda-forge](https://anaconda.org/conda-forge/grapes) and on [PyPI](https://pypi.org/project/grapes/).
+Install it with
+
+```console
+conda install conda-forge::grapes
+```
+
+or
 
 ```console
 pip install grapes
@@ -9,5 +15,5 @@ pip install grapes
 
 This takes care of installing the dependencies as well (listed in `pyproject.toml` in the root directory).
 
-Caveat: when pip installs the dependency [`pygraphviz`](https://github.com/pygraphviz/pygraphviz), it does not install its binary dependency [`graphviz`](https://graphviz.org).
-You can either install it [manually](https://graphviz.org/download/) or install `pygraphviz` from [conda-forge](https://conda-forge.org/) instead of pip.
+Caveat: the automatic installation of the binary dependency [`graphviz`](https://graphviz.org) happens only if you use conda.
+If you want to use pip, you must install it [manually](https://graphviz.org/download/).
